@@ -1,0 +1,54 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Couple {
+  id            String   @id @default(uuid())
+  referenceCode String   @unique
+  users         User[]
+  ideas         Idea[]
+  location      String?  // e.g. "New York, NY" or "London, UK"
+  createdAt     DateTime @default(now())
+}
+
+model User {
+  id                     String   @id @default(uuid())
+  email                  String   @unique
+  name                   String
+  passwordHash           String
+  mustChangePassword     Boolean  @default(true)
+  coupleId               String
+  couple                 Couple   @relation(fields: [coupleId], references: [id])
+  createdIdeas           Idea[]   @relation("CreatedBy")
+  createdAt              DateTime @default(now())
+}
+
+model Idea {
+  id             String   @id @default(uuid())
+  description    String
+  indoor         Boolean // true = indoor, false = outdoor
+  duration       Float // 0.25, 0.5, 0.75, 1.0
+  activityLevel  String // LOW, MEDIUM, HIGH
+  cost           String // FREE, $, $$, $$$
+  timeOfDay      String   @default("ANY") // DAY, EVENING, ANY
+  
+  coupleId       String
+  couple         Couple   @relation(fields: [coupleId], references: [id])
+  
+  createdById    String
+  createdBy      User     @relation("CreatedBy", fields: [createdById], references: [id])
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  selectedAt     DateTime? // If null, it's still in the jar
+  selectedDate   DateTime? // The actual date they went on (optional)
+  rating         Int?      // 1-5 stars
+  notes          String?   // "Best pizza ever!"
+}
