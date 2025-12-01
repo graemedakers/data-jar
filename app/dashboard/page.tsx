@@ -368,6 +368,17 @@ export default function DashboardPage() {
                                             >
                                                 <Copy className="w-3 h-3" />
                                             </button>
+                                            <div className="w-px h-3 bg-slate-700 mx-1" />
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(idea.id);
+                                                }}
+                                                className="p-1 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-red-400"
+                                                title="Delete from History"
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </button>
                                         </div>
 
                                         {idea.rating ? (

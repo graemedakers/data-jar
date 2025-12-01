@@ -20,7 +20,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
             return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
         }
 
-        if (idea.createdById !== session.user.id) {
+        if (idea.coupleId !== session.user.coupleId) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
@@ -56,7 +56,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
         }
 
-        if (idea.createdById !== session.user.id) {
+        if (idea.coupleId !== session.user.coupleId) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
