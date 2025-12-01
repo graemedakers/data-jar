@@ -47,7 +47,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden">
+    <main className="flex min-h-screen flex-col items-center p-4 md:p-6 relative overflow-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -83,7 +83,7 @@ export default function Home() {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20"
+        className="w-full p-4 md:p-6 flex justify-between items-center z-20 relative"
       >
         <div className="flex items-center gap-2">
           <div className="p-2 bg-white/10 rounded-full backdrop-blur-md">
@@ -99,7 +99,7 @@ export default function Home() {
       </motion.header>
 
       {/* Main Content */}
-      <div className="flex flex-col items-center gap-12 z-10 w-full max-w-md">
+      <div className="flex-1 flex flex-col items-center justify-center gap-8 md:gap-12 z-10 w-full max-w-md md:mt-0">
         <div className="text-center space-y-2">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -123,6 +123,7 @@ export default function Home() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.6, type: "spring" }}
+          className="scale-90 md:scale-100"
         >
           <Jar3D />
         </motion.div>

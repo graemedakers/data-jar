@@ -172,7 +172,7 @@ export default function DashboardPage() {
     const availableIdeasCount = ideas.filter(i => !i.selectedAt).length;
 
     return (
-        <main className="min-h-screen p-6 pb-24 relative overflow-hidden">
+        <main className="min-h-screen p-4 md:p-6 pb-24 relative overflow-hidden">
             <PremiumModal
                 isOpen={isPremiumModalOpen} // Force open if not premium
                 onClose={() => setIsPremiumModalOpen(false)} // No-op, cannot close
@@ -228,12 +228,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Header */}
-            <header className="flex justify-between items-center mb-8">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 md:gap-0">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Your Jar</h1>
                     <p className="text-slate-400 text-sm">Manage your date ideas</p>
                 </div>
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center w-full md:w-auto justify-between md:justify-end">
                     {/* Invite Code Badge */}
                     <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
                         <span className="text-xs text-slate-400">Invite Code:</span>
@@ -242,19 +242,22 @@ export default function DashboardPage() {
                             <InviteCodeDisplay />
                         </span>
                     </div>
-                    <Button variant="ghost" size="sm" className="!p-2" onClick={() => setIsSettingsModalOpen(true)}>
-                        <Settings className="w-5 h-5" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="!p-2" onClick={handleLogout}>
-                        <LogOut className="w-5 h-5" />
-                    </Button>
+
+                    {/* Mobile Invite Code Button (Icon only) */}
+                    <div className="md:hidden">
+                        <InviteCodeDisplay mobile />
+                    </div>
+
+                    <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" className="!p-2" onClick={() => setIsSettingsModalOpen(true)}>
+                            <Settings className="w-5 h-5" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="!p-2" onClick={handleLogout}>
+                            <LogOut className="w-5 h-5" />
+                        </Button>
+                    </div>
                 </div>
             </header>
-
-            {/* Mobile Invite Code (visible only on small screens) */}
-            <div className="md:hidden mb-6 flex justify-center">
-                <InviteCodeDisplay mobile />
-            </div>
 
             {/* Stats / Jar Preview */}
             <div className="flex flex-col items-center justify-center py-8 mb-8">
@@ -317,7 +320,7 @@ export default function DashboardPage() {
                             <p className="text-slate-400 text-center py-4 text-sm">No ideas in the jar. Add some!</p>
                         ) : (
                             ideas.filter(i => !i.selectedAt).map((idea) => (
-                                <div key={idea.id} className={`glass p-4 rounded-xl flex items-center justify-between group transition-colors ${idea.isMasked ? 'opacity-75 bg-white/5' : 'hover:bg-white/5'}`}>
+                                <div key={idea.id} className={`glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 group transition-colors ${idea.isMasked ? 'opacity-75 bg-white/5' : 'hover:bg-white/5'}`}>
                                     <div>
                                         <div className="flex items-center gap-2">
                                             {idea.isMasked && <Lock className="w-3 h-3 text-slate-400" />}
@@ -327,20 +330,20 @@ export default function DashboardPage() {
                                             {idea.indoor ? 'Indoor' : 'Outdoor'} • {idea.duration}h • {idea.cost} • {idea.timeOfDay === 'ANY' ? 'Anytime' : idea.timeOfDay === 'DAY' ? 'Day' : 'Evening'}
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
                                         <div className={`w-2 h-2 rounded-full ${idea.activityLevel === 'HIGH' ? 'bg-red-400' : idea.activityLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-green-400'}`} />
                                         {!idea.isMasked && (
                                             <>
                                                 <button
                                                     onClick={() => setEditingIdea(idea)}
-                                                    className="p-1.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                                                    className="p-1.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
                                                     title="Edit Idea"
                                                 >
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(idea.id)}
-                                                    className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                                                    className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
                                                     title="Delete Idea"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -365,14 +368,14 @@ export default function DashboardPage() {
                         </h3>
                         <div className="space-y-3">
                             {ideas.filter(i => i.selectedAt).map((idea) => (
-                                <div key={idea.id} className="glass p-4 rounded-xl flex items-center justify-between opacity-75 hover:opacity-100 transition-opacity">
+                                <div key={idea.id} className="glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 opacity-75 hover:opacity-100 transition-opacity">
                                     <div>
                                         <p className="text-white font-medium line-through text-slate-400">{idea.description}</p>
                                         <p className="text-xs text-slate-500 mt-1">
                                             Selected on {new Date(idea.selectedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
                                         </p>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2">
+                                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 w-full sm:w-auto">
                                         <div className="text-xs text-secondary font-medium px-2 py-1 bg-secondary/10 rounded-md flex items-center gap-2">
                                             <span>Completed</span>
                                             <button
