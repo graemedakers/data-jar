@@ -13,7 +13,7 @@
 - Focus on the 3D Jar animation spinning slowly.
 
 **Voiceover:**
-"Are you and your partner tired of asking, 'What do you want to do tonight?' only to hear 'I don't know' back? Meet **Date Jar**, the fun, interactive way to decide on your next date night."
+"Are you and your partner tired of asking, 'What do you want to do tonight?' only to hear 'I don't know' back? Meet **Date Jar**, the fun, interactive way to decide on your next date."
 
 ---
 
@@ -57,7 +57,7 @@ Running low on inspiration? Hit the **'Surprise Me'** button to let our AI sugge
 - Click **"Accept Date"**.
 
 **Voiceover:**
-"When date night comes, just spin the jar! You can even add filters if you're on a budget or want to stay indoors. The jar picks a random idea from your collection. No more indecision!"
+"When it's time for your next date, just spin the jar! You can even add filters if you're on a budget or want to stay indoors. The jar picks a random idea from your collection. No more indecision!"
 
 ---
 

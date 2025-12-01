@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { UserStatus } from "@/components/UserStatus";
+import { HelpButton } from "@/components/HelpButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Date Jar | Pick Your Next Date",
-  description: "A fun way for couples to decide on their next date night.",
+  description: "A fun way for couples to decide on their next date.",
 };
 
 export default function RootLayout({
@@ -31,6 +32,7 @@ export default function RootLayout({
       >
         {children}
         <UserStatus />
+        <HelpButton />
       </body>
     </html>
   );
