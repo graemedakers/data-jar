@@ -3,7 +3,7 @@ import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+
 
 const COST_VALUES: Record<string, number> = { 'FREE': 0, '$': 1, '$$': 2, '$$$': 3 };
 const ACTIVITY_VALUES: Record<string, number> = { 'LOW': 0, 'MEDIUM': 1, 'HIGH': 2 };
@@ -96,6 +96,7 @@ export async function POST(request: Request) {
                     const recipients = [userEmail];
                     if (partner) recipients.push(partner.email);
 
+                    const resend = new Resend(process.env.RESEND_API_KEY);
                     await resend.emails.send({
                         from: 'Date Jar <onboarding@resend.dev>',
                         to: recipients,
