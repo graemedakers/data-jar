@@ -15,6 +15,16 @@ model Couple {
   ideas         Idea[]
   location      String?  // e.g. "New York, NY" or "London, UK"
   createdAt     DateTime @default(now())
+  deletedLogs   DeletedLog[]
+}
+
+model DeletedLog {
+  id          String   @id @default(uuid())
+  coupleId    String
+  couple      Couple   @relation(fields: [coupleId], references: [id])
+  description String
+  deletedBy   String   // Name of the user who deleted it
+  deletedAt   DateTime @default(now())
 }
 
 model User {

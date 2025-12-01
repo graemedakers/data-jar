@@ -24,6 +24,15 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
+        // Create deletion log
+        await prisma.deletedLog.create({
+            data: {
+                coupleId: session.user.coupleId,
+                description: idea.description,
+                deletedBy: session.user.name || session.user.email,
+            },
+        });
+
         await prisma.idea.delete({
             where: { id },
         });
