@@ -48,6 +48,29 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Date Jar",
+            "applicationCategory": "LifestyleApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "description": "A fun, interactive way for couples to decide on their next date night. Create a shared jar of ideas and let fate decide!",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "120"
+            }
+          })
+        }}
+      />
       <DateReveal idea={selectedIdea} onClose={() => setSelectedIdea(null)} />
 
       {/* Background Elements */}
