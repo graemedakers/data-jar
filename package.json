@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",
@@ -20,6 +22,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "resend": "^6.5.2",
+    "stripe": "^20.0.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

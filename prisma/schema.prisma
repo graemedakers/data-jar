@@ -15,6 +15,7 @@ model Couple {
   ideas         Idea[]
   location      String?  // e.g. "New York, NY" or "London, UK"
   createdAt     DateTime @default(now())
+  isPremium     Boolean  @default(false)
   deletedLogs   DeletedLog[]
 }
 

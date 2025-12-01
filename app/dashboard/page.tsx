@@ -13,6 +13,7 @@ import { SettingsModal } from "@/components/SettingsModal";
 
 import { Check, Star } from "lucide-react";
 import { RateDateModal } from "@/components/RateDateModal";
+import { PremiumModal } from "@/components/PremiumModal";
 
 function InviteCodeDisplay({ mobile }: { mobile?: boolean }) {
     const [code, setCode] = useState<string | null>(null);
@@ -60,15 +61,17 @@ function InviteCodeDisplay({ mobile }: { mobile?: boolean }) {
 }
 
 export default function DashboardPage() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [ideas, setIdeas] = useState<any[]>([]);
-    const [selectedIdea, setSelectedIdea] = useState<any>(null);
-    const [editingIdea, setEditingIdea] = useState<any>(null);
     const [isSpinning, setIsSpinning] = useState(false);
-    const [userLocation, setUserLocation] = useState<string>("");
+    const [selectedIdea, setSelectedIdea] = useState<any>(null);
+    const [userLocation, setUserLocation] = useState<string | null>(null);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+    const [editingIdea, setEditingIdea] = useState<any>(null);
     const [ratingIdea, setRatingIdea] = useState<any>(null);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const [isPremium, setIsPremium] = useState(false);
+    const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
 
     const fetchIdeas = async () => {
@@ -88,8 +91,13 @@ export default function DashboardPage() {
         fetch('/api/auth/me')
             .then(res => res.json())
             .then(data => {
-                if (data?.user?.location) {
-                    setUserLocation(data.user.location);
+                if (data?.user) {
+                    if (data.user.location) setUserLocation(data.user.location);
+                    const userIsPremium = !!data.user.isPremium;
+                    setIsPremium(userIsPremium);
+                    if (!userIsPremium) {
+                        setIsPremiumModalOpen(true);
+                    }
                 }
             });
     }, []);
@@ -157,10 +165,19 @@ export default function DashboardPage() {
         setEditingIdea(ideaData);
     };
 
+    const handleAddIdeaClick = () => {
+        setIsModalOpen(true);
+    };
+
     const availableIdeasCount = ideas.filter(i => !i.selectedAt).length;
 
     return (
         <main className="min-h-screen p-6 pb-24 relative overflow-hidden">
+            <PremiumModal
+                isOpen={isPremiumModalOpen} // Force open if not premium
+                onClose={() => setIsPremiumModalOpen(false)} // No-op, cannot close
+            />
+
             <AddIdeaModal
                 isOpen={isModalOpen || !!editingIdea}
                 onClose={() => {
@@ -190,7 +207,7 @@ export default function DashboardPage() {
                             }
                         });
                 }}
-                currentLocation={userLocation}
+                currentLocation={userLocation ?? undefined}
             />
 
             <RateDateModal
@@ -202,7 +219,7 @@ export default function DashboardPage() {
                 idea={ratingIdea}
             />
 
-            <DateReveal idea={selectedIdea} onClose={() => setSelectedIdea(null)} userLocation={userLocation} />
+            <DateReveal idea={selectedIdea} onClose={() => setSelectedIdea(null)} userLocation={userLocation ?? undefined} />
 
             {/* Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
@@ -254,7 +271,7 @@ export default function DashboardPage() {
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleAddIdeaClick}
                     className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10"
                 >
                     <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
@@ -405,6 +422,6 @@ export default function DashboardPage() {
                     </div>
                 )}
             </div>
-        </main >
+        </main>
     );
 }

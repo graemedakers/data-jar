@@ -22,7 +22,8 @@ export async function GET() {
         user: {
             ...user,
             coupleReferenceCode: user.couple.referenceCode,
-            location: user.couple.location
+            location: user.couple.location,
+            isPremium: user.couple.isPremium,
         }
     });
 }

@@ -52,7 +52,11 @@ function SignupForm() {
             const data = await res.json();
 
             if (res.ok) {
-                router.push("/");
+                if (data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    router.push("/");
+                }
             } else {
                 alert(data.error || "Signup failed");
             }

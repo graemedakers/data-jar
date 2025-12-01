@@ -2,9 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { login } from '@/lib/auth';
-import { Resend } from 'resend';
-
-// const resend = new Resend(process.env.RESEND_API_KEY);
+import { stripe } from '@/lib/stripe';
 
 export async function POST(request: Request) {
     try {
@@ -24,41 +22,48 @@ export async function POST(request: Request) {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
-        let coupleId;
-        let referenceCode;
 
-        if (inviteCode) {
-            // JOINING EXISTING COUPLE
-            const couple = await prisma.couple.findUnique({
-                where: { referenceCode: inviteCode },
-            });
-
-            if (!couple) {
-                return NextResponse.json({ error: 'Invalid invite code' }, { status: 400 });
-            }
-            coupleId = couple.id;
-            referenceCode = couple.referenceCode;
-        } else {
-            // CREATING NEW COUPLE
-            referenceCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const newCouple = await prisma.couple.create({
-                data: {
-                    referenceCode,
-                    location,
+        if (!inviteCode) {
+            // NEW COUPLE: Redirect to Stripe for payment BEFORE creating records
+            const session = await stripe.checkout.sessions.create({
+                mode: 'payment',
+                payment_method_types: ['card'],
+                line_items: [
+                    {
+                        price: process.env.STRIPE_PRICE_ID,
+                        quantity: 1,
+                    },
+                ],
+                metadata: {
+                    type: 'NEW_COUPLE_SIGNUP',
+                    name,
+                    email,
+                    passwordHash,
+                    location: location || '',
                 },
+                success_url: `${process.env.NEXT_PUBLIC_APP_URL}/login?success=true`,
+                cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/signup`,
             });
-            coupleId = newCouple.id;
 
-
+            return NextResponse.json({ checkoutUrl: session.url });
         }
 
-        // Create User
+        // JOINING EXISTING COUPLE
+        const couple = await prisma.couple.findUnique({
+            where: { referenceCode: inviteCode },
+        });
+
+        if (!couple) {
+            return NextResponse.json({ error: 'Invalid invite code' }, { status: 400 });
+        }
+
+        // Create User linked to existing couple
         const user = await prisma.user.create({
             data: {
                 email,
                 name,
                 passwordHash,
-                coupleId,
+                coupleId: couple.id,
             },
         });
 
@@ -66,6 +71,7 @@ export async function POST(request: Request) {
         await login(user);
 
         return NextResponse.json({ success: true, user });
+
     } catch (error) {
         console.error('Signup error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
