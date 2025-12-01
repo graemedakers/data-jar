@@ -131,8 +131,19 @@ export default function Home() {
               </>
             )}
           </Button>
+          <div className="mt-4 text-center">
+            <a
+              href="https://www.youtube.com/watch?v=placeholder"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-400 hover:text-white underline decoration-dotted transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-play-circle"><circle cx="12" cy="12" r="10" /><polygon points="10 8 16 12 10 16 10 8" /></svg>
+              Watch Demo Video
+            </a>
+          </div>
         </motion.div>
       </div>
-    </main>
+    </main >
   );
 }
