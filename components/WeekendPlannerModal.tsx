@@ -20,6 +20,7 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen && suggestions.length === 0) {
@@ -30,17 +31,22 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
     const generatePlan = async () => {
         setIsLoading(true);
         setError(null);
+        setDebugInfo(null);
         try {
             const res = await fetch('/api/ai/weekend-planner', { method: 'POST' });
             const data = await res.json();
 
             if (res.ok) {
                 setSuggestions(data.suggestions);
+                if (data.debugInfo) {
+                    setDebugInfo(data.debugInfo);
+                }
             } else {
-                setError(data.error || "Failed to generate plan");
+                setError(data.details ? `${data.error}: ${data.details}` : (data.error || "Failed to generate plan"));
             }
-        } catch (err) {
-            setError("Something went wrong. Please try again.");
+        } catch (err: any) {
+            console.error("Planner error:", err);
+            setError(err.message || "Something went wrong. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -61,6 +67,13 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
                         <div className="flex items-center gap-2 text-sm text-slate-400 bg-white/5 p-3 rounded-lg">
                             <MapPin className="w-4 h-4" />
                             <span>Planning for: <span className="text-white font-medium">{userLocation}</span></span>
+                        </div>
+                    )}
+
+                    {debugInfo && (
+                        <div className="text-xs text-yellow-500 bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20">
+                            <p className="font-bold mb-1">AI Unavailable (Offline Mode)</p>
+                            <p className="opacity-80 font-mono break-all">{debugInfo}</p>
                         </div>
                     )}
 
