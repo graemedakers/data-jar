@@ -8,6 +8,7 @@ interface Suggestion {
     description: string;
     day: string;
     cost: string;
+    url?: string;
 }
 
 interface WeekendPlannerModalProps {
@@ -96,8 +97,20 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
                                         <span className="text-xs font-mono bg-slate-800 px-2 py-1 rounded text-slate-300">{item.day}</span>
                                     </div>
                                     <p className="text-slate-300 text-sm mb-3 leading-relaxed">{item.description}</p>
-                                    <div className="flex items-center gap-2 text-xs text-slate-500">
-                                        <span className="px-2 py-0.5 bg-slate-800 rounded-full">{item.cost}</span>
+                                    <div className="flex items-center justify-between mt-3">
+                                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                                            <span className="px-2 py-0.5 bg-slate-800 rounded-full">{item.cost}</span>
+                                        </div>
+                                        {item.url && (
+                                            <a
+                                                href={item.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-xs text-primary hover:underline flex items-center gap-1"
+                                            >
+                                                More Info / Tickets &rarr;
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
                             ))}

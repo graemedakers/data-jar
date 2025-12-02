@@ -59,44 +59,40 @@ export async function POST(request: Request) {
         }
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
-        console.log("API Key present:", !!apiKey);
-
         if (!apiKey) {
             console.warn("No API key found, returning mock data");
             return NextResponse.json({
                 suggestions: [
-                    { title: "Mock: Local Farmers Market", description: "Visit the local market for fresh produce.", day: "Saturday", cost: "Free" },
-                    { title: "Mock: Movie Night", description: "Catch the latest blockbuster.", day: "Sunday", cost: "$$" }
+                    { title: "Mock: Local Farmers Market", description: "Visit the local market for fresh produce.", day: "Saturday", cost: "Free", url: "https://www.google.com/search?q=local+farmers+market" },
+                    { title: "Mock: Movie Night", description: "Catch the latest blockbuster.", day: "Sunday", cost: "$$", url: "https://www.google.com/search?q=movie+tickets" },
+                    { title: "Mock: Brunch at a New Spot", description: "Try that new cafe everyone is talking about.", day: "Sunday", cost: "$$", url: "https://www.google.com/search?q=best+brunch+near+me" },
+                    { title: "Mock: Art Gallery Visit", description: "Soak in some culture at a local gallery.", day: "Saturday", cost: "Free", url: "https://www.google.com/search?q=art+galleries+near+me" },
+                    { title: "Mock: Sunset Walk", description: "Take a romantic stroll during golden hour.", day: "Any", cost: "Free", url: "https://www.google.com/search?q=best+sunset+spots+near+me" }
                 ]
             });
         }
 
         const prompt = `
-        I need 3 distinct date ideas for a couple in ${location} for ${context} (${targetDateStr}).
+        I need 5 distinct date ideas for a couple in ${location} for ${context} (${targetDateStr}).
         
-        Consider local events, weather (generally for this time of year), and popular spots in ${location}.
+        Focus on SPECIFIC REAL-WORLD EVENTS scheduled for this weekend if possible (e.g., concerts, festivals, markets, special exhibitions). If no specific events are found, suggest high-quality seasonal activities.
         
-        Return the response as a valid JSON array of objects with the following fields:
-        - title: string (catchy title)
-        - description: string (2-3 sentences describing the activity and why it's good for this weekend)
-        - day: string (suggested day, e.g., "Saturday" or "Sunday" or "Any")
-        - cost: string (estimated cost)
-
-        Example:
-        [
-            {
-                "title": "Sunset Walk at the Pier",
-                "description": "Enjoy the beautiful views...",
-                "day": "Saturday",
-                "cost": "Free"
-            }
-        ]
+        Pay particular attention to events that are good for couples (romantic, fun, interactive).
+        
+        Provide the response as a JSON array of objects. Each object should have the following structure:
+        {
+            "title": "string", // A concise title for the date idea
+            "description": "string", // A brief description of the date idea
+            "day": "string", // e.g., "Saturday", "Sunday", "Any"
+            "cost": "string", // e.g., "Free", "Low", "$", "$$", "$$$"
+            "url": "string" // A URL to buy tickets or get more info (e.g., Ticketmaster, Eventbrite, or a Google Search URL if specific link unavailable)
+        }
         
         Do not include markdown formatting. Just the raw JSON.
         `;
 
-        const models = ["gemini-1.5-flash", "gemini-pro"];
-        let lastError = "";
+        const models = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+        let errors: string[] = [];
 
         for (const model of models) {
             try {
@@ -112,11 +108,11 @@ export async function POST(request: Request) {
                 if (!response.ok) {
                     const errText = await response.text();
                     console.error(`Model ${model} failed with status ${response.status}: ${errText}`);
-                    lastError = `Model ${model} status ${response.status}: ${errText}`;
+                    errors.push(`Model ${model} status ${response.status}: ${errText}`);
 
                     if (response.status === 429) {
-                        // Wait 1s before trying next model
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        // Wait 2s before trying next model
+                        await new Promise(resolve => setTimeout(resolve, 2000));
                     }
                     continue;
                 }
@@ -124,12 +120,11 @@ export async function POST(request: Request) {
                 const data = await response.json();
                 if (!data.candidates?.[0]?.content) {
                     console.error(`Model ${model} returned invalid structure`, data);
-                    lastError = `Model ${model} returned invalid structure`;
+                    errors.push(`Model ${model} returned invalid structure`);
                     continue;
                 }
 
                 const text = data.candidates[0].content.parts[0].text;
-                console.log(`Raw AI response (${model}):`, text);
 
                 // Clean up markdown code blocks if present
                 const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -149,29 +144,32 @@ export async function POST(request: Request) {
                         return NextResponse.json({ suggestions });
                     } else {
                         console.warn(`Model ${model} returned JSON but not an array`);
-                        lastError = `Model ${model} returned JSON but not an array`;
+                        errors.push(`Model ${model} returned JSON but not an array`);
                     }
                 } catch (parseError) {
                     console.warn(`JSON parse failed for model ${model}:`, parseError);
-                    lastError = `JSON parse failed for model ${model}: ${parseError}`;
+                    errors.push(`JSON parse failed for model ${model}: ${parseError}`);
                     continue; // Try next model
                 }
 
             } catch (e: any) {
                 console.warn(`Model ${model} failed`, e);
-                lastError = `Model ${model} exception: ${e.message}`;
+                errors.push(`Model ${model} exception: ${e.message}`);
             }
         }
 
         // Fallback to mock data if AI fails
-        console.warn("All AI models failed, returning mock data. Last error:", lastError);
+        console.warn("All AI models failed, returning mock data. Errors:", errors);
+
         return NextResponse.json({
             suggestions: [
-                { title: "Offline: Local Park Picnic", description: "Pack a basket and enjoy the outdoors. (AI unavailable)", day: "Saturday", cost: "Low" },
-                { title: "Offline: Stargazing", description: "Find a dark spot and watch the stars. (AI unavailable)", day: "Sunday", cost: "Free" },
-                { title: "Offline: Cook a New Recipe", description: "Try making something exotic together. (AI unavailable)", day: "Any", cost: "$$" }
+                { title: "Offline: Local Park Picnic", description: "Pack a basket and enjoy the outdoors. (AI unavailable)", day: "Saturday", cost: "Low", url: "https://www.google.com/search?q=picnic+spots+near+me" },
+                { title: "Offline: Stargazing", description: "Find a dark spot and watch the stars. (AI unavailable)", day: "Sunday", cost: "Free", url: "https://www.google.com/search?q=stargazing+near+me" },
+                { title: "Offline: Cook a New Recipe", description: "Try making something exotic together. (AI unavailable)", day: "Any", cost: "$$", url: "https://www.google.com/search?q=romantic+dinner+recipes" },
+                { title: "Offline: Board Game Night", description: "Dust off those old games and have a friendly competition. (AI unavailable)", day: "Any", cost: "Free", url: "https://www.google.com/search?q=best+board+games+for+couples" },
+                { title: "Offline: DIY Spa Night", description: "Pamper yourselves with face masks and relaxation. (AI unavailable)", day: "Sunday", cost: "Low", url: "https://www.google.com/search?q=diy+spa+night+ideas" }
             ],
-            debugInfo: lastError
+            debugInfo: errors.join(" | ")
         });
 
     } catch (error: any) {

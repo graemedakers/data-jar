@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle } from "lucide-react";
+import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface HelpModalProps {
@@ -25,6 +25,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
         { id: "getting-started", title: "Getting Started", icon: MapPin },
         { id: "dashboard", title: "The Dashboard", icon: History },
         { id: "adding-ideas", title: "Adding Ideas", icon: Plus },
+        { id: "weekend-planner", title: "Weekend Planner", icon: Calendar },
         { id: "spinning", title: "Spinning the Jar", icon: Sparkles },
         { id: "history", title: "History & Logs", icon: History },
         { id: "settings", title: "Settings", icon: Settings },
@@ -77,6 +78,20 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                             <h4 className="font-bold text-secondary">AI Surprise Me</h4>
                             <p className="text-slate-300">Stuck? Click "Add Idea" then the <Sparkles className="inline w-4 h-4" /> <strong>Surprise Me</strong> button to let AI generate a creative idea for you.</p>
                         </div>
+                    </div>
+                );
+            case "weekend-planner":
+                return (
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold text-white">Weekend Planner</h3>
+                        <p className="text-slate-300">
+                            Need a full plan for the upcoming weekend? The AI Weekend Planner creates a curated list of 5 distinct date ideas based on your location and the current day of the week.
+                        </p>
+                        <ul className="list-disc list-inside space-y-2 text-slate-300">
+                            <li><strong>Smart Timing:</strong> If it's Monday-Thursday, it plans for the upcoming weekend. If it's Friday-Sunday, it plans for the current weekend.</li>
+                            <li><strong>Local Context:</strong> Uses your location to find relevant events and weather-appropriate activities.</li>
+                            <li><strong>Offline Mode:</strong> Even if the AI is busy, you'll get a set of great fallback suggestions so you're never left without a plan.</li>
+                        </ul>
                     </div>
                 );
             case "spinning":
