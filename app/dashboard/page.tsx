@@ -3,13 +3,14 @@
 import { Button } from "@/components/ui/Button";
 import { AddIdeaModal } from "@/components/AddIdeaModal";
 import { motion } from "framer-motion";
-import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Edit2, Copy } from "lucide-react";
+import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Edit2, Copy, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Jar3D } from "@/components/Jar3D";
 import { useRouter } from "next/navigation";
 import { DateReveal } from "@/components/DateReveal";
 import { SpinFiltersModal } from "@/components/SpinFiltersModal";
 import { SettingsModal } from "@/components/SettingsModal";
+import { WeekendPlannerModal } from "@/components/WeekendPlannerModal";
 
 import { Check, Star } from "lucide-react";
 import { RateDateModal } from "@/components/RateDateModal";
@@ -72,6 +73,7 @@ export default function DashboardPage() {
     const [isPremium, setIsPremium] = useState(false);
     const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPlannerOpen, setIsPlannerOpen] = useState(false);
     const router = useRouter();
 
     const fetchIdeas = async () => {
@@ -210,6 +212,12 @@ export default function DashboardPage() {
                 currentLocation={userLocation ?? undefined}
             />
 
+            <WeekendPlannerModal
+                isOpen={isPlannerOpen}
+                onClose={() => setIsPlannerOpen(false)}
+                userLocation={userLocation ?? undefined}
+            />
+
             <RateDateModal
                 isOpen={!!ratingIdea}
                 onClose={() => {
@@ -270,7 +278,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Actions Grid */}
-            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -280,7 +288,7 @@ export default function DashboardPage() {
                     <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
                         <Plus className="w-6 h-6 text-primary" />
                     </div>
-                    <span className="font-medium text-white">Add Idea</span>
+                    <span className="font-medium text-white text-center">Add Idea</span>
                 </motion.div>
 
                 <motion.div
@@ -298,9 +306,21 @@ export default function DashboardPage() {
                         }`}>
                         <Sparkles className={`w-6 h-6 ${availableIdeasCount > 0 ? "text-secondary" : "text-slate-500"} ${isSpinning ? 'animate-spin' : ''}`} />
                     </div>
-                    <span className={`font-medium ${availableIdeasCount > 0 ? "text-white" : "text-slate-500"}`}>
+                    <span className={`font-medium ${availableIdeasCount > 0 ? "text-white" : "text-slate-500"} text-center`}>
                         {isSpinning ? 'Spinning...' : 'Spin Jar'}
                     </span>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setIsPlannerOpen(true)}
+                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 col-span-2 md:col-span-1"
+                >
+                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                        <Calendar className="w-6 h-6 text-purple-400" />
+                    </div>
+                    <span className="font-medium text-white text-center">Weekend Plan</span>
                 </motion.div>
             </div>
 
