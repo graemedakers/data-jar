@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { description, indoor, duration, activityLevel, cost, timeOfDay } = body;
+        const { description, indoor, duration, activityLevel, cost, timeOfDay, details } = body;
 
         if (!description) {
             return NextResponse.json({ error: 'Description is required' }, { status: 400 });
@@ -19,8 +19,9 @@ export async function POST(request: Request) {
         const idea = await prisma.idea.create({
             data: {
                 description,
-                indoor,
-                duration: parseFloat(duration),
+                details: details || null, // Ensure it's null if undefined/empty string
+                indoor: Boolean(indoor), // Ensure boolean
+                duration: typeof duration === 'string' ? parseFloat(duration) : duration,
                 activityLevel,
                 cost,
                 timeOfDay: timeOfDay || 'ANY',

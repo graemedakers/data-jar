@@ -1,7 +1,24 @@
 import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
     try {
+        const session = await getSession();
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Check premium status
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            include: { couple: true },
+        });
+
+        if (!user || !(user.couple as any)?.isPremium) {
+            return NextResponse.json({ error: 'Premium required' }, { status: 403 });
+        }
+
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         if (!apiKey) {

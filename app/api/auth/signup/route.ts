@@ -24,12 +24,12 @@ export async function POST(request: Request) {
         const passwordHash = await bcrypt.hash(password, 10);
 
         if (!inviteCode) {
-            // BYPASS STRIPE FOR WALKTHROUGH
             // Create new couple
             const couple = await prisma.couple.create({
                 data: {
                     referenceCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
                     location: location || 'Unknown',
+                    isPremium: false, // Explicitly set to false, though default is false
                 },
             });
 
@@ -45,31 +45,6 @@ export async function POST(request: Request) {
 
             await login(user);
             return NextResponse.json({ success: true, user });
-
-            /*
-            // NEW COUPLE: Redirect to Stripe for payment BEFORE creating records
-            const session = await stripe.checkout.sessions.create({
-                mode: 'payment',
-                payment_method_types: ['card'],
-                line_items: [
-                    {
-                        price: process.env.STRIPE_PRICE_ID,
-                        quantity: 1,
-                    },
-                ],
-                metadata: {
-                    type: 'NEW_COUPLE_SIGNUP',
-                    name,
-                    email,
-                    passwordHash,
-                    location: location || '',
-                },
-                success_url: `${process.env.NEXT_PUBLIC_APP_URL}/login?success=true`,
-                cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/signup`,
-            });
-
-            return NextResponse.json({ checkoutUrl: session.url });
-            */
         }
 
         // JOINING EXISTING COUPLE

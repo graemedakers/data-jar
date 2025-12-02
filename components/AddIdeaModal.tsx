@@ -3,22 +3,25 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Plus, Clock, Activity, DollarSign, Home, Trees, Sparkles, Loader2 } from "lucide-react";
+import { X, Plus, Clock, Activity, DollarSign, Home, Trees, Sparkles, Loader2, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 interface AddIdeaModalProps {
     isOpen: boolean;
     onClose: () => void;
     initialData?: any; // If provided, we are in "Edit" mode
+    isPremium?: boolean;
+    onUpgrade?: () => void;
 }
 
-export function AddIdeaModal({ isOpen, onClose, initialData }: AddIdeaModalProps) {
-    const router = useRouter();
+export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrade }: AddIdeaModalProps) {
+    // const router = useRouter(); // Removed as it's not needed and might conflict
     const [isLoading, setIsLoading] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [formData, setFormData] = useState({
         description: "",
+        details: "",
         indoor: true,
         duration: "0.5",
         activityLevel: "MEDIUM",
@@ -31,6 +34,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData }: AddIdeaModalProps
             if (initialData) {
                 setFormData({
                     description: initialData.description,
+                    details: initialData.details || "",
                     indoor: initialData.indoor,
                     duration: Number.isInteger(initialData.duration) ? `${initialData.duration}.0` : String(initialData.duration),
                     activityLevel: initialData.activityLevel,
@@ -40,6 +44,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData }: AddIdeaModalProps
             } else {
                 setFormData({
                     description: "",
+                    details: "",
                     indoor: true,
                     duration: "0.5",
                     activityLevel: "MEDIUM",
@@ -58,6 +63,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData }: AddIdeaModalProps
                 const data = await res.json();
                 setFormData({
                     description: data.description,
+                    details: "", // AI doesn't generate details yet
                     indoor: data.indoor,
                     duration: String(data.duration),
                     activityLevel: data.activityLevel,
@@ -95,7 +101,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData }: AddIdeaModalProps
 
             if (res.ok) {
                 onClose();
-                router.refresh();
+                // router.refresh(); // Removed to prevent conflict with modal closing
             } else {
                 alert("Failed to save idea");
             }
@@ -136,6 +142,16 @@ export function AddIdeaModal({ isOpen, onClose, initialData }: AddIdeaModalProps
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     placeholder="e.g. Build a blanket fort"
                                     required
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300 ml-1">Details (Optional)</label>
+                                <textarea
+                                    value={formData.details}
+                                    onChange={(e) => setFormData({ ...formData, details: e.target.value })}
+                                    placeholder="Add more info, e.g. what to bring, specific location..."
+                                    className="glass-input w-full min-h-[80px] py-2 px-3 resize-none"
                                 />
                             </div>
 
@@ -240,22 +256,40 @@ export function AddIdeaModal({ isOpen, onClose, initialData }: AddIdeaModalProps
                                 <Button
                                     type="button"
                                     variant="secondary"
-                                    className="flex-1"
-                                    onClick={handleSurpriseMe}
+                                    className="flex-1 relative overflow-hidden"
+                                    onClick={() => {
+                                        if (!isPremium && onUpgrade) {
+                                            onUpgrade();
+                                        } else {
+                                            handleSurpriseMe();
+                                        }
+                                    }}
                                     disabled={isLoading || isGeneratingAI}
                                 >
                                     {isGeneratingAI ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
                                         <>
+                                            {!isPremium && (
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] z-10">
+                                                    <Lock className="w-4 h-4 text-white" />
+                                                </div>
+                                            )}
                                             <Sparkles className="w-5 h-5 mr-2 text-yellow-400" />
                                             Surprise Me
                                         </>
                                     )}
                                 </Button>
-                                <Button type="submit" className="flex-[2]" isLoading={isLoading} disabled={isGeneratingAI}>
+                                <button
+                                    type="submit"
+                                    className="flex-[2] inline-flex items-center justify-center transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none glass-button px-8 py-3 text-base"
+                                    disabled={isLoading || isGeneratingAI}
+                                >
+                                    {isLoading ? (
+                                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                    ) : null}
                                     {initialData && initialData.id ? "Save Changes" : <><Plus className="w-5 h-5 mr-2" /> Add to Jar</>}
-                                </Button>
+                                </button>
                             </div>
                         </form>
                     </motion.div>

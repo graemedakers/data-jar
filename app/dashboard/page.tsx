@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { AddIdeaModal } from "@/components/AddIdeaModal";
 import { motion } from "framer-motion";
-import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Edit2, Copy, Calendar } from "lucide-react";
+import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Copy, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Jar3D } from "@/components/Jar3D";
 import { useRouter } from "next/navigation";
@@ -97,9 +97,6 @@ export default function DashboardPage() {
                     if (data.user.location) setUserLocation(data.user.location);
                     const userIsPremium = !!data.user.isPremium;
                     setIsPremium(userIsPremium);
-                    if (!userIsPremium) {
-                        setIsPremiumModalOpen(true);
-                    }
                 }
             });
     }, []);
@@ -176,8 +173,8 @@ export default function DashboardPage() {
     return (
         <main className="min-h-screen p-4 md:p-6 pb-24 relative overflow-hidden">
             <PremiumModal
-                isOpen={isPremiumModalOpen} // Force open if not premium
-                onClose={() => setIsPremiumModalOpen(false)} // No-op, cannot close
+                isOpen={isPremiumModalOpen}
+                onClose={() => setIsPremiumModalOpen(false)}
             />
 
             <AddIdeaModal
@@ -188,6 +185,11 @@ export default function DashboardPage() {
                     fetchIdeas(); // Refresh list after adding
                 }}
                 initialData={editingIdea}
+                isPremium={isPremium}
+                onUpgrade={() => {
+                    setIsModalOpen(false);
+                    setIsPremiumModalOpen(true);
+                }}
             />
 
             <SpinFiltersModal
@@ -254,7 +256,20 @@ export default function DashboardPage() {
                     {/* Mobile Invite Code Button (Icon only) */}
                     <div className="md:hidden">
                         <InviteCodeDisplay mobile />
+                        <InviteCodeDisplay mobile />
                     </div>
+
+                    {!isPremium && (
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 text-yellow-200 border-yellow-400/30 hover:bg-yellow-400/30"
+                            onClick={() => setIsPremiumModalOpen(true)}
+                        >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Upgrade
+                        </Button>
+                    )}
 
                     <div className="flex gap-2">
                         <Button variant="ghost" size="sm" className="!p-2" onClick={() => setIsSettingsModalOpen(true)}>
@@ -314,9 +329,20 @@ export default function DashboardPage() {
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setIsPlannerOpen(true)}
-                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 col-span-2 md:col-span-1"
+                    onClick={() => {
+                        if (isPremium) {
+                            setIsPlannerOpen(true);
+                        } else {
+                            setIsPremiumModalOpen(true);
+                        }
+                    }}
+                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 col-span-2 md:col-span-1 relative overflow-hidden"
                 >
+                    {!isPremium && (
+                        <div className="absolute top-3 right-3">
+                            <Lock className="w-4 h-4 text-slate-500" />
+                        </div>
+                    )}
                     <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
                         <Calendar className="w-6 h-6 text-purple-400" />
                     </div>
@@ -340,7 +366,11 @@ export default function DashboardPage() {
                             <p className="text-slate-400 text-center py-4 text-sm">No ideas in the jar. Add some!</p>
                         ) : (
                             ideas.filter(i => !i.selectedAt).map((idea) => (
-                                <div key={idea.id} className={`glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 group transition-colors ${idea.isMasked ? 'opacity-75 bg-white/5' : 'hover:bg-white/5'}`}>
+                                <div
+                                    key={idea.id}
+                                    onClick={() => !idea.isMasked && setEditingIdea(idea)}
+                                    className={`glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 group transition-colors ${idea.isMasked ? 'opacity-75 bg-white/5 cursor-default' : 'hover:bg-white/5 cursor-pointer'}`}
+                                >
                                     <div>
                                         <div className="flex items-center gap-2">
                                             {idea.isMasked && <Lock className="w-3 h-3 text-slate-400" />}
@@ -353,22 +383,16 @@ export default function DashboardPage() {
                                     <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
                                         <div className={`w-2 h-2 rounded-full ${idea.activityLevel === 'HIGH' ? 'bg-red-400' : idea.activityLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-green-400'}`} />
                                         {!idea.isMasked && (
-                                            <>
-                                                <button
-                                                    onClick={() => setEditingIdea(idea)}
-                                                    className="p-1.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
-                                                    title="Edit Idea"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(idea.id)}
-                                                    className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
-                                                    title="Delete Idea"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(idea.id);
+                                                }}
+                                                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
+                                                title="Delete Idea"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
                                         )}
                                     </div>
                                 </div>

@@ -62,4 +62,5 @@ model Idea {
   selectedDate   DateTime? // The actual date they went on (optional)
   rating         Int?      // 1-5 stars
   notes          String?   // "Best pizza ever!"
+  details        String?   // "Wear comfortable shoes", "Bring a swimsuit"
 }
