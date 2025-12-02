@@ -1,21 +1,29 @@
 import { PrismaClient } from '@prisma/client'
+import * as bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-    // Create a demo couple
-    const couple = await prisma.couple.create({
-        data: {
+    // Create or update a demo couple
+    const couple = await prisma.couple.upsert({
+        where: { referenceCode: 'DEMO123' },
+        update: {},
+        create: {
             referenceCode: 'DEMO123',
         }
     })
 
-    // Create a user
-    const user = await prisma.user.create({
-        data: {
+    // Create or update a user
+    const passwordHash = await bcrypt.hash('password123', 10)
+    const user = await prisma.user.upsert({
+        where: { email: 'demo@example.com' },
+        update: {
+            passwordHash, // Update password if re-running
+        },
+        create: {
             email: 'demo@example.com',
             name: 'Demo User',
-            passwordHash: 'hashed_secret', // In real app, hash this!
+            passwordHash,
             coupleId: couple.id,
             mustChangePassword: false,
         }
