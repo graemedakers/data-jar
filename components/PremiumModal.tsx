@@ -94,10 +94,14 @@ export function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                                 One-time payment per couple. No monthly fees.
                             </p>
                             <button
-                                onClick={() => router.push('/')}
+                                onClick={async () => {
+                                    await fetch('/api/auth/logout', { method: 'POST' });
+                                    router.push('/');
+                                    router.refresh();
+                                }}
                                 className="text-sm text-slate-400 hover:text-white transition-colors"
                             >
-                                Back to Home
+                                Back to Home (Logout)
                             </button>
                         </div>
                     </motion.div>
