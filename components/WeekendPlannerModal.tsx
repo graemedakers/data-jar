@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
-import { Sparkles, Calendar, MapPin, Loader2, ExternalLink } from "lucide-react";
+import { Sparkles, Calendar, MapPin, Loader2, ExternalLink, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface Suggestion {
@@ -29,6 +29,8 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
         }
     }, [isOpen]);
 
+    const [addingId, setAddingId] = useState<number | null>(null);
+
     const generatePlan = async () => {
         setIsLoading(true);
         setError(null);
@@ -50,6 +52,45 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
             setError(err.message || "Something went wrong. Please try again.");
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleAddToJar = async (item: Suggestion) => {
+        const idx = suggestions.indexOf(item);
+        setAddingId(idx);
+
+        // Normalize cost
+        let cost = "$";
+        const lowerCost = item.cost.toLowerCase();
+        if (lowerCost.includes("free")) cost = "FREE";
+        else if (lowerCost.includes("$$$")) cost = "$$$";
+        else if (lowerCost.includes("$$")) cost = "$$";
+
+        try {
+            const res = await fetch('/api/ideas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    description: item.title,
+                    details: item.description + (item.url ? `\n\nMore info: ${item.url}` : ""),
+                    indoor: false, // Default to outdoor for weekend plans usually
+                    duration: 2.0,
+                    activityLevel: "MEDIUM",
+                    cost: cost,
+                    timeOfDay: "ANY"
+                }),
+            });
+
+            if (res.ok) {
+                alert("Added to jar!");
+            } else {
+                alert("Failed to add to jar");
+            }
+        } catch (e) {
+            console.error("Error adding to jar:", e);
+            alert("Error adding to jar");
+        } finally {
+            setAddingId(null);
         }
     };
 
@@ -101,16 +142,33 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
                                         <div className="flex items-center gap-2 text-xs text-slate-400">
                                             <span className="px-2.5 py-1 bg-slate-800 rounded-full border border-slate-700">{item.cost}</span>
                                         </div>
-                                        {item.url && (
-                                            <a
-                                                href={item.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-xs font-medium text-white bg-primary/20 hover:bg-primary/30 border border-primary/50 px-3 py-1.5 rounded-full transition-colors flex items-center justify-center gap-1.5 w-full sm:w-auto"
+                                        <div className="flex gap-2 w-full sm:w-auto">
+                                            <Button
+                                                size="sm"
+                                                variant="secondary"
+                                                className="flex-1 sm:flex-none text-xs h-8"
+                                                onClick={() => handleAddToJar(item)}
+                                                disabled={addingId === idx}
                                             >
-                                                More Info / Tickets <ExternalLink className="w-3 h-3" />
-                                            </a>
-                                        )}
+                                                {addingId === idx ? (
+                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        <Plus className="w-3 h-3 mr-1.5" /> Add
+                                                    </>
+                                                )}
+                                            </Button>
+                                            {item.url && (
+                                                <a
+                                                    href={item.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-xs font-medium text-white bg-primary/20 hover:bg-primary/30 border border-primary/50 px-3 py-1.5 rounded-md transition-colors flex items-center justify-center gap-1.5 flex-1 sm:flex-none h-8"
+                                                >
+                                                    Info <ExternalLink className="w-3 h-3" />
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
