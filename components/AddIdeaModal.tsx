@@ -63,7 +63,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                 const data = await res.json();
                 setFormData({
                     description: data.description,
-                    details: "", // AI doesn't generate details yet
+                    details: data.details || "", // Populate details from AI
                     indoor: data.indoor,
                     duration: String(data.duration),
                     activityLevel: data.activityLevel,
