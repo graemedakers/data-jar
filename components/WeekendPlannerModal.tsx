@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
-import { Sparkles, Calendar, MapPin, Loader2, ExternalLink, Plus } from "lucide-react";
+import { Sparkles, Calendar, MapPin, Loader2, ExternalLink, Plus, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface Suggestion {
@@ -15,13 +15,15 @@ interface WeekendPlannerModalProps {
     isOpen: boolean;
     onClose: () => void;
     userLocation?: string;
+    onIdeaAdded?: () => void;
 }
 
-export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPlannerModalProps) {
+export function WeekendPlannerModal({ isOpen, onClose, userLocation, onIdeaAdded }: WeekendPlannerModalProps) {
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [debugInfo, setDebugInfo] = useState<string | null>(null);
+    const [addedIdeas, setAddedIdeas] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         if (isOpen && suggestions.length === 0) {
@@ -35,6 +37,7 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
         setIsLoading(true);
         setError(null);
         setDebugInfo(null);
+        setAddedIdeas(new Set()); // Reset added ideas on new generation
         try {
             const res = await fetch('/api/ai/weekend-planner', { method: 'POST' });
             const data = await res.json();
@@ -57,6 +60,8 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
 
     const handleAddToJar = async (item: Suggestion) => {
         const idx = suggestions.indexOf(item);
+        if (addedIdeas.has(idx)) return; // Prevent double add
+
         setAddingId(idx);
 
         // Normalize cost
@@ -82,7 +87,9 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
             });
 
             if (res.ok) {
-                alert("Added to jar!");
+                // alert("Added to jar!"); // Removed alert
+                setAddedIdeas(prev => new Set(prev).add(idx));
+                if (onIdeaAdded) onIdeaAdded();
             } else {
                 alert("Failed to add to jar");
             }
@@ -145,13 +152,17 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation }: WeekendPl
                                         <div className="flex gap-2 w-full sm:w-auto">
                                             <Button
                                                 size="sm"
-                                                variant="secondary"
-                                                className="flex-1 sm:flex-none text-xs h-8"
+                                                variant={addedIdeas.has(idx) ? "ghost" : "secondary"}
+                                                className={`flex-1 sm:flex-none text-xs h-8 ${addedIdeas.has(idx) ? "text-green-400 hover:text-green-300 hover:bg-green-400/10" : ""}`}
                                                 onClick={() => handleAddToJar(item)}
-                                                disabled={addingId === idx}
+                                                disabled={addingId === idx || addedIdeas.has(idx)}
                                             >
                                                 {addingId === idx ? (
                                                     <Loader2 className="w-3 h-3 animate-spin" />
+                                                ) : addedIdeas.has(idx) ? (
+                                                    <>
+                                                        <Check className="w-3 h-3 mr-1.5" /> Added
+                                                    </>
                                                 ) : (
                                                     <>
                                                         <Plus className="w-3 h-3 mr-1.5" /> Add

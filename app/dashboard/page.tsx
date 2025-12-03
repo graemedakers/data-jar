@@ -222,6 +222,7 @@ export default function DashboardPage() {
                 isOpen={isPlannerOpen}
                 onClose={() => setIsPlannerOpen(false)}
                 userLocation={userLocation ?? undefined}
+                onIdeaAdded={fetchIdeas}
             />
 
             <RateDateModal
