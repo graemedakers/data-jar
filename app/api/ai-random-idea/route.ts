@@ -80,11 +80,14 @@ export async function POST(request: Request) {
         CONTEXT:
         - Location: ${location || "Unknown"}
         - Current Weather: ${weatherInfo}
+        - Consider any major local events, festivals, or seasonal activities happening right now in ${location || "the area"} if known.
         
         CONSTRAINTS:
         - The idea MUST be suitable for the current weather conditions and location.
         - It can be an indoor activity (staying at home) or an outdoor activity (going out).
         - Do NOT involve cardboard in any way.
+        - Do NOT involve cocktails or alcohol-focused activities.
+        - Avoid activities that require significant prior preparation or planning (spontaneous ideas preferred).
         
         Return the response as a valid JSON object with the following fields:
         - description: string (a short, catchy title for the date)
