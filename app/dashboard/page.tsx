@@ -388,14 +388,15 @@ export default function DashboardPage() {
                                         <div className={`w-2 h-2 rounded-full ${idea.activityLevel === 'HIGH' ? 'bg-red-400' : idea.activityLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-green-400'}`} />
                                         {!idea.isMasked && (
                                             <button
+                                                type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDelete(idea.id);
                                                 }}
-                                                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
+                                                className="relative z-10 p-2 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
                                                 title="Delete Idea"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-4 h-4 pointer-events-none" />
                                             </button>
                                         )}
                                     </div>
@@ -427,25 +428,27 @@ export default function DashboardPage() {
                                         <div className="text-xs text-secondary font-medium px-2 py-1 bg-secondary/10 rounded-md flex items-center gap-2">
                                             <span>Completed</span>
                                             <button
+                                                type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDuplicate(idea);
                                                 }}
-                                                className="p-1 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
+                                                className="relative z-10 p-1.5 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
                                                 title="Add to Jar Again"
                                             >
-                                                <Copy className="w-3 h-3" />
+                                                <Copy className="w-3 h-3 pointer-events-none" />
                                             </button>
                                             <div className="w-px h-3 bg-slate-700 mx-1" />
                                             <button
+                                                type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDelete(idea.id);
                                                 }}
-                                                className="p-1 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-red-400"
+                                                className="relative z-10 p-1.5 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-red-400"
                                                 title="Delete from History"
                                             >
-                                                <Trash2 className="w-3 h-3" />
+                                                <Trash2 className="w-3 h-3 pointer-events-none" />
                                             </button>
                                         </div>
 
