@@ -296,7 +296,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Actions Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -339,7 +339,7 @@ export default function DashboardPage() {
                             setIsPremiumModalOpen(true);
                         }
                     }}
-                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 col-span-2 md:col-span-1 relative overflow-hidden"
+                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 sm:col-span-2 md:col-span-1 relative overflow-hidden"
                 >
                     {!isPremium && (
                         <div className="absolute top-3 right-3">
