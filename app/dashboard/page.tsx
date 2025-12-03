@@ -74,6 +74,7 @@ export default function DashboardPage() {
     const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
     const router = useRouter();
 
     const fetchIdeas = async () => {
@@ -98,6 +99,9 @@ export default function DashboardPage() {
                     const userIsPremium = !!data.user.isPremium;
                     setIsPremium(userIsPremium);
                 }
+            })
+            .finally(() => {
+                setIsLoadingUser(false);
             });
     }, []);
 
@@ -256,10 +260,9 @@ export default function DashboardPage() {
                     {/* Mobile Invite Code Button (Icon only) */}
                     <div className="md:hidden">
                         <InviteCodeDisplay mobile />
-                        <InviteCodeDisplay mobile />
                     </div>
 
-                    {!isPremium && (
+                    {!isLoadingUser && !isPremium && (
                         <Button
                             variant="secondary"
                             size="sm"
