@@ -40,8 +40,10 @@ export async function POST(request: Request) {
             if (locs.length > 0) {
                 targetLocation = locs.join(" and ");
 
-                if (userHomeTown && userHomeTown !== coupleLocation) {
-                    extraInstructions += `IMPORTANT: You MUST include at least one recommendation located in or very near to ${userHomeTown}.\n`;
+                if (userHomeTown && coupleLocation && userHomeTown.trim().toLowerCase() !== coupleLocation.trim().toLowerCase()) {
+                    extraInstructions += `IMPORTANT: You MUST include at least TWO recommendations located in ${coupleLocation} and at least TWO recommendations located in ${userHomeTown}.\n`;
+                } else if (userHomeTown && (!coupleLocation || userHomeTown.trim().toLowerCase() === coupleLocation.trim().toLowerCase())) {
+                    // If locations are the same or only home town exists, just treat it normally, no special split needed.
                 }
             } else {
                 targetLocation = "your local area";
