@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
-        const { description, location } = await request.json();
+        const { description, details, location } = await request.json();
 
         if (!description) {
             return NextResponse.json({ error: 'Description is required' }, { status: 400 });
@@ -25,10 +25,15 @@ export async function POST(request: Request) {
 
         const prompt = `
         I am planning a date with the following idea: "${description}".
-        ${location ? `We are located in or near ${location}. Please suggest 3 REAL, specific places nearby that fit this date idea.` : 'Please suggest 3 creative variations or themes for this date.'}
+        ${details ? `Additional details/context: "${details}".` : ''}
+        ${location ? `We are located in or near ${location}.` : ''}
         
-        If a location is provided, you MUST find actual businesses, parks, or venues in that area.
-        If no location is provided or specific places aren't found, suggest creative themes or types of places.
+        Please suggest 3 REAL, specific places nearby that fit this date idea.
+        
+        CRITICAL INSTRUCTION:
+        - If the "Additional details/context" contains specific location clues (e.g. a specific neighborhood, venue name, or city), YOU MUST PRIORITIZE finding places that match those clues.
+        - If a location is provided, you MUST find actual businesses, parks, or venues in that area.
+        - If no location is provided or specific places aren't found, suggest creative themes or types of places.
         
         For each suggestion, provide:
         - title: The name of the place or activity.

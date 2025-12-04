@@ -42,6 +42,7 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     description: idea.description,
+                    details: idea.details,
                     location: userLocation
                 }),
             });
