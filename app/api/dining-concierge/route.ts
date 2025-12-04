@@ -57,7 +57,7 @@ export async function POST(request: Request) {
             extraInstructions += `The user is asking about "${targetLocation}". 
             Context: The user is based in ${contextLocation}. 
             - If "${targetLocation}" is a specific place or city (e.g. "The Alamo", "Paris", "123 Main St"), find restaurants near THAT place.
-            - If "${targetLocation}" is a generic activity (e.g. "Hiking", "Picnic"), find restaurants near suitable spots for that activity in or near ${contextLocation}.
+            - If "${targetLocation}" is a generic activity or contains details (e.g. "Hiking", "Context: ..."), first IDENTIFY the best specific venue for this activity in ${contextLocation}, then find restaurants near THAT venue.
             - CRITICAL: If the input contains a specific address or venue name, prioritize restaurants within walking distance (5-10 mins) of that location.\n`;
         }
 

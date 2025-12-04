@@ -209,7 +209,15 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
 
                                         {onFindDining && (
                                             <Button
-                                                onClick={() => onFindDining(idea.address ? `${idea.description} near ${idea.address}` : idea.description)}
+                                                onClick={() => {
+                                                    let query = idea.description;
+                                                    if (idea.address) {
+                                                        query += ` near ${idea.address}`;
+                                                    } else if (idea.details) {
+                                                        query += `. Context/Details: ${idea.details}`;
+                                                    }
+                                                    onFindDining(query);
+                                                }}
                                                 variant="ghost"
                                                 className="w-full mt-4 border border-white/10 hover:bg-white/5 text-orange-300 hover:text-orange-200"
                                             >
