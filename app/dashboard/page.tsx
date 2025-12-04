@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { AddIdeaModal } from "@/components/AddIdeaModal";
 import { motion } from "framer-motion";
-import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Copy, Calendar } from "lucide-react";
+import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Copy, Calendar, Activity, Utensils } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Jar3D } from "@/components/Jar3D";
 import { useRouter } from "next/navigation";
@@ -112,7 +112,7 @@ export default function DashboardPage() {
         router.refresh();
     };
 
-    const handleSpinJar = async (filters: { maxDuration?: number; maxCost?: string; maxActivityLevel?: string; timeOfDay?: string } = {}) => {
+    const handleSpinJar = async (filters: { maxDuration?: number; maxCost?: string; maxActivityLevel?: string; timeOfDay?: string; category?: string } = {}) => {
         if (ideas.length === 0) {
             alert("Add some ideas first!");
             return;
@@ -401,9 +401,14 @@ export default function DashboardPage() {
                                             {idea.isMasked && <Lock className="w-3 h-3 text-slate-400" />}
                                             <p className={`font-medium ${idea.isMasked ? 'text-slate-400 italic' : 'text-white'}`}>{idea.description}</p>
                                         </div>
-                                        <p className="text-xs text-slate-400 mt-1">
-                                            {idea.indoor ? 'Indoor' : 'Outdoor'} • {idea.duration}h • {idea.cost} • {idea.timeOfDay === 'ANY' ? 'Anytime' : idea.timeOfDay === 'DAY' ? 'Day' : 'Evening'}
-                                        </p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            {idea.category === 'MEAL' && <Utensils className="w-3 h-3 text-orange-400" />}
+                                            {idea.category === 'EVENT' && <Calendar className="w-3 h-3 text-purple-400" />}
+                                            {(!idea.category || idea.category === 'ACTIVITY') && <Activity className="w-3 h-3 text-blue-400" />}
+                                            <p className="text-xs text-slate-400">
+                                                {idea.indoor ? 'Indoor' : 'Outdoor'} • {idea.duration}h • {idea.cost} • {idea.timeOfDay === 'ANY' ? 'Anytime' : idea.timeOfDay === 'DAY' ? 'Day' : 'Evening'}
+                                            </p>
+                                        </div>
                                     </div>
                                     <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
                                         <div className={`w-2 h-2 rounded-full ${idea.activityLevel === 'HIGH' ? 'bg-red-400' : idea.activityLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-green-400'}`} />

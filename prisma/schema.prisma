@@ -48,6 +48,7 @@ model Idea {
   activityLevel  String // LOW, MEDIUM, HIGH
   cost           String // FREE, $, $$, $$$
   timeOfDay      String   @default("ANY") // DAY, EVENING, ANY
+  category       String   @default("ACTIVITY") // ACTIVITY, MEAL, EVENT
   
   coupleId       String
   couple         Couple   @relation(fields: [coupleId], references: [id])

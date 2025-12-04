@@ -11,7 +11,7 @@ const ACTIVITY_VALUES: Record<string, number> = { 'LOW': 0, 'MEDIUM': 1, 'HIGH':
 export async function POST(request: Request) {
     try {
         const session = await getSession();
-        const { maxDuration, maxCost, maxActivityLevel, timeOfDay } = await request.json().catch(() => ({}));
+        const { maxDuration, maxCost, maxActivityLevel, timeOfDay, category } = await request.json().catch(() => ({}));
 
         let ideas = [];
         let coupleId = null;
@@ -37,6 +37,11 @@ export async function POST(request: Request) {
 
         // Filter in memory (easier for string enums)
         ideas = allIdeas.filter(idea => {
+            // Category filter (if specified and not ANY)
+            if (category !== undefined && category !== 'ANY') {
+                if (idea.category !== category) return false;
+            }
+
             // Duration filter (if specified)
             if (maxDuration !== undefined && idea.duration > maxDuration) return false;
 

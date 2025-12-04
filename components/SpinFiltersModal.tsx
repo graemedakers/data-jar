@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 interface SpinFiltersModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSpin: (filters: { maxDuration?: number; maxCost?: string; maxActivityLevel?: string; timeOfDay?: string }) => void;
+    onSpin: (filters: { maxDuration?: number; maxCost?: string; maxActivityLevel?: string; timeOfDay?: string; category?: string }) => void;
 }
 
 export function SpinFiltersModal({ isOpen, onClose, onSpin }: SpinFiltersModalProps) {
@@ -16,6 +16,7 @@ export function SpinFiltersModal({ isOpen, onClose, onSpin }: SpinFiltersModalPr
     const [maxCost, setMaxCost] = useState<string | undefined>(undefined);
     const [maxActivityLevel, setMaxActivityLevel] = useState<string | undefined>(undefined);
     const [timeOfDay, setTimeOfDay] = useState<string | undefined>(undefined);
+    const [category, setCategory] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         if (isOpen) {
@@ -23,11 +24,12 @@ export function SpinFiltersModal({ isOpen, onClose, onSpin }: SpinFiltersModalPr
             setMaxCost(undefined);
             setMaxActivityLevel(undefined);
             setTimeOfDay(undefined);
+            setCategory(undefined);
         }
     }, [isOpen]);
 
     const handleSpin = () => {
-        onSpin({ maxDuration, maxCost, maxActivityLevel, timeOfDay });
+        onSpin({ maxDuration, maxCost, maxActivityLevel, timeOfDay, category });
         onClose();
     };
 
@@ -44,7 +46,7 @@ export function SpinFiltersModal({ isOpen, onClose, onSpin }: SpinFiltersModalPr
                         initial={{ scale: 0.9, y: 20, opacity: 0 }}
                         animate={{ scale: 1, y: 0, opacity: 1 }}
                         exit={{ scale: 0.9, y: 20, opacity: 0 }}
-                        className="glass-card w-full max-w-md relative overflow-hidden p-6"
+                        className="glass-card w-full max-w-md relative overflow-hidden p-6 max-h-[90vh] overflow-y-auto"
                     >
                         <button
                             onClick={onClose}
@@ -61,6 +63,25 @@ export function SpinFiltersModal({ isOpen, onClose, onSpin }: SpinFiltersModalPr
                         </div>
 
                         <div className="space-y-6">
+                            {/* Category Filter */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Category</label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {['ACTIVITY', 'MEAL', 'EVENT'].map((cat) => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setCategory(category === cat ? undefined : cat)}
+                                            className={`p-2 rounded-lg text-sm font-medium transition-colors border ${category === cat
+                                                ? "bg-secondary/20 border-secondary text-white"
+                                                : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                                                }`}
+                                        >
+                                            {cat === 'ACTIVITY' ? 'Activity' : cat === 'MEAL' ? 'Meal' : 'Event'}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Duration Filter */}
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-300">Max Duration (Hours)</label>

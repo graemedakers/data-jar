@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { description, indoor, duration, activityLevel, cost, timeOfDay, details } = body;
+        const { description, indoor, duration, activityLevel, cost, timeOfDay, details, category } = body;
 
         if (!description) {
             return NextResponse.json({ error: 'Description is required' }, { status: 400 });
@@ -25,6 +25,7 @@ export async function POST(request: Request) {
                 activityLevel,
                 cost,
                 timeOfDay: timeOfDay || 'ANY',
+                category: category || 'ACTIVITY',
                 coupleId: session.user.coupleId,
                 createdById: session.user.id,
             },

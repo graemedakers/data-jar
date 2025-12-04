@@ -3,9 +3,8 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Plus, Clock, Activity, DollarSign, Home, Trees, Sparkles, Loader2, Lock } from "lucide-react";
+import { X, Plus, Clock, Activity, DollarSign, Home, Trees, Sparkles, Loader2, Lock, Utensils, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
 
 interface AddIdeaModalProps {
     isOpen: boolean;
@@ -16,7 +15,6 @@ interface AddIdeaModalProps {
 }
 
 export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrade }: AddIdeaModalProps) {
-    // const router = useRouter(); // Removed as it's not needed and might conflict
     const [isLoading, setIsLoading] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [formData, setFormData] = useState({
@@ -27,6 +25,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
         activityLevel: "MEDIUM",
         cost: "$",
         timeOfDay: "ANY",
+        category: "ACTIVITY",
     });
 
     useEffect(() => {
@@ -40,6 +39,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                     activityLevel: initialData.activityLevel,
                     cost: initialData.cost,
                     timeOfDay: initialData.timeOfDay || "ANY",
+                    category: initialData.category || "ACTIVITY",
                 });
             } else {
                 setFormData({
@@ -50,6 +50,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                     activityLevel: "MEDIUM",
                     cost: "$",
                     timeOfDay: "ANY",
+                    category: "ACTIVITY",
                 });
             }
         }
@@ -69,6 +70,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                     activityLevel: data.activityLevel,
                     cost: data.cost,
                     timeOfDay: data.timeOfDay,
+                    category: "ACTIVITY", // Default AI ideas to activity for now
                 });
             } else {
                 const errorData = await res.json();
@@ -101,7 +103,6 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
 
             if (res.ok) {
                 onClose();
-                // router.refresh(); // Removed to prevent conflict with modal closing
             } else {
                 alert("Failed to save idea");
             }
@@ -154,6 +155,33 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                                         placeholder="Add more info, e.g. what to bring, specific location..."
                                         className="glass-input w-full min-h-[80px] py-2 px-3 resize-none"
                                     />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300 ml-1">Category</label>
+                                    <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, category: 'ACTIVITY' })}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'ACTIVITY' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
+                                        >
+                                            <Activity className="w-4 h-4" /> Activity
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, category: 'MEAL' })}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'MEAL' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
+                                        >
+                                            <Utensils className="w-4 h-4" /> Meal
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, category: 'EVENT' })}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'EVENT' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
+                                        >
+                                            <Calendar className="w-4 h-4" /> Event
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

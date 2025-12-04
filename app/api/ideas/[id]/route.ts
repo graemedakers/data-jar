@@ -54,7 +54,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     try {
         const body = await request.json();
-        const { description, indoor, duration, activityLevel, cost, timeOfDay, details } = body;
+        const { description, indoor, duration, activityLevel, cost, timeOfDay, details, category } = body;
 
         // Verify ownership
         const idea = await prisma.idea.findUnique({
@@ -79,6 +79,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
                 activityLevel,
                 cost,
                 timeOfDay,
+                category,
             },
         });
 
