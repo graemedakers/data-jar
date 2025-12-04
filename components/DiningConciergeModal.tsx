@@ -19,13 +19,13 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
     const [vibe, setVibe] = useState("");
     const [recommendations, setRecommendations] = useState<any[]>([]);
 
-    const handleGetRecommendations = async () => {
+    const handleGetRecommendations = async (overrideLocation?: string) => {
         setIsLoading(true);
         try {
             const res = await fetch('/api/dining-concierge', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cuisine, vibe, location: userLocation }),
+                body: JSON.stringify({ cuisine, vibe, location: overrideLocation || userLocation }),
             });
 
             if (res.ok) {
@@ -41,6 +41,21 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
             setIsLoading(false);
         }
     };
+
+    // Auto-fetch if userLocation is provided (e.g. from "Find food nearby")
+    // Use a ref to prevent double-fetching if needed, or just simple useEffect
+    const [hasAutoFetched, setHasAutoFetched] = useState(false);
+
+    // Reset auto-fetched state when modal closes or location changes
+    if (!isOpen && hasAutoFetched) {
+        setHasAutoFetched(false);
+        setRecommendations([]);
+    }
+
+    if (isOpen && userLocation && !hasAutoFetched && !isLoading && recommendations.length === 0) {
+        setHasAutoFetched(true);
+        handleGetRecommendations(userLocation);
+    }
 
     const handleAddToJar = async (rec: any) => {
         try {
