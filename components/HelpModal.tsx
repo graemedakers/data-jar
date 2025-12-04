@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle, Calendar } from "lucide-react";
+import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle, Calendar, Utensils } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface HelpModalProps {
@@ -24,6 +24,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
         { id: "intro", title: "Introduction", icon: BookOpen },
         { id: "getting-started", title: "Getting Started", icon: MapPin },
         { id: "dashboard", title: "The Dashboard", icon: History },
+        { id: "dining-concierge", title: "Dining Concierge", icon: Utensils },
         { id: "adding-ideas", title: "Adding Ideas", icon: Plus },
         { id: "weekend-planner", title: "Weekend Planner", icon: Calendar },
         { id: "spinning", title: "Spinning the Jar", icon: Sparkles },
@@ -63,6 +64,21 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                             <li><strong>The Jar:</strong> Visual representation of your ideas.</li>
                             <li><strong>In the Jar:</strong> Active ideas waiting to be picked.</li>
                             <li><strong>Past Dates:</strong> Ideas you've already completed.</li>
+                        </ul>
+                    </div>
+                );
+            case "dining-concierge":
+                return (
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold text-white">Dining Concierge <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-0.5 rounded-full ml-2">PREMIUM</span></h3>
+                        <p className="text-slate-300">
+                            Can't decide where to eat? Let our AI Concierge find the perfect spot for you.
+                        </p>
+                        <ul className="list-disc list-inside space-y-2 text-slate-300">
+                            <li><strong>Preferences:</strong> Enter your craving (e.g., "Sushi", "Italian") and desired vibe (e.g., "Romantic", "Lively").</li>
+                            <li><strong>Recommendations:</strong> The AI will find 3 top-rated local restaurants matching your criteria.</li>
+                            <li><strong>Go Tonight:</strong> Found a winner? Click <span className="text-yellow-400">Go Tonight</span> to instantly select it as your date. We'll even fetch opening hours and provide a direct link to their website!</li>
+                            <li><strong>Add to Jar:</strong> Want to save it for later? Click "Add" to drop it in your jar for a future spin.</li>
                         </ul>
                     </div>
                 );
