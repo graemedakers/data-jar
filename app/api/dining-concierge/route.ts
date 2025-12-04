@@ -34,6 +34,11 @@ export async function POST(request: Request) {
         // We normalize strings to be safe (trim, lowercase)
         const isDefaultLocation = !location || (coupleLocation && location.trim().toLowerCase() === coupleLocation.trim().toLowerCase());
 
+        let contextLocation = "";
+        if (coupleLocation || userHomeTown) {
+            contextLocation = [coupleLocation, userHomeTown].filter(Boolean).join(" or ");
+        }
+
         if (isDefaultLocation) {
             const locs = [coupleLocation, userHomeTown].filter(Boolean);
             // Use both locations for the context if available
@@ -46,6 +51,13 @@ export async function POST(request: Request) {
             } else {
                 targetLocation = "your local area";
             }
+        } else {
+            // If a specific location/activity was provided (e.g. "Hiking" or "The Alamo"), 
+            // provide the user's base location as context so the AI can resolve generic activities.
+            extraInstructions += `The user is asking about "${targetLocation}". 
+            Context: The user is based in ${contextLocation}. 
+            - If "${targetLocation}" is a specific place or city (e.g. "The Alamo", "Paris"), find restaurants near THAT place.
+            - If "${targetLocation}" is a generic activity (e.g. "Hiking", "Picnic"), find restaurants near suitable spots for that activity in or near ${contextLocation}.\n`;
         }
 
         if (userInterests) {

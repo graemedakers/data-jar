@@ -206,6 +206,17 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                                                 {idea.indoor ? 'Indoor' : 'Outdoor'}
                                             </span>
                                         </div>
+
+                                        {onFindDining && (
+                                            <Button
+                                                onClick={() => onFindDining(idea.description)}
+                                                variant="ghost"
+                                                className="w-full mt-4 border border-white/10 hover:bg-white/5 text-orange-300 hover:text-orange-200"
+                                            >
+                                                <Utensils className="w-4 h-4 mr-2" />
+                                                Find food nearby
+                                            </Button>
+                                        )}
                                     </div>
 
                                     {/* AI Recommendations Section */}
@@ -239,14 +250,6 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                                                                     <div>
                                                                         <h5 className="font-medium text-white text-sm">{rec.title}</h5>
                                                                         <p className="text-xs text-slate-400 mt-1">{rec.description}</p>
-                                                                        {onFindDining && (
-                                                                            <button
-                                                                                onClick={() => onFindDining(rec.title)}
-                                                                                className="text-xs text-orange-400 hover:text-orange-300 underline mt-2 flex items-center gap-1 transition-colors"
-                                                                            >
-                                                                                <Utensils className="w-3 h-3" /> Find food nearby
-                                                                            </button>
-                                                                        )}
                                                                     </div>
                                                                     {rec.url && (
                                                                         <a
