@@ -8,22 +8,27 @@ export async function GET() {
         return NextResponse.json({ user: null });
     }
 
-    const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        include: { couple: true },
-    });
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            include: { couple: true },
+        });
 
-    if (!user) {
-        return NextResponse.json({ user: null });
-    }
-
-    // Return user with couple reference code
-    return NextResponse.json({
-        user: {
-            ...user,
-            coupleReferenceCode: user.couple.referenceCode,
-            location: user.couple.location,
-            isPremium: user.couple.isPremium,
+        if (!user) {
+            return NextResponse.json({ user: null });
         }
-    });
+
+        // Return user with couple reference code
+        return NextResponse.json({
+            user: {
+                ...user,
+                coupleReferenceCode: user.couple.referenceCode,
+                location: user.couple.location,
+                isPremium: user.couple.isPremium,
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching user in /api/auth/me:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
 }

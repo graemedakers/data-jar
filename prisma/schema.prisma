@@ -38,6 +38,8 @@ model User {
   couple                 Couple   @relation(fields: [coupleId], references: [id])
   createdIdeas           Idea[]   @relation("CreatedBy")
   createdAt              DateTime @default(now())
+  homeTown               String?
+  interests              String?  // Comma separated list of interests
 }
 
 model Idea {

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, DollarSign, Activity, Sparkles, Loader2, MapPin, ExternalLink, Star } from "lucide-react";
+import { X, Calendar, Clock, DollarSign, Activity, Sparkles, Loader2, MapPin, ExternalLink, Star, Utensils } from "lucide-react";
 import { Button } from "./ui/Button";
 import { useState } from "react";
 import { Confetti } from "./Confetti";
@@ -17,16 +17,18 @@ interface Idea {
     address?: string;
     openingHours?: string;
     googleRating?: number;
+    details?: string;
 }
 
 interface DateRevealProps {
     idea: Idea | null;
     onClose: () => void;
     userLocation?: string;
+    onFindDining?: (location: string) => void;
 }
 
-export function DateReveal({ idea, onClose, userLocation }: DateRevealProps) {
-    const [recommendations, setRecommendations] = useState<string[]>([]);
+export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRevealProps) {
+    const [recommendations, setRecommendations] = useState<any[]>([]);
     const [isLoadingAI, setIsLoadingAI] = useState(false);
     const [showAI, setShowAI] = useState(false);
 
@@ -176,23 +178,32 @@ export function DateReveal({ idea, onClose, userLocation }: DateRevealProps) {
                             {/* Only show categories and AI if it's NOT a dining concierge result (i.e. no address/website) */}
                             {!(idea.website || idea.address || idea.openingHours) && (
                                 <>
-                                    <div className="grid grid-cols-2 gap-4 py-6 border-y border-white/10">
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Clock className="w-5 h-5 text-accent" />
-                                            <span className="text-sm text-slate-300">{idea.duration * 60} mins</span>
-                                        </div>
-                                        <div className="flex flex-col items-center gap-2">
-                                            <DollarSign className="w-5 h-5 text-green-400" />
-                                            <span className="text-sm text-slate-300">{idea.cost}</span>
-                                        </div>
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Activity className="w-5 h-5 text-pink-400" />
-                                            <span className="text-sm text-slate-300">{idea.activityLevel}</span>
-                                        </div>
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Calendar className="w-5 h-5 text-blue-400" />
-                                            <span className="text-sm text-slate-300">
-                                                {idea.timeOfDay === 'ANY' ? 'Anytime' : idea.timeOfDay === 'DAY' ? 'Day' : 'Evening'}
+                                    {/* Idea Details */}
+                                    <div className="bg-white/5 rounded-xl p-6 border border-white/10 text-left">
+                                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                            <Sparkles className="w-4 h-4 text-secondary" />
+                                            The Plan
+                                        </h4>
+                                        <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">
+                                            {idea.details ? (
+                                                idea.details.split(/(https?:\/\/[^\s]+)/g).map((part, i) => (
+                                                    part.match(/https?:\/\/[^\s]+/) ? (
+                                                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline break-all">
+                                                            {part}
+                                                        </a>
+                                                    ) : part
+                                                ))
+                                            ) : "No specific details provided. Be spontaneous!"}
+                                        </p>
+                                        <div className="mt-4 flex flex-wrap gap-2">
+                                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                                {idea.duration * 60} mins
+                                            </span>
+                                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                                {idea.cost}
+                                            </span>
+                                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                                {idea.indoor ? 'Indoor' : 'Outdoor'}
                                             </span>
                                         </div>
                                     </div>
@@ -206,32 +217,55 @@ export function DateReveal({ idea, onClose, userLocation }: DateRevealProps) {
                                                 className="w-full border border-white/10 hover:bg-white/5 text-slate-300"
                                             >
                                                 <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                                                Get AI Recommendations
+                                                Find Specific Places & Tickets
                                             </Button>
                                         ) : (
                                             <div className="bg-white/5 rounded-xl p-4 text-left space-y-3 animate-in fade-in slide-in-from-bottom-4">
                                                 <h4 className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                                                    <Sparkles className="w-4 h-4 text-yellow-400" />
-                                                    AI Suggestions
+                                                    <MapPin className="w-4 h-4 text-yellow-400" />
+                                                    Suggested Places
                                                 </h4>
 
                                                 {isLoadingAI ? (
                                                     <div className="flex items-center justify-center py-4 text-slate-400 gap-2">
                                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                                        <span className="text-sm">Thinking...</span>
+                                                        <span className="text-sm">Scouting locations...</span>
                                                     </div>
                                                 ) : (
-                                                    <ul className="space-y-2">
-                                                        {recommendations.map((rec, i) => (
-                                                            <li key={i} className="text-sm text-slate-300 flex gap-2">
-                                                                <span className="text-primary">•</span>
-                                                                {rec}
-                                                            </li>
+                                                    <div className="space-y-3">
+                                                        {recommendations.map((rec: any, i) => (
+                                                            <div key={i} className="bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-black/30 transition-colors">
+                                                                <div className="flex justify-between items-start gap-2">
+                                                                    <div>
+                                                                        <h5 className="font-medium text-white text-sm">{rec.title}</h5>
+                                                                        <p className="text-xs text-slate-400 mt-1">{rec.description}</p>
+                                                                        {onFindDining && (
+                                                                            <button
+                                                                                onClick={() => onFindDining(rec.title)}
+                                                                                className="text-xs text-orange-400 hover:text-orange-300 underline mt-2 flex items-center gap-1 transition-colors"
+                                                                            >
+                                                                                <Utensils className="w-3 h-3" /> Find food nearby
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                    {rec.url && (
+                                                                        <a
+                                                                            href={rec.url}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="shrink-0 p-2 bg-white/10 hover:bg-white/20 rounded-full text-secondary transition-colors"
+                                                                            title="View Info / Tickets"
+                                                                        >
+                                                                            <ExternalLink className="w-3 h-3" />
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+                                                            </div>
                                                         ))}
                                                         {recommendations.length === 0 && (
-                                                            <li className="text-sm text-slate-400 italic">No specific recommendations found.</li>
+                                                            <p className="text-sm text-slate-400 italic">No specific places found. Try a Google search!</p>
                                                         )}
-                                                    </ul>
+                                                    </div>
                                                 )}
                                             </div>
                                         )}

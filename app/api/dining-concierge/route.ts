@@ -20,7 +20,17 @@ export async function POST(request: Request) {
         }
 
         const { cuisine, vibe, location } = await request.json().catch(() => ({}));
-        const userLocation = location || (user.couple as any)?.location || "Unknown City";
+
+        const coupleLocation = (user.couple as any)?.location;
+        const userHomeTown = user.homeTown;
+
+        // If user manually provided a location in the request, use that.
+        // Otherwise, mix couple location and home town.
+        let userLocation = location;
+        if (!userLocation) {
+            const locations = [coupleLocation, userHomeTown].filter(Boolean).join(" and ");
+            userLocation = locations || "Unknown City";
+        }
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         if (!apiKey) {

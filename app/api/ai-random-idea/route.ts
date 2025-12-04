@@ -38,7 +38,16 @@ export async function POST(request: Request) {
             });
         }
 
-        const location = (user.couple as any)?.location;
+        const coupleLocation = (user.couple as any)?.location;
+        const userHomeTown = user.homeTown;
+
+        // Determine which location to use (randomly mix or use both contextually)
+        // For a single idea, we can't "mix" the result, but we can randomly pick one of the two locations to ensure variety over time.
+        const locations = [coupleLocation, userHomeTown].filter(Boolean);
+        const location = locations.length > 0 ? locations[Math.floor(Math.random() * locations.length)] : "Unknown";
+
+        const userInterests = user.interests ? `User Interests: ${user.interests}` : "";
+
         let weatherInfo = "Unknown";
 
         if (location && location !== 'Unknown') {
@@ -83,6 +92,7 @@ export async function POST(request: Request) {
         CONTEXT:
         - Location: ${location || "Unknown"}
         - Current Weather: ${weatherInfo}
+        - ${userInterests}
         - Consider any major local events, festivals, or seasonal activities happening right now in ${location || "the area"} if known.
         ${category ? `- The user specifically wants a date idea in the category: "${category}" (e.g. if MEAL, suggest a specific type of cuisine or restaurant vibe; if ACTIVITY, suggest something active; if EVENT, suggest a show or festival).` : ''}
         
@@ -92,6 +102,7 @@ export async function POST(request: Request) {
         - Do NOT involve cardboard in any way.
         - Do NOT involve cocktails or alcohol-focused activities.
         - Avoid activities that require significant prior preparation or planning (spontaneous ideas preferred).
+        - If the user has listed interests, try to incorporate them if possible, but don't be limited by them.
         ${category ? `- The idea MUST fit the category: ${category}` : ''}
         
         Return the response as a valid JSON object with the following fields:

@@ -16,9 +16,9 @@ export async function POST(request: Request) {
             await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
             return NextResponse.json({
                 recommendations: [
-                    `Mock Recommendation 1 for ${description}`,
-                    `Mock Recommendation 2 for ${description}`,
-                    `Mock Recommendation 3 for ${description} (Add GEMINI_API_KEY to .env for real AI!)`
+                    { title: "Mock Place 1", description: `A great spot for ${description}`, url: "https://google.com" },
+                    { title: "Mock Place 2", description: `Another cool place for ${description}`, url: "https://google.com" },
+                    { title: "Mock Place 3", description: `Try this for ${description}`, url: "https://google.com" }
                 ]
             });
         }
@@ -27,12 +27,22 @@ export async function POST(request: Request) {
         I am planning a date with the following idea: "${description}".
         ${location ? `We are located in or near ${location}. Please suggest 3 REAL, specific places nearby that fit this date idea.` : 'Please suggest 3 creative variations or themes for this date.'}
         
-        If a location is provided, try to find actual businesses, parks, or venues in that area.
+        If a location is provided, you MUST find actual businesses, parks, or venues in that area.
         If no location is provided or specific places aren't found, suggest creative themes or types of places.
         
-        Keep the suggestions concise (max 1 sentence each).
-        Format the output as a simple JSON array of strings.
-        Example: ["Central Park near the Boathouse", "The High Line Park", "Riverside Park at Sunset"]
+        For each suggestion, provide:
+        - title: The name of the place or activity.
+        - description: A short, catchy description (1 sentence).
+        - url: A valid URL for the place (official website, Ticketmaster, Eventbrite, or a Google Search URL if specific site unknown).
+        
+        Format the output as a JSON array of objects.
+        Example:
+        [
+            { "title": "Central Park Boathouse", "description": "Rent a rowboat for a romantic afternoon.", "url": "https://centralparkboathouse.com" },
+            { "title": "The High Line", "description": "Walk along the elevated park with city views.", "url": "https://www.thehighline.org" }
+        ]
+        
+        Do not include markdown formatting. Just the raw JSON.
         `;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
@@ -54,22 +64,15 @@ export async function POST(request: Request) {
         }
 
         const data = await response.json();
-        const text = data.candidates[0].content.parts[0].text;
+        const text = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
 
         // simple parsing to ensure we get an array
         let recommendations = [];
         try {
-            // Try to find JSON array in the text
-            const match = text.match(/\[.*\]/s);
-            if (match) {
-                recommendations = JSON.parse(match[0]);
-            } else {
-                // Fallback splitting
-                recommendations = text.split('\n').filter((line: string) => line.trim().length > 0).slice(0, 3);
-            }
+            recommendations = JSON.parse(text);
         } catch (e) {
             console.error("Failed to parse AI response", e);
-            recommendations = ["Could not generate specific recommendations. Try exploring nearby!"];
+            recommendations = [];
         }
 
         return NextResponse.json({ recommendations });

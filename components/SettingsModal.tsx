@@ -17,12 +17,23 @@ interface SettingsModalProps {
 export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModalProps) {
     const router = useRouter();
     const [location, setLocation] = useState(currentLocation || "");
+    const [homeTown, setHomeTown] = useState("");
+    const [interests, setInterests] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             setLocation(currentLocation || "");
+            // Fetch user settings
+            fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(data => {
+                    if (data?.user) {
+                        setHomeTown(data.user.homeTown || "");
+                        setInterests(data.user.interests || "");
+                    }
+                });
         }
     }, [isOpen, currentLocation]);
 
@@ -31,23 +42,31 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
         setIsLoading(true);
 
         try {
-            const res = await fetch('/api/couple/location', {
+            // Update couple location
+            const locRes = await fetch('/api/couple/location', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ location }),
                 credentials: 'include',
             });
 
-            if (res.ok) {
+            // Update user settings
+            const userRes = await fetch('/api/user/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ homeTown, interests }),
+                credentials: 'include',
+            });
+
+            if (locRes.ok && userRes.ok) {
                 onClose();
                 router.refresh();
             } else {
-                const data = await res.json();
-                alert(`Failed to update location: ${data.details || "Unknown error"}`);
+                alert("Failed to update settings");
             }
         } catch (error) {
             console.error(error);
-            alert("Error updating location");
+            alert("Error updating settings");
         } finally {
             setIsLoading(false);
         }
@@ -91,7 +110,7 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass-card w-full max-w-md relative"
+                            className="glass-card w-full max-w-md relative max-h-[90vh] overflow-y-auto"
                         >
                             <button
                                 onClick={onClose}
@@ -107,7 +126,7 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300 ml-1">Your Location</label>
+                                    <label className="text-sm font-medium text-slate-300 ml-1">Couple Location</label>
                                     <Input
                                         value={location}
                                         onChange={(e) => setLocation(e.target.value)}
@@ -115,7 +134,31 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                                         required
                                     />
                                     <p className="text-xs text-slate-400 ml-1">
-                                        Used to find nearby date spots.
+                                        Used as the default location for date spots.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300 ml-1">Your Home Town</label>
+                                    <Input
+                                        value={homeTown}
+                                        onChange={(e) => setHomeTown(e.target.value)}
+                                        placeholder="e.g. Brooklyn, NY"
+                                    />
+                                    <p className="text-xs text-slate-400 ml-1">
+                                        Your specific area. Used to refine searches.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300 ml-1">Your Interests</label>
+                                    <Input
+                                        value={interests}
+                                        onChange={(e) => setInterests(e.target.value)}
+                                        placeholder="e.g. Hiking, Sushi, Jazz, Art"
+                                    />
+                                    <p className="text-xs text-slate-400 ml-1">
+                                        Comma separated. Used to personalize AI suggestions.
                                     </p>
                                 </div>
 

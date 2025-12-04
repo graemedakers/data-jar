@@ -19,7 +19,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Premium required' }, { status: 403 });
         }
 
-        const location = (user.couple as any).location || "your area";
+        const coupleLocation = (user.couple as any).location;
+        const userHomeTown = user.homeTown;
+        const locations = [coupleLocation, userHomeTown].filter(Boolean).join(" and ");
+        const location = locations || "your area";
+        const userInterests = user.interests ? `User Interests: ${user.interests}` : "";
         const today = new Date();
         const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
 
@@ -74,8 +78,16 @@ export async function POST(request: Request) {
 
         const prompt = `
         I need 5 distinct date ideas for a couple in ${location} for ${context} (${targetDateStr}).
+        ${userInterests}
         
-        Focus on SPECIFIC REAL-WORLD EVENTS scheduled for this weekend if possible (e.g., concerts, festivals, markets, special exhibitions). If no specific events are found, suggest high-quality seasonal activities.
+        CRITICAL INSTRUCTION:
+        You MUST search for and identify SPECIFIC, REAL-WORLD EVENTS that are actually scheduled to happen in ${location} during ${targetDateStr}.
+        - If multiple locations are provided (e.g. "City A and City B"), you MUST look for events in BOTH locations.
+        - Look for concerts, festivals, markets, theater shows, sports games, or special exhibitions.
+        - If you find real events, prioritize them at the top of the list.
+        - If no specific scheduled events are found, only then suggest high-quality seasonal activities or evergreen local favorites.
+        
+        For each idea, clearly state if it is a "Scheduled Event" or a "General Activity" and which location it is in.
         
         Pay particular attention to events that are good for couples (romantic, fun, interactive).
         

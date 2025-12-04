@@ -16,19 +16,8 @@ import { PremiumModal } from "@/components/PremiumModal";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { DiningConciergeModal } from "@/components/DiningConciergeModal";
 
-function InviteCodeDisplay({ mobile }: { mobile?: boolean }) {
-    const [code, setCode] = useState<string | null>(null);
+function InviteCodeDisplay({ mobile, code }: { mobile?: boolean; code: string | null }) {
     const [copied, setCopied] = useState(false);
-
-    useEffect(() => {
-        fetch('/api/auth/me')
-            .then(res => res.json())
-            .then(data => {
-                if (data?.user?.coupleReferenceCode) {
-                    setCode(data.user.coupleReferenceCode);
-                }
-            });
-    }, []);
 
     const copyToClipboard = () => {
         if (!code) return;
@@ -66,6 +55,8 @@ export default function DashboardPage() {
     const [isSpinning, setIsSpinning] = useState(false);
     const [selectedIdea, setSelectedIdea] = useState<any>(null);
     const [userLocation, setUserLocation] = useState<string | null>(null);
+    const [homeTown, setHomeTown] = useState<string | null>(null);
+    const [inviteCode, setInviteCode] = useState<string | null>(null);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [editingIdea, setEditingIdea] = useState<any>(null);
     const [ratingIdea, setRatingIdea] = useState<any>(null);
@@ -77,6 +68,8 @@ export default function DashboardPage() {
     const [isDiningModalOpen, setIsDiningModalOpen] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
     const router = useRouter();
+
+    const [diningSearchLocation, setDiningSearchLocation] = useState<string | null>(null);
 
     const fetchIdeas = async () => {
         try {
@@ -93,14 +86,20 @@ export default function DashboardPage() {
     useEffect(() => {
         fetchIdeas();
         fetch('/api/auth/me')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch user');
+                return res.json();
+            })
             .then(data => {
                 if (data?.user) {
                     if (data.user.location) setUserLocation(data.user.location);
+                    if (data.user.homeTown) setHomeTown(data.user.homeTown);
+                    if (data.user.coupleReferenceCode) setInviteCode(data.user.coupleReferenceCode);
                     const userIsPremium = !!data.user.isPremium;
                     setIsPremium(userIsPremium);
                 }
             })
+            .catch(err => console.error("Error fetching user:", err))
             .finally(() => {
                 setIsLoadingUser(false);
             });
@@ -187,6 +186,8 @@ export default function DashboardPage() {
 
     const availableIdeasCount = ideas.filter(i => !i.selectedAt).length;
 
+    const combinedLocation = [userLocation, homeTown].filter(Boolean).join(" and ");
+
     return (
         <main className="min-h-screen p-4 md:p-6 pb-24 relative overflow-hidden">
             <PremiumModal
@@ -223,8 +224,9 @@ export default function DashboardPage() {
                     fetch('/api/auth/me')
                         .then(res => res.json())
                         .then(data => {
-                            if (data?.user?.location) {
-                                setUserLocation(data.user.location);
+                            if (data?.user) {
+                                if (data.user.location) setUserLocation(data.user.location);
+                                if (data.user.homeTown) setHomeTown(data.user.homeTown);
                             }
                         });
                 }}
@@ -234,14 +236,17 @@ export default function DashboardPage() {
             <WeekendPlannerModal
                 isOpen={isPlannerOpen}
                 onClose={() => setIsPlannerOpen(false)}
-                userLocation={userLocation ?? undefined}
+                userLocation={combinedLocation || undefined}
                 onIdeaAdded={fetchIdeas}
             />
 
             <DiningConciergeModal
                 isOpen={isDiningModalOpen}
-                onClose={() => setIsDiningModalOpen(false)}
-                userLocation={userLocation ?? undefined}
+                onClose={() => {
+                    setIsDiningModalOpen(false);
+                    setDiningSearchLocation(null);
+                }}
+                userLocation={diningSearchLocation || userLocation || undefined}
                 onIdeaAdded={fetchIdeas}
                 onGoTonight={(idea) => {
                     setSelectedIdea(idea);
@@ -257,7 +262,16 @@ export default function DashboardPage() {
                 idea={ratingIdea}
             />
 
-            <DateReveal idea={selectedIdea} onClose={() => setSelectedIdea(null)} userLocation={userLocation ?? undefined} />
+            <DateReveal
+                idea={selectedIdea}
+                onClose={() => setSelectedIdea(null)}
+                userLocation={userLocation ?? undefined}
+                onFindDining={(location) => {
+                    setDiningSearchLocation(location);
+                    setIsDiningModalOpen(true);
+                    setSelectedIdea(null);
+                }}
+            />
 
             <DeleteConfirmModal
                 isOpen={!!ideaToDelete}
@@ -283,13 +297,13 @@ export default function DashboardPage() {
                         <span className="text-xs text-slate-400">Invite Code:</span>
                         <span className="text-xs font-mono text-white select-all">
                             {/* We need to fetch this from the user object */}
-                            <InviteCodeDisplay />
+                            <InviteCodeDisplay code={inviteCode} />
                         </span>
                     </div>
 
                     {/* Mobile Invite Code Button (Icon only) */}
                     <div className="md:hidden">
-                        <InviteCodeDisplay mobile />
+                        <InviteCodeDisplay mobile code={inviteCode} />
                     </div>
 
                     {!isLoadingUser && !isPremium && (
