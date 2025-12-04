@@ -15,6 +15,7 @@ import { WeekendPlannerModal } from "@/components/WeekendPlannerModal";
 import { Check, Star } from "lucide-react";
 import { RateDateModal } from "@/components/RateDateModal";
 import { PremiumModal } from "@/components/PremiumModal";
+import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 
 function InviteCodeDisplay({ mobile }: { mobile?: boolean }) {
     const [code, setCode] = useState<string | null>(null);
@@ -143,11 +144,18 @@ export default function DashboardPage() {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to remove this idea?")) return;
+    const [ideaToDelete, setIdeaToDelete] = useState<string | null>(null);
+
+    const handleDeleteClick = (id: string) => {
+        console.log("Delete clicked for id:", id);
+        setIdeaToDelete(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!ideaToDelete) return;
 
         try {
-            const res = await fetch(`/api/ideas/${id}`, {
+            const res = await fetch(`/api/ideas/${ideaToDelete}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
@@ -155,10 +163,15 @@ export default function DashboardPage() {
             if (res.ok) {
                 fetchIdeas();
             } else {
-                alert("Failed to delete idea");
+                const data = await res.json();
+                alert(`Failed to delete idea: ${data.error || "Unknown error"}`);
+                console.error("Delete failed:", data);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error deleting idea:", error);
+            alert(`Error deleting idea: ${error.message}`);
+        } finally {
+            setIdeaToDelete(null);
         }
     };
 
@@ -235,6 +248,12 @@ export default function DashboardPage() {
             />
 
             <DateReveal idea={selectedIdea} onClose={() => setSelectedIdea(null)} userLocation={userLocation ?? undefined} />
+
+            <DeleteConfirmModal
+                isOpen={!!ideaToDelete}
+                onClose={() => setIdeaToDelete(null)}
+                onConfirm={confirmDelete}
+            />
 
             {/* Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
@@ -372,10 +391,12 @@ export default function DashboardPage() {
                             ideas.filter(i => !i.selectedAt).map((idea) => (
                                 <div
                                     key={idea.id}
-                                    onClick={() => !idea.isMasked && setEditingIdea(idea)}
-                                    className={`glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 group transition-colors ${idea.isMasked ? 'opacity-75 bg-white/5 cursor-default' : 'hover:bg-white/5 cursor-pointer'}`}
+                                    className={`glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 group transition-colors ${idea.isMasked ? 'opacity-75 bg-white/5' : 'hover:bg-white/5'}`}
                                 >
-                                    <div>
+                                    <div
+                                        className={`flex-1 ${!idea.isMasked ? 'cursor-pointer' : ''}`}
+                                        onClick={() => !idea.isMasked && setEditingIdea(idea)}
+                                    >
                                         <div className="flex items-center gap-2">
                                             {idea.isMasked && <Lock className="w-3 h-3 text-slate-400" />}
                                             <p className={`font-medium ${idea.isMasked ? 'text-slate-400 italic' : 'text-white'}`}>{idea.description}</p>
@@ -390,10 +411,11 @@ export default function DashboardPage() {
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
+                                                    // No need for stopPropagation now, but keeping it is safe
                                                     e.stopPropagation();
-                                                    handleDelete(idea.id);
+                                                    handleDeleteClick(idea.id);
                                                 }}
-                                                className="relative z-10 p-2 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors sm:opacity-0 group-hover:opacity-100"
+                                                className="relative z-10 p-2 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors"
                                                 title="Delete Idea"
                                             >
                                                 <Trash2 className="w-4 h-4 pointer-events-none" />
@@ -443,7 +465,7 @@ export default function DashboardPage() {
                                                 type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleDelete(idea.id);
+                                                    handleDeleteClick(idea.id);
                                                 }}
                                                 className="relative z-10 p-1.5 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-red-400"
                                                 title="Delete from History"

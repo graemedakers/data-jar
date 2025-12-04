@@ -66,3 +66,19 @@ export function DialogTitle({ children, className }: { children: React.ReactNode
         </h2>
     );
 }
+
+export function DialogDescription({ children, className }: { children: React.ReactNode; className?: string }) {
+    return (
+        <p className={cn("text-sm text-slate-400", className)}>
+            {children}
+        </p>
+    );
+}
+
+export function DialogFooter({ children, className }: { children: React.ReactNode; className?: string }) {
+    return (
+        <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}>
+            {children}
+        </div>
+    );
+}
