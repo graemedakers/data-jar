@@ -99,7 +99,7 @@ export async function POST(request: Request) {
 
         const prompt = `
         Act as a local dining concierge for ${targetLocation}.
-        Recommend 3 distinct restaurants based on the following preferences:
+        Recommend 5 distinct restaurants based on the following preferences:
         - Cuisine: ${cuisine || "Any good local food"}
         - Vibe/Atmosphere: ${vibe || "Any"}
         

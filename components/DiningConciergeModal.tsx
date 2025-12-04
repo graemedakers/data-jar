@@ -17,15 +17,25 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
     const [isLoading, setIsLoading] = useState(false);
     const [cuisine, setCuisine] = useState("");
     const [vibe, setVibe] = useState("");
+    const [locationInput, setLocationInput] = useState(userLocation || "");
     const [recommendations, setRecommendations] = useState<any[]>([]);
 
     const handleGetRecommendations = async (overrideLocation?: string) => {
         setIsLoading(true);
+        // Update input if override provided (e.g. from auto-fetch)
+        if (overrideLocation) {
+            setLocationInput(overrideLocation);
+        }
+
         try {
             const res = await fetch('/api/dining-concierge', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cuisine, vibe, location: overrideLocation || userLocation }),
+                body: JSON.stringify({
+                    cuisine,
+                    vibe,
+                    location: overrideLocation || locationInput || userLocation
+                }),
             });
 
             if (res.ok) {
@@ -175,6 +185,19 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
 
                         <div className="p-6 overflow-y-auto overflow-x-hidden flex-1 space-y-6 px-7">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2 md:col-span-2">
+                                    <label className="text-sm font-medium text-slate-300">Location</label>
+                                    <div className="relative">
+                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            value={locationInput}
+                                            onChange={(e) => setLocationInput(e.target.value)}
+                                            placeholder="e.g. Downtown, Near Central Park..."
+                                            className="glass-input w-full pl-12 pr-4 py-2"
+                                        />
+                                    </div>
+                                </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-300">Cuisine Preference</label>
                                     <input
