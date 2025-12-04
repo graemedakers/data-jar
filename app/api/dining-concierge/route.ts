@@ -34,11 +34,6 @@ export async function POST(request: Request) {
         // We normalize strings to be safe (trim, lowercase)
         const isDefaultLocation = !location || (coupleLocation && location.trim().toLowerCase() === coupleLocation.trim().toLowerCase());
 
-        let contextLocation = "";
-        if (coupleLocation || userHomeTown) {
-            contextLocation = [coupleLocation, userHomeTown].filter(Boolean).join(" or ");
-        }
-
         if (isDefaultLocation) {
             const locs = [coupleLocation, userHomeTown].filter(Boolean);
             // Use both locations for the context if available
@@ -53,11 +48,10 @@ export async function POST(request: Request) {
             }
         } else {
             // If a specific location/activity was provided (e.g. "Hiking" or "The Alamo"), 
-            // provide the user's base location as context so the AI can resolve generic activities.
+            // rely ONLY on that information.
             extraInstructions += `The user is asking about "${targetLocation}". 
-            Context: The user is based in ${contextLocation}. 
             - If "${targetLocation}" is a specific place or city (e.g. "The Alamo", "Paris", "123 Main St"), find restaurants near THAT place.
-            - If "${targetLocation}" is a generic activity or contains details (e.g. "Hiking", "Context: ..."), first IDENTIFY the best specific venue for this activity in ${contextLocation}, then find restaurants near THAT venue.
+            - If "${targetLocation}" is a generic activity or contains details (e.g. "Hiking", "Context: ..."), first IDENTIFY the best specific venue for this activity based ONLY on the provided text, then find restaurants near THAT venue.
             - CRITICAL: If the input contains a specific address or venue name, prioritize restaurants within walking distance (5-10 mins) of that location.\n`;
         }
 
