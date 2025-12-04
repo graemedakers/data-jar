@@ -59,7 +59,17 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
     const handleSurpriseMe = async () => {
         setIsGeneratingAI(true);
         try {
-            const res = await fetch('/api/ai-random-idea', { method: 'POST' });
+            const res = await fetch('/api/ai-random-idea', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category: formData.category,
+                    // We can optionally send other fields if we want the AI to respect them too,
+                    // but the user specifically asked for category.
+                    // Let's send them as "preferences" if they are not default?
+                    // For now, just category is the main request.
+                })
+            });
             if (res.ok) {
                 const data = await res.json();
                 setFormData({
@@ -70,7 +80,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                     activityLevel: data.activityLevel,
                     cost: data.cost,
                     timeOfDay: data.timeOfDay,
-                    category: "ACTIVITY", // Default AI ideas to activity for now
+                    category: data.category || formData.category || "ACTIVITY",
                 });
             } else {
                 const errorData = await res.json();
@@ -135,7 +145,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                             {initialData && initialData.id ? "Edit Idea" : initialData ? "Duplicate Idea" : "Add New Idea"}
                         </h2>
 
-                        <div className="max-h-[85vh] overflow-y-auto px-1">
+                        <div className="max-h-[85vh] overflow-y-auto px-4 pb-6">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-300 ml-1">Description</label>
@@ -304,8 +314,15 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                                                         <Lock className="w-4 h-4 text-white" />
                                                     </div>
                                                 )}
-                                                <Sparkles className="w-5 h-5 mr-2 text-yellow-400" />
-                                                Surprise Me
+                                                <div className="flex flex-col items-center leading-none py-1">
+                                                    <div className="flex items-center">
+                                                        <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
+                                                        <span>Surprise Me</span>
+                                                    </div>
+                                                    <span className="text-[10px] opacity-70 font-normal mt-1">
+                                                        Based on {formData.category.charAt(0) + formData.category.slice(1).toLowerCase()}
+                                                    </span>
+                                                </div>
                                             </>
                                         )}
                                     </Button>

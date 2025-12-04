@@ -1,0 +1,131 @@
+import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+export async function POST(request: Request) {
+    try {
+        const session = await getSession();
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Check premium status
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            include: { couple: true },
+        });
+
+        if (!user || !(user.couple as any)?.isPremium) {
+            return NextResponse.json({ error: 'Premium required' }, { status: 403 });
+        }
+
+        const { cuisine, vibe, location } = await request.json().catch(() => ({}));
+        const userLocation = location || (user.couple as any)?.location || "Unknown City";
+        const apiKey = process.env.GEMINI_API_KEY?.trim();
+
+        if (!apiKey) {
+            // Mock response for dev/testing without API key
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            return NextResponse.json({
+                recommendations: [
+                    {
+                        name: "Mock Bistro",
+                        description: "A cozy spot with great pasta.",
+                        cuisine: cuisine || "Italian",
+                        price: "$$",
+                        address: "123 Main St, " + userLocation
+                    },
+                    {
+                        name: "The Mockingbird",
+                        description: "Lively atmosphere and amazing cocktails.",
+                        cuisine: "Modern American",
+                        price: "$$$",
+                        address: "456 Oak Ave, " + userLocation
+                    },
+                    {
+                        name: "Taco Mock",
+                        description: "Best street tacos in town.",
+                        cuisine: "Mexican",
+                        price: "$",
+                        address: "789 Pine Ln, " + userLocation
+                    }
+                ]
+            });
+        }
+
+        const prompt = `
+        Act as a local dining concierge for ${userLocation}.
+        Recommend 3 distinct restaurants based on the following preferences:
+        - Cuisine: ${cuisine || "Any good local food"}
+        - Vibe/Atmosphere: ${vibe || "Any"}
+        
+        For each restaurant, provide:
+        - Name
+        - A brief, appetizing description (1 sentence)
+        - Cuisine type
+        - Price range ($, $$, $$$)
+        - Approximate address or neighborhood
+        - A likely website URL (or a Google Search URL if specific site unknown)
+        - Typical opening hours for dinner (e.g. "5pm - 10pm")
+        
+        Return the result as a JSON object with a "recommendations" array.
+        Example format:
+        {
+            "recommendations": [
+                {
+                    "name": "Restaurant Name",
+                    "description": "Delicious food in a great setting.",
+                    "cuisine": "Italian",
+                    "price": "$$",
+                    "address": "123 Main St, Neighborhood",
+                    "website": "https://example.com",
+                    "opening_hours": "5pm - 10pm"
+                }
+            ]
+        }
+        Do not include markdown formatting. Just raw JSON.
+        `;
+
+        const models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-exp", "gemini-2.0-flash"];
+        let lastError = null;
+
+        for (const model of models) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.warn(`Model ${model} failed: ${response.status} - ${errorText}`);
+                    lastError = `Model ${model} failed: ${response.status}`;
+                    continue;
+                }
+
+                const data = await response.json();
+                if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                    throw new Error("Invalid API response format");
+                }
+
+                const text = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const result = JSON.parse(text);
+
+                return NextResponse.json(result);
+
+            } catch (e) {
+                console.warn(`Error with model ${model}:`, e);
+                lastError = e;
+            }
+        }
+
+        throw new Error(`All models failed. Last error: ${lastError}`);
+
+    } catch (error: any) {
+        console.error('Dining Concierge error:', error);
+        return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+    }
+}

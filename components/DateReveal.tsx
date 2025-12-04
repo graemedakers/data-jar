@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, DollarSign, Activity, Sparkles, Loader2 } from "lucide-react";
+import { X, Calendar, Clock, DollarSign, Activity, Sparkles, Loader2, MapPin, ExternalLink } from "lucide-react";
 import { Button } from "./ui/Button";
 import { useState } from "react";
 import { Confetti } from "./Confetti";
@@ -12,6 +12,10 @@ interface Idea {
     activityLevel: string;
     cost: string;
     timeOfDay: string;
+    // Optional fields for Dining Concierge
+    website?: string;
+    address?: string;
+    openingHours?: string;
 }
 
 interface DateRevealProps {
@@ -99,66 +103,118 @@ export function DateReveal({ idea, onClose, userLocation }: DateRevealProps) {
                                 </h3>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 py-6 border-y border-white/10">
-                                <div className="flex flex-col items-center gap-2">
-                                    <Clock className="w-5 h-5 text-accent" />
-                                    <span className="text-sm text-slate-300">{idea.duration * 60} mins</span>
-                                </div>
-                                <div className="flex flex-col items-center gap-2">
-                                    <DollarSign className="w-5 h-5 text-green-400" />
-                                    <span className="text-sm text-slate-300">{idea.cost}</span>
-                                </div>
-                                <div className="flex flex-col items-center gap-2">
-                                    <Activity className="w-5 h-5 text-pink-400" />
-                                    <span className="text-sm text-slate-300">{idea.activityLevel}</span>
-                                </div>
-                                <div className="flex flex-col items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-blue-400" />
-                                    <span className="text-sm text-slate-300">
-                                        {idea.timeOfDay === 'ANY' ? 'Anytime' : idea.timeOfDay === 'DAY' ? 'Day' : 'Evening'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* AI Recommendations Section */}
-                            <div className="space-y-4">
-                                {!showAI ? (
-                                    <Button
-                                        onClick={handleGetAI}
-                                        variant="ghost"
-                                        className="w-full border border-white/10 hover:bg-white/5 text-slate-300"
-                                    >
-                                        <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                                        Get AI Recommendations
-                                    </Button>
-                                ) : (
-                                    <div className="bg-white/5 rounded-xl p-4 text-left space-y-3 animate-in fade-in slide-in-from-bottom-4">
-                                        <h4 className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                                            <Sparkles className="w-4 h-4 text-yellow-400" />
-                                            AI Suggestions
-                                        </h4>
-
-                                        {isLoadingAI ? (
-                                            <div className="flex items-center justify-center py-4 text-slate-400 gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                <span className="text-sm">Thinking...</span>
+                            {/* Dining Details Section */}
+                            {(idea.website || idea.address || idea.openingHours) && (
+                                <div className="bg-white/5 rounded-xl p-4 space-y-3 text-left">
+                                    {idea.address && (
+                                        <div className="flex items-start gap-3">
+                                            <div className="p-2 bg-white/10 rounded-full shrink-0">
+                                                <MapPin className="w-4 h-4 text-orange-400" />
                                             </div>
+                                            <div>
+                                                <p className="text-xs text-slate-400 font-medium uppercase">Address</p>
+                                                <p className="text-sm text-white">{idea.address}</p>
+                                                <a
+                                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(idea.description + " " + idea.address)}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-xs text-secondary hover:underline mt-1 inline-block"
+                                                >
+                                                    View on Google Maps
+                                                </a>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {idea.openingHours && (
+                                        <div className="flex items-start gap-3">
+                                            <div className="p-2 bg-white/10 rounded-full shrink-0">
+                                                <Clock className="w-4 h-4 text-blue-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-400 font-medium uppercase">Opening Hours</p>
+                                                <p className="text-sm text-white">{idea.openingHours}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {idea.website && (
+                                        <Button
+                                            onClick={() => window.open(idea.website, '_blank')}
+                                            className="w-full mt-2 bg-white/10 hover:bg-white/20 text-white"
+                                        >
+                                            <ExternalLink className="w-4 h-4 mr-2" />
+                                            Make Reservation / Visit Website
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Only show categories and AI if it's NOT a dining concierge result (i.e. no address/website) */}
+                            {!(idea.website || idea.address || idea.openingHours) && (
+                                <>
+                                    <div className="grid grid-cols-2 gap-4 py-6 border-y border-white/10">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Clock className="w-5 h-5 text-accent" />
+                                            <span className="text-sm text-slate-300">{idea.duration * 60} mins</span>
+                                        </div>
+                                        <div className="flex flex-col items-center gap-2">
+                                            <DollarSign className="w-5 h-5 text-green-400" />
+                                            <span className="text-sm text-slate-300">{idea.cost}</span>
+                                        </div>
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Activity className="w-5 h-5 text-pink-400" />
+                                            <span className="text-sm text-slate-300">{idea.activityLevel}</span>
+                                        </div>
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Calendar className="w-5 h-5 text-blue-400" />
+                                            <span className="text-sm text-slate-300">
+                                                {idea.timeOfDay === 'ANY' ? 'Anytime' : idea.timeOfDay === 'DAY' ? 'Day' : 'Evening'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* AI Recommendations Section */}
+                                    <div className="space-y-4">
+                                        {!showAI ? (
+                                            <Button
+                                                onClick={handleGetAI}
+                                                variant="ghost"
+                                                className="w-full border border-white/10 hover:bg-white/5 text-slate-300"
+                                            >
+                                                <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
+                                                Get AI Recommendations
+                                            </Button>
                                         ) : (
-                                            <ul className="space-y-2">
-                                                {recommendations.map((rec, i) => (
-                                                    <li key={i} className="text-sm text-slate-300 flex gap-2">
-                                                        <span className="text-primary">•</span>
-                                                        {rec}
-                                                    </li>
-                                                ))}
-                                                {recommendations.length === 0 && (
-                                                    <li className="text-sm text-slate-400 italic">No specific recommendations found.</li>
+                                            <div className="bg-white/5 rounded-xl p-4 text-left space-y-3 animate-in fade-in slide-in-from-bottom-4">
+                                                <h4 className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                                                    <Sparkles className="w-4 h-4 text-yellow-400" />
+                                                    AI Suggestions
+                                                </h4>
+
+                                                {isLoadingAI ? (
+                                                    <div className="flex items-center justify-center py-4 text-slate-400 gap-2">
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <span className="text-sm">Thinking...</span>
+                                                    </div>
+                                                ) : (
+                                                    <ul className="space-y-2">
+                                                        {recommendations.map((rec, i) => (
+                                                            <li key={i} className="text-sm text-slate-300 flex gap-2">
+                                                                <span className="text-primary">•</span>
+                                                                {rec}
+                                                            </li>
+                                                        ))}
+                                                        {recommendations.length === 0 && (
+                                                            <li className="text-sm text-slate-400 italic">No specific recommendations found.</li>
+                                                        )}
+                                                    </ul>
                                                 )}
-                                            </ul>
+                                            </div>
                                         )}
                                     </div>
-                                )}
-                            </div>
+                                </>
+                            )}
 
                             <div className="flex gap-3 pt-2">
                                 <Button onClick={onClose} variant="secondary" className="w-full">

@@ -19,19 +19,22 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Premium required' }, { status: 403 });
         }
 
+        const { category } = await request.json().catch(() => ({}));
+
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         if (!apiKey) {
             console.warn("GEMINI_API_KEY is missing. Returning mock data.");
             await new Promise(resolve => setTimeout(resolve, 1000));
             return NextResponse.json({
-                description: "Mock: Picnic in the Park",
-                details: "Bring a checkered blanket and some sandwiches. It's a nice day!",
-                indoor: false,
+                description: category === 'MEAL' ? "Mock: Dinner at Luigi's" : "Mock: Picnic in the Park",
+                details: category === 'MEAL' ? "Enjoy some authentic Italian pasta." : "Bring a checkered blanket and some sandwiches. It's a nice day!",
+                indoor: category === 'MEAL',
                 duration: "2.0",
                 activityLevel: "LOW",
-                cost: "FREE",
-                timeOfDay: "DAY"
+                cost: category === 'MEAL' ? "$$" : "FREE",
+                timeOfDay: category === 'MEAL' ? "EVENING" : "DAY",
+                category: category || "ACTIVITY"
             });
         }
 
@@ -81,6 +84,7 @@ export async function POST(request: Request) {
         - Location: ${location || "Unknown"}
         - Current Weather: ${weatherInfo}
         - Consider any major local events, festivals, or seasonal activities happening right now in ${location || "the area"} if known.
+        ${category ? `- The user specifically wants a date idea in the category: "${category}" (e.g. if MEAL, suggest a specific type of cuisine or restaurant vibe; if ACTIVITY, suggest something active; if EVENT, suggest a show or festival).` : ''}
         
         CONSTRAINTS:
         - The idea MUST be suitable for the current weather conditions and location.
@@ -88,6 +92,7 @@ export async function POST(request: Request) {
         - Do NOT involve cardboard in any way.
         - Do NOT involve cocktails or alcohol-focused activities.
         - Avoid activities that require significant prior preparation or planning (spontaneous ideas preferred).
+        ${category ? `- The idea MUST fit the category: ${category}` : ''}
         
         Return the response as a valid JSON object with the following fields:
         - description: string (a short, catchy title for the date)
@@ -97,6 +102,7 @@ export async function POST(request: Request) {
         - activityLevel: string (one of: "LOW", "MEDIUM", "HIGH")
         - cost: string (one of: "FREE", "$", "$$", "$$$")
         - timeOfDay: string (one of: "ANY", "DAY", "EVENING")
+        - category: string (must be one of: "ACTIVITY", "MEAL", "EVENT")
 
         Example:
         {
@@ -106,7 +112,8 @@ export async function POST(request: Request) {
             "duration": "2.0",
             "activityLevel": "LOW",
             "cost": "$",
-            "timeOfDay": "EVENING"
+            "timeOfDay": "EVENING",
+            "category": "ACTIVITY"
         }
         
         Do not include markdown formatting like \`\`\`json. Just the raw JSON string.

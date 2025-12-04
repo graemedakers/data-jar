@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { AddIdeaModal } from "@/components/AddIdeaModal";
 import { motion } from "framer-motion";
-import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Copy, Calendar, Activity, Utensils } from "lucide-react";
+import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Copy, Calendar, Activity, Utensils, Check, Star } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Jar3D } from "@/components/Jar3D";
 import { useRouter } from "next/navigation";
@@ -11,11 +11,10 @@ import { DateReveal } from "@/components/DateReveal";
 import { SpinFiltersModal } from "@/components/SpinFiltersModal";
 import { SettingsModal } from "@/components/SettingsModal";
 import { WeekendPlannerModal } from "@/components/WeekendPlannerModal";
-
-import { Check, Star } from "lucide-react";
 import { RateDateModal } from "@/components/RateDateModal";
 import { PremiumModal } from "@/components/PremiumModal";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
+import { DiningConciergeModal } from "@/components/DiningConciergeModal";
 
 function InviteCodeDisplay({ mobile }: { mobile?: boolean }) {
     const [code, setCode] = useState<string | null>(null);
@@ -75,6 +74,7 @@ export default function DashboardPage() {
     const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+    const [isDiningModalOpen, setIsDiningModalOpen] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
     const router = useRouter();
 
@@ -238,6 +238,16 @@ export default function DashboardPage() {
                 onIdeaAdded={fetchIdeas}
             />
 
+            <DiningConciergeModal
+                isOpen={isDiningModalOpen}
+                onClose={() => setIsDiningModalOpen(false)}
+                userLocation={userLocation ?? undefined}
+                onIdeaAdded={fetchIdeas}
+                onGoTonight={(idea) => {
+                    setSelectedIdea(idea);
+                }}
+            />
+
             <RateDateModal
                 isOpen={!!ratingIdea}
                 onClose={() => {
@@ -316,7 +326,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Actions Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -359,7 +369,7 @@ export default function DashboardPage() {
                             setIsPremiumModalOpen(true);
                         }
                     }}
-                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 sm:col-span-2 md:col-span-1 relative overflow-hidden"
+                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 relative overflow-hidden"
                 >
                     {!isPremium && (
                         <div className="absolute top-3 right-3">
@@ -370,6 +380,29 @@ export default function DashboardPage() {
                         <Calendar className="w-6 h-6 text-purple-400" />
                     </div>
                     <span className="font-medium text-white text-center">Weekend Plan</span>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                        if (isPremium) {
+                            setIsDiningModalOpen(true);
+                        } else {
+                            setIsPremiumModalOpen(true);
+                        }
+                    }}
+                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 relative overflow-hidden"
+                >
+                    {!isPremium && (
+                        <div className="absolute top-3 right-3">
+                            <Lock className="w-4 h-4 text-slate-500" />
+                        </div>
+                    )}
+                    <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center group-hover:bg-orange-500/30 transition-colors">
+                        <Utensils className="w-6 h-6 text-orange-400" />
+                    </div>
+                    <span className="font-medium text-white text-center">Dining Concierge</span>
                 </motion.div>
             </div>
 
@@ -443,7 +476,7 @@ export default function DashboardPage() {
                             </span>
                         </h3>
                         <div className="space-y-3">
-                            {ideas.filter(i => i.selectedAt).map((idea) => (
+                            {ideas.filter(i => i.selectedAt).sort((a, b) => new Date(b.selectedAt).getTime() - new Date(a.selectedAt).getTime()).map((idea) => (
                                 <div key={idea.id} className="glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 opacity-75 hover:opacity-100 transition-opacity">
                                     <div>
                                         <p className="text-white font-medium line-through text-slate-400">{idea.description}</p>
