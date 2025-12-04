@@ -53,21 +53,31 @@ export default function Home() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            "name": "Date Jar",
-            "applicationCategory": "LifestyleApplication",
-            "operatingSystem": "Web",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
-            },
-            "description": "A fun, interactive way for couples to decide on their next date night. Create a shared jar of ideas and let fate decide!",
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "ratingCount": "120"
-            }
+            "@graph": [
+              {
+                "@type": "SoftwareApplication",
+                "name": "Date Jar",
+                "applicationCategory": "LifestyleApplication",
+                "operatingSystem": "Web",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "USD"
+                },
+                "description": "A fun, interactive way for couples to decide on their next date night. Create a shared jar of ideas and let fate decide!",
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": "4.8",
+                  "ratingCount": "120"
+                }
+              },
+              {
+                "@type": "WebSite",
+                "name": "Date Jar",
+                "url": "https://date-jar.vercel.app",
+                "description": "Pick your next date night with Date Jar."
+              }
+            ]
           })
         }}
       />

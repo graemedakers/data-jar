@@ -16,14 +16,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://date-jar.vercel.app'),
   title: {
     default: "Date Jar | Pick Your Next Date",
     template: "%s | Date Jar",
   },
   description: "A fun, interactive way for couples to decide on their next date. Create a shared jar of ideas and let fate decide!",
-  keywords: ["date ideas", "couples app", "relationship", "date night", "random date generator", "decision maker"],
+  keywords: ["date ideas", "couples app", "relationship", "date night", "random date generator", "decision maker", "date planner"],
   authors: [{ name: "Date Jar Team" }],
   creator: "Date Jar",
+  applicationName: "Date Jar",
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -31,14 +47,24 @@ export const metadata: Metadata = {
     title: "Date Jar | Pick Your Next Date",
     description: "Stop asking 'What do you want to do?'. Let the Date Jar decide.",
     siteName: "Date Jar",
+    images: [
+      {
+        url: '/og-image.jpg', // Assuming you might add one later, or use a default
+        width: 1200,
+        height: 630,
+        alt: 'Date Jar App',
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Date Jar | Pick Your Next Date",
     description: "A fun way for couples to decide on their next date.",
+    images: ['/og-image.jpg'],
   },
   icons: {
     icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 
