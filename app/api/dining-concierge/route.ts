@@ -22,15 +22,36 @@ export async function POST(request: Request) {
         const { cuisine, vibe, location } = await request.json().catch(() => ({}));
 
         const coupleLocation = (user.couple as any)?.location;
-        const userHomeTown = user.homeTown;
+        const userHomeTown = (user as any).homeTown;
+        const userInterests = (user as any).interests;
 
         // If user manually provided a location in the request, use that.
-        // Otherwise, mix couple location and home town.
-        let userLocation = location;
-        if (!userLocation) {
-            const locations = [coupleLocation, userHomeTown].filter(Boolean).join(" and ");
-            userLocation = locations || "Unknown City";
+        // Otherwise, use couple location.
+        let targetLocation = location;
+        let extraInstructions = "";
+
+        // Check if the requested location is effectively the default couple location (or empty)
+        // We normalize strings to be safe (trim, lowercase)
+        const isDefaultLocation = !location || (coupleLocation && location.trim().toLowerCase() === coupleLocation.trim().toLowerCase());
+
+        if (isDefaultLocation) {
+            const locs = [coupleLocation, userHomeTown].filter(Boolean);
+            // Use both locations for the context if available
+            if (locs.length > 0) {
+                targetLocation = locs.join(" and ");
+
+                if (userHomeTown && userHomeTown !== coupleLocation) {
+                    extraInstructions += `IMPORTANT: You MUST include at least one recommendation located in or very near to ${userHomeTown}.\n`;
+                }
+            } else {
+                targetLocation = "your local area";
+            }
         }
+
+        if (userInterests) {
+            extraInstructions += `The user is interested in: ${userInterests}. Consider this when selecting the vibe or cuisine if applicable.\n`;
+        }
+
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         if (!apiKey) {
@@ -43,31 +64,33 @@ export async function POST(request: Request) {
                         description: "A cozy spot with great pasta.",
                         cuisine: cuisine || "Italian",
                         price: "$$",
-                        address: "123 Main St, " + userLocation
+                        address: "123 Main St, " + (targetLocation.split(" and ")[0] || "City")
                     },
                     {
                         name: "The Mockingbird",
                         description: "Lively atmosphere and amazing cocktails.",
                         cuisine: "Modern American",
                         price: "$$$",
-                        address: "456 Oak Ave, " + userLocation
+                        address: "456 Oak Ave, " + (targetLocation.split(" and ")[0] || "City")
                     },
                     {
-                        name: "Taco Mock",
+                        name: "Home Town Taco",
                         description: "Best street tacos in town.",
                         cuisine: "Mexican",
                         price: "$",
-                        address: "789 Pine Ln, " + userLocation
+                        address: "789 Pine Ln, " + (userHomeTown || targetLocation.split(" and ")[0] || "City")
                     }
                 ]
             });
         }
 
         const prompt = `
-        Act as a local dining concierge for ${userLocation}.
+        Act as a local dining concierge for ${targetLocation}.
         Recommend 3 distinct restaurants based on the following preferences:
         - Cuisine: ${cuisine || "Any good local food"}
         - Vibe/Atmosphere: ${vibe || "Any"}
+        
+        ${extraInstructions}
         
         For each restaurant, provide:
         - Name
