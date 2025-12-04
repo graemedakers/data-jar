@@ -209,7 +209,7 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
 
                                         {onFindDining && (
                                             <Button
-                                                onClick={() => onFindDining(idea.description)}
+                                                onClick={() => onFindDining(idea.address ? `${idea.description} near ${idea.address}` : idea.description)}
                                                 variant="ghost"
                                                 className="w-full mt-4 border border-white/10 hover:bg-white/5 text-orange-300 hover:text-orange-200"
                                             >
