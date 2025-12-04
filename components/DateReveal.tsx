@@ -227,60 +227,62 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                                         )}
                                     </div>
 
-                                    {/* AI Recommendations Section */}
-                                    <div className="space-y-4">
-                                        {!showAI ? (
-                                            <Button
-                                                onClick={handleGetAI}
-                                                variant="ghost"
-                                                className="w-full border border-white/10 hover:bg-white/5 text-slate-300"
-                                            >
-                                                <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                                                Find Specific Places & Tickets
-                                            </Button>
-                                        ) : (
-                                            <div className="bg-white/5 rounded-xl p-4 text-left space-y-3 animate-in fade-in slide-in-from-bottom-4">
-                                                <h4 className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                                                    <MapPin className="w-4 h-4 text-yellow-400" />
-                                                    Suggested Places
-                                                </h4>
+                                    {/* AI Recommendations Section - Only show if no link in details (implies generic idea) */}
+                                    {!idea.details?.match(/https?:\/\/[^\s]+/) && (
+                                        <div className="space-y-4">
+                                            {!showAI ? (
+                                                <Button
+                                                    onClick={handleGetAI}
+                                                    variant="ghost"
+                                                    className="w-full border border-white/10 hover:bg-white/5 text-slate-300"
+                                                >
+                                                    <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
+                                                    Find Specific Places & Tickets
+                                                </Button>
+                                            ) : (
+                                                <div className="bg-white/5 rounded-xl p-4 text-left space-y-3 animate-in fade-in slide-in-from-bottom-4">
+                                                    <h4 className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                                                        <MapPin className="w-4 h-4 text-yellow-400" />
+                                                        Suggested Places
+                                                    </h4>
 
-                                                {isLoadingAI ? (
-                                                    <div className="flex items-center justify-center py-4 text-slate-400 gap-2">
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                        <span className="text-sm">Scouting locations...</span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="space-y-3">
-                                                        {recommendations.map((rec: any, i) => (
-                                                            <div key={i} className="bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-black/30 transition-colors">
-                                                                <div className="flex justify-between items-start gap-2">
-                                                                    <div>
-                                                                        <h5 className="font-medium text-white text-sm">{rec.title}</h5>
-                                                                        <p className="text-xs text-slate-400 mt-1">{rec.description}</p>
+                                                    {isLoadingAI ? (
+                                                        <div className="flex items-center justify-center py-4 text-slate-400 gap-2">
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            <span className="text-sm">Scouting locations...</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-3">
+                                                            {recommendations.map((rec: any, i) => (
+                                                                <div key={i} className="bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-black/30 transition-colors">
+                                                                    <div className="flex justify-between items-start gap-2">
+                                                                        <div>
+                                                                            <h5 className="font-medium text-white text-sm">{rec.title}</h5>
+                                                                            <p className="text-xs text-slate-400 mt-1">{rec.description}</p>
+                                                                        </div>
+                                                                        {rec.url && (
+                                                                            <a
+                                                                                href={rec.url}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="shrink-0 p-2 bg-white/10 hover:bg-white/20 rounded-full text-secondary transition-colors"
+                                                                                title="View Info / Tickets"
+                                                                            >
+                                                                                <ExternalLink className="w-3 h-3" />
+                                                                            </a>
+                                                                        )}
                                                                     </div>
-                                                                    {rec.url && (
-                                                                        <a
-                                                                            href={rec.url}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="shrink-0 p-2 bg-white/10 hover:bg-white/20 rounded-full text-secondary transition-colors"
-                                                                            title="View Info / Tickets"
-                                                                        >
-                                                                            <ExternalLink className="w-3 h-3" />
-                                                                        </a>
-                                                                    )}
                                                                 </div>
-                                                            </div>
-                                                        ))}
-                                                        {recommendations.length === 0 && (
-                                                            <p className="text-sm text-slate-400 italic">No specific places found. Try a Google search!</p>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
+                                                            ))}
+                                                            {recommendations.length === 0 && (
+                                                                <p className="text-sm text-slate-400 italic">No specific places found. Try a Google search!</p>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </>
                             )}
 
