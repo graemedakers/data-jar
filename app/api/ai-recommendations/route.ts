@@ -25,15 +25,13 @@ export async function POST(request: Request) {
 
         const prompt = `
         I am planning a date with the following idea: "${description}".
-        ${details ? `Additional details/context: "${details}".` : ''}
-        ${location ? `We are located in or near ${location}.` : ''}
-        
-        Please suggest 3 REAL, specific places nearby that fit this date idea.
+        ${details ? `The plan details are: "${details}".` : ''}
         
         CRITICAL INSTRUCTION:
-        - If the "Additional details/context" contains specific location clues (e.g. a specific neighborhood, venue name, or city), YOU MUST PRIORITIZE finding places that match those clues.
-        - If a location is provided, you MUST find actual businesses, parks, or venues in that area.
-        - If no location is provided or specific places aren't found, suggest creative themes or types of places.
+        - You must find 3 REAL, specific places that fit this date idea.
+        - The location of these places MUST be based on the "plan details" provided above.
+        - ONLY if the plan details do not specify a location, use the user's general location: ${location ? location : "their local area"}.
+        - If the plan details mention a specific city, neighborhood, or venue, IGNORE the user's general location and search there instead.
         
         For each suggestion, provide:
         - title: The name of the place or activity.
