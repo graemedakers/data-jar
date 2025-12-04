@@ -67,6 +67,7 @@ export async function POST(request: Request) {
         - Approximate address or neighborhood
         - A likely website URL (or a Google Search URL if specific site unknown)
         - Typical opening hours for dinner (e.g. "5pm - 10pm")
+        - Approximate Google Rating (e.g. 4.5)
         
         Return the result as a JSON object with a "recommendations" array.
         Example format:
@@ -79,7 +80,8 @@ export async function POST(request: Request) {
                     "price": "$$",
                     "address": "123 Main St, Neighborhood",
                     "website": "https://example.com",
-                    "opening_hours": "5pm - 10pm"
+                    "opening_hours": "5pm - 10pm",
+                    "google_rating": 4.5
                 }
             ]
         }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Utensils, MapPin, Loader2, Sparkles, ExternalLink, Plus, Zap } from "lucide-react";
+import { X, Utensils, MapPin, Loader2, Sparkles, ExternalLink, Plus, Zap, Star } from "lucide-react";
 import { Button } from "./ui/Button";
 
 interface DiningConciergeModalProps {
@@ -72,7 +72,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
     const handleGoTonight = async (rec: any) => {
         const ideaData = {
             description: rec.name,
-            details: `${rec.description}\n\nAddress: ${rec.address}\nPrice: ${rec.price}\nWebsite: ${rec.website || 'N/A'}\nHours: ${rec.opening_hours || 'N/A'}`,
+            details: `${rec.description}\n\nAddress: ${rec.address}\nPrice: ${rec.price}\nWebsite: ${rec.website || 'N/A'}\nHours: ${rec.opening_hours || 'N/A'}\nRating: ${rec.google_rating || 'N/A'}`,
             indoor: true,
             duration: 2.0,
             activityLevel: "LOW",
@@ -106,6 +106,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                     website: rec.website,
                     address: rec.address,
                     openingHours: rec.opening_hours,
+                    googleRating: rec.google_rating,
                     // Ensure ID is present if save failed (fallback)
                     id: (savedIdea as any).id || 'temp-' + Date.now(),
                 });
@@ -121,6 +122,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                     website: rec.website,
                     address: rec.address,
                     openingHours: rec.opening_hours,
+                    googleRating: rec.google_rating,
                     id: 'temp-' + Date.now(),
                 });
                 onClose();
@@ -213,7 +215,20 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                                     <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
                                                         <span className="flex items-center gap-1"><Utensils className="w-3 h-3" /> {rec.cuisine}</span>
                                                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {rec.address}</span>
+                                                        {rec.google_rating && (
+                                                            <span className="flex items-center gap-1 text-yellow-400">
+                                                                <Star className="w-3 h-3 fill-yellow-400" /> {rec.google_rating}
+                                                            </span>
+                                                        )}
                                                     </div>
+                                                    {rec.google_rating && (
+                                                        <button
+                                                            onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(rec.name + " " + rec.address + " reviews")}`, '_blank')}
+                                                            className="text-xs text-blue-400 hover:text-blue-300 underline mt-1 text-left"
+                                                        >
+                                                            Read Google Reviews
+                                                        </button>
+                                                    )}
                                                 </div>
                                                 <div className="flex flex-row sm:flex-col gap-2 justify-end">
                                                     <Button size="sm" variant="ghost" className="text-xs" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rec.name + " " + rec.address)}`, '_blank')}>

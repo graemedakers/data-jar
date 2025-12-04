@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, DollarSign, Activity, Sparkles, Loader2, MapPin, ExternalLink } from "lucide-react";
+import { X, Calendar, Clock, DollarSign, Activity, Sparkles, Loader2, MapPin, ExternalLink, Star } from "lucide-react";
 import { Button } from "./ui/Button";
 import { useState } from "react";
 import { Confetti } from "./Confetti";
@@ -16,6 +16,7 @@ interface Idea {
     website?: string;
     address?: string;
     openingHours?: string;
+    googleRating?: number;
 }
 
 interface DateRevealProps {
@@ -134,6 +135,28 @@ export function DateReveal({ idea, onClose, userLocation }: DateRevealProps) {
                                             <div>
                                                 <p className="text-xs text-slate-400 font-medium uppercase">Opening Hours</p>
                                                 <p className="text-sm text-white">{idea.openingHours}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {idea.googleRating && (
+                                        <div className="flex items-start gap-3">
+                                            <div className="p-2 bg-white/10 rounded-full shrink-0">
+                                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-400 font-medium uppercase">Google Rating</p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-sm text-white font-bold">{idea.googleRating} / 5</p>
+                                                    <a
+                                                        href={`https://www.google.com/search?q=${encodeURIComponent(idea.description + " " + (idea.address || "") + " reviews")}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-xs text-blue-400 hover:underline"
+                                                    >
+                                                        Read Reviews
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
