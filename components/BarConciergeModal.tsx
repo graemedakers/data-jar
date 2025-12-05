@@ -18,7 +18,7 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
     const [selectedDrinks, setSelectedDrinks] = useState<string[]>([]);
     const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
     const [location, setLocation] = useState(userLocation || "");
-    const [price, setPrice] = useState("moderate");
+    const [price, setPrice] = useState("any");
     const [recommendations, setRecommendations] = useState<any[]>([]);
     const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -263,7 +263,7 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-300">Price Range</label>
                                     <div className="flex gap-2">
-                                        {['cheap', 'moderate', 'expensive'].map((p) => (
+                                        {['any', 'cheap', 'moderate', 'expensive'].map((p) => (
                                             <button
                                                 key={p}
                                                 type="button"
@@ -273,7 +273,7 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
                                                     : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                                                     }`}
                                             >
-                                                {p.charAt(0).toUpperCase() + p.slice(1)} ({p === 'cheap' ? '$' : p === 'moderate' ? '$$' : '$$$'})
+                                                {p === 'any' ? 'Any' : p.charAt(0).toUpperCase() + p.slice(1)} {p !== 'any' && `(${p === 'cheap' ? '$' : p === 'moderate' ? '$$' : '$$$'})`}
                                             </button>
                                         ))}
                                     </div>
