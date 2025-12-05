@@ -316,40 +316,42 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        className="flex-1 relative overflow-hidden py-3"
-                                        onClick={() => {
-                                            if (!isPremium && onUpgrade) {
-                                                onUpgrade();
-                                            } else {
-                                                handleSurpriseMe();
-                                            }
-                                        }}
-                                        disabled={isLoading || isGeneratingAI}
-                                    >
-                                        {isGeneratingAI ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                        ) : (
-                                            <>
-                                                {!isPremium && (
-                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] z-10">
-                                                        <Lock className="w-4 h-4 text-white" />
+                                    {!(initialData?.id) && (
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            className="flex-1 relative overflow-hidden py-3"
+                                            onClick={() => {
+                                                if (!isPremium && onUpgrade) {
+                                                    onUpgrade();
+                                                } else {
+                                                    handleSurpriseMe();
+                                                }
+                                            }}
+                                            disabled={isLoading || isGeneratingAI}
+                                        >
+                                            {isGeneratingAI ? (
+                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                            ) : (
+                                                <>
+                                                    {!isPremium && (
+                                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] z-10">
+                                                            <Lock className="w-4 h-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex flex-col items-center leading-none py-1">
+                                                        <div className="flex items-center">
+                                                            <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
+                                                            <span>Surprise {formData.category.charAt(0) + formData.category.slice(1).toLowerCase()}</span>
+                                                        </div>
                                                     </div>
-                                                )}
-                                                <div className="flex flex-col items-center leading-none py-1">
-                                                    <div className="flex items-center">
-                                                        <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                                                        <span>Surprise {formData.category.charAt(0) + formData.category.slice(1).toLowerCase()}</span>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                    </Button>
+                                                </>
+                                            )}
+                                        </Button>
+                                    )}
                                     <button
                                         type="submit"
-                                        className="flex-[2] inline-flex items-center justify-center transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none glass-button px-8 py-3 text-base"
+                                        className={`${initialData?.id ? "w-full" : "flex-[2]"} inline-flex items-center justify-center transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none glass-button px-8 py-3 text-base`}
                                         disabled={isLoading || isGeneratingAI}
                                     >
                                         {isLoading ? (
