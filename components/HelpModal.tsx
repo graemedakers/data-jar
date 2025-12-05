@@ -25,7 +25,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
         { id: "getting-started", title: "Getting Started", icon: MapPin },
         { id: "dashboard", title: "The Dashboard", icon: History },
         { id: "dining-concierge", title: "Dining Concierge", icon: Utensils },
-        { id: "bar-concierge", title: "Bar Concierge", icon: Wine },
+        { id: "bar-concierge", title: "Bar Scout", icon: Wine },
         { id: "adding-ideas", title: "Adding Ideas", icon: Plus },
         { id: "weekend-planner", title: "Weekend Planner", icon: Calendar },
         { id: "spinning", title: "Spinning the Jar", icon: Sparkles },
@@ -86,9 +86,9 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
             case "bar-concierge":
                 return (
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold text-white">Bar Concierge <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-0.5 rounded-full ml-2">PREMIUM</span></h3>
+                        <h3 className="text-xl font-bold text-white">Bar Scout <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-0.5 rounded-full ml-2">PREMIUM</span></h3>
                         <p className="text-slate-300">
-                            Looking for a place to grab a drink? The Bar Concierge helps you discover great local spots.
+                            Looking for a place to grab a drink? The Bar Scout helps you discover great local spots.
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-slate-300">
                             <li><strong>Drink Types:</strong> Select what you're in the mood for (e.g., "Cocktails", "Craft Beer", "Wine").</li>

@@ -493,7 +493,7 @@ export default function DashboardPage() {
                     <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
                         <Wine className="w-6 h-6 text-purple-400" />
                     </div>
-                    <span className="font-medium text-white text-center">Bar Concierge</span>
+                    <span className="font-medium text-white text-center">Bar Scout</span>
                 </motion.div>
             </div>
 

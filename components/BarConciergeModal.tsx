@@ -195,7 +195,7 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
                                     <Wine className="w-5 h-5 text-purple-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-white">Bar Concierge</h2>
+                                    <h2 className="text-xl font-bold text-white">Bar Scout</h2>
                                     <p className="text-sm text-slate-400">Find the perfect spot for a drink</p>
                                 </div>
                             </div>
