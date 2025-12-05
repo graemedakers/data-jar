@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { login } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
+import crypto from 'crypto';
+import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
     try {
@@ -22,6 +24,9 @@ export async function POST(request: Request) {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
+        let user;
 
         if (!inviteCode) {
             // Create new couple
@@ -29,48 +34,52 @@ export async function POST(request: Request) {
                 data: {
                     referenceCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
                     location: location || 'Unknown',
-                    isPremium: false, // Explicitly set to false, though default is false
+                    isPremium: false,
                 },
             });
 
             // Create User
-            const user = await prisma.user.create({
+            user = await prisma.user.create({
                 data: {
                     email,
                     name,
                     passwordHash,
                     coupleId: couple.id,
-                    hasUsedTrial: true, // User starts their trial immediately
+                    hasUsedTrial: true,
+                    verificationToken,
+                    emailVerified: null,
                 },
             });
+        } else {
+            // JOINING EXISTING COUPLE
+            const couple = await prisma.couple.findUnique({
+                where: { referenceCode: inviteCode },
+            });
 
-            await login(user);
-            return NextResponse.json({ success: true, user });
+            if (!couple) {
+                return NextResponse.json({ error: 'Invalid invite code' }, { status: 400 });
+            }
+
+            // Create User linked to existing couple
+            user = await prisma.user.create({
+                data: {
+                    email,
+                    name,
+                    passwordHash,
+                    coupleId: couple.id,
+                    verificationToken,
+                    emailVerified: null,
+                },
+            });
         }
 
-        // JOINING EXISTING COUPLE
-        const couple = await prisma.couple.findUnique({
-            where: { referenceCode: inviteCode },
-        });
+        // Send verification email
+        await sendVerificationEmail(email, verificationToken);
 
-        if (!couple) {
-            return NextResponse.json({ error: 'Invalid invite code' }, { status: 400 });
-        }
+        // DO NOT LOGIN YET
+        // await login(user);
 
-        // Create User linked to existing couple
-        const user = await prisma.user.create({
-            data: {
-                email,
-                name,
-                passwordHash,
-                coupleId: couple.id,
-            },
-        });
-
-        // Login the user immediately
-        await login(user);
-
-        return NextResponse.json({ success: true, user });
+        return NextResponse.json({ success: true, requiresVerification: true });
 
     } catch (error) {
         console.error('Signup error:', error);

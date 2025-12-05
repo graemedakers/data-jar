@@ -28,6 +28,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }
 
+        // Check if email is verified
+        if (!user.emailVerified && user.verificationToken) {
+            return NextResponse.json({ error: 'Please verify your email address before logging in.' }, { status: 403 });
+        }
+
         // Login
         await login({ id: user.id, email: user.email, name: user.name, coupleId: user.coupleId });
 

@@ -42,6 +42,8 @@ model User {
   homeTown               String?
   interests              String?  // Comma separated list of interests
   hasUsedTrial           Boolean  @default(false)
+  emailVerified          DateTime?
+  verificationToken      String?
 }
 
 

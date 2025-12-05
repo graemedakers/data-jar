@@ -16,6 +16,8 @@ export function SignupForm() {
     const [isValidating, setIsValidating] = useState(!!inviteCode);
     const [codeError, setCodeError] = useState<string | null>(null);
 
+    const [isVerificationSent, setIsVerificationSent] = useState(false);
+
     useEffect(() => {
         if (inviteCode) {
             setIsValidating(true);
@@ -74,7 +76,9 @@ export function SignupForm() {
             const data = await res.json();
 
             if (res.ok) {
-                if (data.checkoutUrl) {
+                if (data.requiresVerification) {
+                    setIsVerificationSent(true);
+                } else if (data.checkoutUrl) {
                     window.location.href = data.checkoutUrl;
                 } else {
                     router.push("/dashboard");
@@ -96,6 +100,29 @@ export function SignupForm() {
                 <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full mx-auto mb-4" />
                 <p className="text-slate-300">Validating invite code...</p>
             </div>
+        );
+    }
+
+    if (isVerificationSent) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-md"
+            >
+                <div className="glass-card p-8 text-center">
+                    <div className="w-16 h-16 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-6">
+                        <Mail className="w-8 h-8 text-green-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Check your inbox</h2>
+                    <p className="text-slate-400 mb-8">
+                        We've sent a verification link to your email address. Please click the link to activate your account.
+                    </p>
+                    <p className="text-xs text-slate-500">
+                        Can't find it? Check your spam folder.
+                    </p>
+                </div>
+            </motion.div>
         );
     }
 
