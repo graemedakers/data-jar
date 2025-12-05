@@ -19,7 +19,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Premium required' }, { status: 403 });
         }
 
-        const { cuisine, vibe, location } = await request.json().catch(() => ({}));
+        const { cuisine, vibe, location, price } = await request.json().catch(() => ({}));
 
         const coupleLocation = (user.couple as any)?.location;
         const userHomeTown = (user as any).homeTown;
@@ -98,6 +98,7 @@ export async function POST(request: Request) {
         Recommend 5 distinct restaurants based on the following preferences:
         - Cuisine: ${cuisine || "Any good local food"}
         - Vibe/Atmosphere: ${vibe || "Any"}
+        - Price Range: ${price || "Any"}
         
         ${extraInstructions}
         

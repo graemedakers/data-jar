@@ -15,20 +15,55 @@ interface DiningConciergeModalProps {
 
 export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, onGoTonight }: DiningConciergeModalProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [cuisine, setCuisine] = useState("");
-    const [vibe, setVibe] = useState("");
+    const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+    const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+    const [location, setLocation] = useState(userLocation || "");
+    const [price, setPrice] = useState("moderate");
     const [recommendations, setRecommendations] = useState<any[]>([]);
 
-    const handleGetRecommendations = async (overrideLocation?: string) => {
+    // Constants for selection options
+    const CUISINE_OPTIONS = [
+        "Italian", "Japanese", "Mexican", "Thai", "Indian", "Chinese",
+        "Mediterranean", "Burgers", "Pizza", "Seafood", "Steak", "Vegan", "Dessert"
+    ];
+
+    const VIBE_OPTIONS = [
+        "Romantic", "Casual", "Lively", "Cozy", "Upscale", "Hidden Gem",
+        "Outdoor", "Quiet", "Trendy", "Kid Friendly", "Late Night", "Live Music"
+    ];
+
+    // Using a ref to track if we have initialized for this open session
+    const [prevOpen, setPrevOpen] = useState(false);
+
+    if (isOpen && !prevOpen) {
+        setLocation(userLocation || "");
+        setSelectedCuisines([]);
+        setSelectedVibes([]);
+        setRecommendations([]);
+        setPrevOpen(true);
+    } else if (!isOpen && prevOpen) {
+        setPrevOpen(false);
+    }
+
+    const toggleSelection = (item: string, list: string[], setList: (l: string[]) => void) => {
+        if (list.includes(item)) {
+            setList(list.filter(i => i !== item));
+        } else {
+            setList([...list, item]);
+        }
+    };
+
+    const handleGetRecommendations = async () => {
         setIsLoading(true);
         try {
             const res = await fetch('/api/dining-concierge', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    cuisine,
-                    vibe,
-                    location: overrideLocation || userLocation
+                    cuisine: selectedCuisines.join(", "),
+                    vibe: selectedVibes.join(", "),
+                    location,
+                    price
                 }),
             });
 
@@ -45,21 +80,6 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
             setIsLoading(false);
         }
     };
-
-    // Auto-fetch if userLocation is provided (e.g. from "Find food nearby")
-    // Use a ref to prevent double-fetching if needed, or just simple useEffect
-    const [hasAutoFetched, setHasAutoFetched] = useState(false);
-
-    // Reset auto-fetched state when modal closes or location changes
-    if (!isOpen && hasAutoFetched) {
-        setHasAutoFetched(false);
-        setRecommendations([]);
-    }
-
-    if (isOpen && userLocation && !hasAutoFetched && !isLoading && recommendations.length === 0) {
-        setHasAutoFetched(true);
-        handleGetRecommendations(userLocation);
-    }
 
     const handleAddToJar = async (rec: any) => {
         try {
@@ -178,26 +198,75 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                         </div>
 
                         <div className="p-6 overflow-y-auto overflow-x-hidden flex-1 space-y-6 px-7">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300">Cuisine Preference</label>
-                                    <input
-                                        type="text"
-                                        value={cuisine}
-                                        onChange={(e) => setCuisine(e.target.value)}
-                                        placeholder="e.g. Italian, Sushi, Tacos..."
-                                        className="glass-input w-full px-4 py-2"
-                                    />
+                                    <label className="text-sm font-medium text-slate-300">Location to Search</label>
+                                    <div className="relative">
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            value={location}
+                                            onChange={(e) => setLocation(e.target.value)}
+                                            placeholder="Current location, Neighborhood, or City"
+                                            className="glass-input w-full pl-9 pr-4 py-2"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-500">Edit this to search in a specific area.</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-300">Cuisine Preference (Select multiple)</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {CUISINE_OPTIONS.map((c) => (
+                                                <button
+                                                    key={c}
+                                                    onClick={() => toggleSelection(c, selectedCuisines, setSelectedCuisines)}
+                                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${selectedCuisines.includes(c)
+                                                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                                                            : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+                                                        }`}
+                                                >
+                                                    {c}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-300">Vibe / Atmosphere (Select multiple)</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {VIBE_OPTIONS.map((v) => (
+                                                <button
+                                                    key={v}
+                                                    onClick={() => toggleSelection(v, selectedVibes, setSelectedVibes)}
+                                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${selectedVibes.includes(v)
+                                                            ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
+                                                            : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+                                                        }`}
+                                                >
+                                                    {v}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300">Vibe / Atmosphere</label>
-                                    <input
-                                        type="text"
-                                        value={vibe}
-                                        onChange={(e) => setVibe(e.target.value)}
-                                        placeholder="e.g. Romantic, Lively, Cozy..."
-                                        className="glass-input w-full px-4 py-2"
-                                    />
+                                    <label className="text-sm font-medium text-slate-300">Price Range</label>
+                                    <div className="flex gap-2">
+                                        {['cheap', 'moderate', 'expensive'].map((p) => (
+                                            <button
+                                                key={p}
+                                                type="button"
+                                                onClick={() => setPrice(p)}
+                                                className={`flex-1 py-2 px-4 rounded-lg border text-sm font-medium transition-all ${price === p
+                                                    ? 'bg-orange-500/20 border-orange-500 text-orange-200'
+                                                    : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                                                    }`}
+                                            >
+                                                {p.charAt(0).toUpperCase() + p.slice(1)} ({p === 'cheap' ? '$' : p === 'moderate' ? '$$' : '$$$'})
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 

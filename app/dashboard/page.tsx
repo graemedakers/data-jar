@@ -246,7 +246,7 @@ export default function DashboardPage() {
                     setIsDiningModalOpen(false);
                     setDiningSearchLocation(null);
                 }}
-                userLocation={diningSearchLocation || userLocation || undefined}
+                userLocation={diningSearchLocation || combinedLocation || undefined}
                 onIdeaAdded={fetchIdeas}
                 onGoTonight={(idea) => {
                     setSelectedIdea(idea);

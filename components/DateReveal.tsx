@@ -208,15 +208,11 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                                             </span>
                                         </div>
 
-                                        {onFindDining && (
+                                        {onFindDining && idea.address && (
                                             <Button
                                                 onClick={() => {
-                                                    let query = idea.description;
-                                                    if (idea.address) {
-                                                        query += ` near ${idea.address}`;
-                                                    } else if (idea.details) {
-                                                        query += `. Context/Details: ${idea.details}`;
-                                                    }
+                                                    // Use description (Name) and address for specific location
+                                                    const query = `${idea.description}, ${idea.address}`;
                                                     onFindDining(query);
                                                 }}
                                                 variant="ghost"
@@ -261,17 +257,28 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                                                                             <h5 className="font-medium text-white text-sm">{rec.title}</h5>
                                                                             <p className="text-xs text-slate-400 mt-1">{rec.description}</p>
                                                                         </div>
-                                                                        {rec.url && (
-                                                                            <a
-                                                                                href={rec.url}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="shrink-0 p-2 bg-white/10 hover:bg-white/20 rounded-full text-secondary transition-colors"
-                                                                                title="View Info / Tickets"
-                                                                            >
-                                                                                <ExternalLink className="w-3 h-3" />
-                                                                            </a>
-                                                                        )}
+                                                                        <div className="flex flex-col gap-1">
+                                                                            {rec.url && (
+                                                                                <a
+                                                                                    href={rec.url}
+                                                                                    target="_blank"
+                                                                                    rel="noopener noreferrer"
+                                                                                    className="shrink-0 p-2 bg-white/10 hover:bg-white/20 rounded-full text-secondary transition-colors"
+                                                                                    title="View Info / Tickets"
+                                                                                >
+                                                                                    <ExternalLink className="w-3 h-3" />
+                                                                                </a>
+                                                                            )}
+                                                                            {onFindDining && (
+                                                                                <button
+                                                                                    onClick={() => onFindDining(rec.title)}
+                                                                                    className="shrink-0 p-2 bg-orange-500/10 hover:bg-orange-500/20 rounded-full text-orange-400 transition-colors"
+                                                                                    title="Find Food Nearby"
+                                                                                >
+                                                                                    <Utensils className="w-3 h-3" />
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             ))}
