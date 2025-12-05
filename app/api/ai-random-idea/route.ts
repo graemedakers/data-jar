@@ -110,6 +110,7 @@ export async function POST(request: Request) {
         
         CONSTRAINTS:
         - The idea MUST be suitable for the current weather conditions and location.
+        - Verify to the best of your knowledge that the venue/restaurant is currently OPEN and operating (not permanently closed).
         - It can be an indoor activity (staying at home) or an outdoor activity (going out).
         - Do NOT involve cardboard in any way.
         - Do NOT involve cocktails or alcohol-focused activities.

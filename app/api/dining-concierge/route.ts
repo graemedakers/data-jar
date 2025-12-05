@@ -102,6 +102,8 @@ export async function POST(request: Request) {
         
         ${extraInstructions}
         
+        IMPORTANT: Perform a check to ensure the restaurant is currently OPEN for business and has NOT permanently closed.
+        
         For each restaurant, provide:
         - Name
         - A brief, appetizing description (1 sentence)
