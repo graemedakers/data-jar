@@ -239,19 +239,19 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         </button>
 
                         {/* Sidebar */}
-                        <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-white/10 bg-black/20 p-4 shrink-0 flex flex-col md:block">
-                            <div className="flex items-center gap-2 mb-4 md:mb-6 px-2 pr-12 md:pr-2">
+                        <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-white/10 bg-black/20 py-4 md:p-4 shrink-0 flex flex-col md:block">
+                            <div className="flex items-center gap-2 mb-4 md:mb-6 px-6 md:px-2 pr-14 md:pr-2">
                                 <HelpCircle className="w-6 h-6 text-primary" />
                                 <h2 className="text-xl font-bold text-white whitespace-nowrap">Help Center</h2>
                             </div>
-                            <nav className="flex flex-row md:flex-col gap-2 md:gap-0 md:space-y-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 min-h-0 no-scrollbar">
+                            <nav className="flex flex-row md:flex-col gap-2 md:gap-0 md:space-y-1 overflow-x-auto md:overflow-visible px-6 md:px-0 pb-2 md:pb-0 min-h-0 no-scrollbar snap-x">
                                 {sections.map((section) => (
                                     <button
                                         key={section.id}
                                         onClick={() => setActiveSection(section.id)}
-                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0 ${activeSection === section.id
-                                            ? "bg-primary/20 text-white border border-primary/30"
-                                            : "text-slate-400 hover:text-white hover:bg-white/5"
+                                        className={`flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-full md:rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0 snap-start border ${activeSection === section.id
+                                            ? "bg-primary/20 text-white border-primary/30"
+                                            : "text-slate-400 hover:text-white hover:bg-white/5 border-transparent"
                                             }`}
                                     >
                                         <section.icon className="w-4 h-4" />
