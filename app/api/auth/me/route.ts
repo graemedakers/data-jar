@@ -1,6 +1,7 @@
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { isCouplePremium } from '@/lib/premium';
 
 export async function GET() {
     const session = await getSession();
@@ -11,12 +12,24 @@ export async function GET() {
     try {
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
-            include: { couple: true },
+            include: {
+                couple: {
+                    include: {
+                        users: {
+                            orderBy: { createdAt: 'asc' },
+                            select: { id: true }
+                        }
+                    }
+                }
+            },
         });
 
-        if (!user) {
+        if (!user || !user.couple) {
             return NextResponse.json({ user: null });
         }
+
+        const isCreator = user.couple.users[0]?.id === user.id;
+        const hasPartner = user.couple.users.length > 1;
 
         // Return user with couple reference code
         return NextResponse.json({
@@ -24,7 +37,12 @@ export async function GET() {
                 ...user,
                 coupleReferenceCode: user.couple.referenceCode,
                 location: user.couple.location,
-                isPremium: user.couple.isPremium,
+                isPremium: isCouplePremium(user.couple),
+                hasPaid: user.couple.isPremium,
+                isTrialEligible: (user.couple as any).isTrialEligible,
+                coupleCreatedAt: user.couple.createdAt,
+                isCreator,
+                hasPartner
             }
         });
     } catch (error) {

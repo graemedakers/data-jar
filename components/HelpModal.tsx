@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle, Calendar, Utensils } from "lucide-react";
+import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle, Calendar, Utensils, Wine } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface HelpModalProps {
@@ -25,6 +25,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
         { id: "getting-started", title: "Getting Started", icon: MapPin },
         { id: "dashboard", title: "The Dashboard", icon: History },
         { id: "dining-concierge", title: "Dining Concierge", icon: Utensils },
+        { id: "bar-concierge", title: "Bar Concierge", icon: Wine },
         { id: "adding-ideas", title: "Adding Ideas", icon: Plus },
         { id: "weekend-planner", title: "Weekend Planner", icon: Calendar },
         { id: "spinning", title: "Spinning the Jar", icon: Sparkles },
@@ -82,6 +83,21 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         </ul>
                     </div>
                 );
+            case "bar-concierge":
+                return (
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold text-white">Bar Concierge <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-0.5 rounded-full ml-2">PREMIUM</span></h3>
+                        <p className="text-slate-300">
+                            Looking for a place to grab a drink? The Bar Concierge helps you discover great local spots.
+                        </p>
+                        <ul className="list-disc list-inside space-y-2 text-slate-300">
+                            <li><strong>Drink Types:</strong> Select what you're in the mood for (e.g., "Cocktails", "Craft Beer", "Wine").</li>
+                            <li><strong>Vibe:</strong> Choose the atmosphere (e.g., "Speakeasy", "Rooftop", "Dive Bar").</li>
+                            <li><strong>Top Picks:</strong> Get curated recommendations with ratings and reviews.</li>
+                            <li><strong>Go Tonight:</strong> Instantly pick a spot for your evening out.</li>
+                        </ul>
+                    </div>
+                );
             case "adding-ideas":
                 return (
                     <div className="space-y-4">
@@ -114,12 +130,30 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                 return (
                     <div className="space-y-4">
                         <h3 className="text-xl font-bold text-white">Spinning the Jar</h3>
-                        <p className="text-slate-300">Ready for a date? Click <strong>Spin Jar</strong>.</p>
-                        <ul className="list-disc list-inside space-y-2 text-slate-300">
-                            <li><strong>Filters:</strong> You can filter by Duration, Cost, or Setting before spinning.</li>
-                            <li><strong>The Reveal:</strong> The jar picks one random idea matching your filters.</li>
-                            <li><strong>Accept:</strong> Click "Accept Date" to move it to your history.</li>
-                        </ul>
+                        <p className="text-slate-300">Ready for a date? Click <strong>Spin Jar</strong> to let fate decide.</p>
+
+                        <div className="space-y-3">
+                            <div>
+                                <h4 className="font-bold text-white text-sm">Filters</h4>
+                                <p className="text-slate-300 text-sm mb-2">Narrow down the random selection to fit your current mood:</p>
+                                <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
+                                    <li><strong>Category:</strong> Filter by Activity, Meal, or Event.</li>
+                                    <li><strong>Duration:</strong> Set a maximum time limit (e.g., "Under 2 hours").</li>
+                                    <li><strong>Cost:</strong> Set a budget cap (e.g., "Free" or "$$").</li>
+                                    <li><strong>Energy:</strong> Choose how active you want to be (Low, Medium, High).</li>
+                                    <li><strong>Time:</strong> Filter for Day or Evening activities.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold text-white text-sm">The Reveal & Locations</h4>
+                                <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
+                                    <li><strong>Accept Date:</strong> Marks the idea as "Selected" and moves it to your history.</li>
+                                    <li><strong>Find Places:</strong> For generic ideas (e.g., "Go Bowling"), click <strong>"Find Specific Places"</strong> to let AI find top-rated venues near you.</li>
+                                    <li><strong>Find Food:</strong> Planning an activity? Use the <strong>"Find food nearby"</strong> button to instantly search for restaurants near that location using the Dining Concierge.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 );
             case "history":
@@ -137,12 +171,42 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
             case "settings":
                 return (
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold text-white">Settings & Invites</h3>
-                        <ul className="list-disc list-inside space-y-2 text-slate-300">
-                            <li><strong>Invite Partner:</strong> Click the Invite Code on the dashboard to copy a link for your partner.</li>
-                            <li><strong>Location:</strong> Update your city in Settings.</li>
-                            <li><strong>Empty Jar:</strong> Use the "Danger Zone" to delete all data if needed.</li>
-                        </ul>
+                        <h3 className="text-xl font-bold text-white">Settings & Configuration</h3>
+                        <p className="text-slate-300">Customize your Date Jar experience.</p>
+
+                        <div className="space-y-3">
+                            <div>
+                                <h4 className="font-bold text-white text-sm">Profile Settings</h4>
+                                <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
+                                    <li><strong>Couple Location:</strong> The general city or area for your dates (e.g., "New York, NY"). This is the default search area for the Concierge.</li>
+                                    <li><strong>Your Home Town:</strong> Your specific neighborhood (e.g., "Brooklyn"). Helps refine searches to be closer to home.</li>
+                                    <li><strong>Your Interests:</strong> A comma-separated list of things you love (e.g., "Sushi, Hiking, Jazz"). The AI uses this to tailor "Surprise Me" suggestions specifically to you.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold text-white text-sm">Partner Management</h4>
+                                <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
+                                    <li><strong>Invite Partner:</strong> Use the code on the dashboard to invite your significant other.</li>
+                                    <li><strong>Regenerate Code:</strong> (Creator only) If you need a new invite link or want to invalidate an old one, use this option.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold text-white text-sm">Data & Privacy</h4>
+                                <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
+                                    <li><strong>Deletion History:</strong> View a log of who deleted which date ideas and when.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold text-red-400 text-sm">Danger Zone (Creator Only)</h4>
+                                <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
+                                    <li><strong>Empty Jar:</strong> Permanently deletes ALL ideas and past date history. This cannot be undone.</li>
+                                    <li><strong>Delete Partner:</strong> Removes your partner from the jar and deletes all their contributions.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 );
             default:

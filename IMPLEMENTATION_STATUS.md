@@ -31,8 +31,6 @@
     - `Jar3D`: CSS/Framer Motion animated 3D jar visualization.
 - [x] **Landing Page**: High-fidelity landing page with animations.
 - [x] **Seeding**: Database populated with demo date ideas.
-
-## 🚧 In Progress / Next Steps
 - [x] **"Pick a Date" Logic**:
     - Backend API to select a random idea based on filters.
     - Frontend integration to show the selection animation.
@@ -44,10 +42,24 @@
     - [x] List view to edit/delete ideas (Dashboard).
 - [x] **Email Notifications**:
     - [x] Integrate Resend to email the selected date to the couple.
+- [x] **Premium Features**:
+    - [x] Stripe Integration (Checkout & Webhooks).
+    - [x] Premium Banner & Upgrade Flow.
+    - [x] Trial Logic (7-day free trial).
+- [x] **Concierge Services**:
+    - [x] Dining Concierge (Google Places API integration).
+    - [x] Bar Concierge.
+- [x] **Weekend Planner**:
+    - [x] AI-generated weekend itineraries.
+
+## 🚧 In Progress / Next Steps
+- [ ] **Mobile App**: Native mobile app using React Native (Future).
+- [ ] **Social Features**: Share dates with friends (Future).
 
 ## 🐛 Bug Fixes
 - Fixed CSS syntax error in `globals.css`.
 - Fixed hydration error caused by invalid HTML nesting (`<Link>` wrapping `<Button>`).
+- Fixed Premium Banner trial logic.
 - The app is running at `http://localhost:3000`.
 
 ## 📝 Notes

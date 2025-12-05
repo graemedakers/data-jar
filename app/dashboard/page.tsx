@@ -15,6 +15,9 @@ import { RateDateModal } from "@/components/RateDateModal";
 import { PremiumModal } from "@/components/PremiumModal";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { DiningConciergeModal } from "@/components/DiningConciergeModal";
+import { BarConciergeModal } from "@/components/BarConciergeModal";
+import { Wine } from "lucide-react";
+import { PremiumBanner } from "@/components/PremiumBanner";
 
 function InviteCodeDisplay({ mobile, code }: { mobile?: boolean; code: string | null }) {
     const [copied, setCopied] = useState(false);
@@ -66,10 +69,16 @@ export default function DashboardPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isPlannerOpen, setIsPlannerOpen] = useState(false);
     const [isDiningModalOpen, setIsDiningModalOpen] = useState(false);
+    const [isBarModalOpen, setIsBarModalOpen] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
     const router = useRouter();
 
     const [diningSearchLocation, setDiningSearchLocation] = useState<string | null>(null);
+
+    // New state for Premium Banner
+    const [hasPaid, setHasPaid] = useState(false);
+    const [coupleCreatedAt, setCoupleCreatedAt] = useState<string>("");
+    const [isTrialEligible, setIsTrialEligible] = useState(true);
 
     const fetchIdeas = async () => {
         try {
@@ -97,6 +106,12 @@ export default function DashboardPage() {
                     if (data.user.coupleReferenceCode) setInviteCode(data.user.coupleReferenceCode);
                     const userIsPremium = !!data.user.isPremium;
                     setIsPremium(userIsPremium);
+
+                    // Set premium banner data
+                    setHasPaid(!!data.user.hasPaid);
+                    setCoupleCreatedAt(data.user.coupleCreatedAt);
+                    // Default to true if undefined (backward compatibility)
+                    setIsTrialEligible(data.user.isTrialEligible !== false);
                 }
             })
             .catch(err => console.error("Error fetching user:", err))
@@ -253,6 +268,18 @@ export default function DashboardPage() {
                 }}
             />
 
+            <BarConciergeModal
+                isOpen={isBarModalOpen}
+                onClose={() => {
+                    setIsBarModalOpen(false);
+                }}
+                userLocation={combinedLocation || undefined}
+                onIdeaAdded={fetchIdeas}
+                onGoTonight={(idea) => {
+                    setSelectedIdea(idea);
+                }}
+            />
+
             <RateDateModal
                 isOpen={!!ratingIdea}
                 onClose={() => {
@@ -328,6 +355,33 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </header>
+
+            {/* Settings Prompt */}
+            {!isLoadingUser && !userLocation && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between gap-4"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                            <Settings className="w-4 h-4 text-blue-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white">Setup your profile</h3>
+                            <p className="text-xs text-slate-400">Add your location to get better AI recommendations.</p>
+                        </div>
+                    </div>
+                    <Button size="sm" onClick={() => setIsSettingsModalOpen(true)} className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border-none">
+                        Configure
+                    </Button>
+                </motion.div>
+            )}
+
+            {/* Premium Banner */}
+            {!isLoadingUser && (
+                <PremiumBanner hasPaid={hasPaid} coupleCreatedAt={coupleCreatedAt} isTrialEligible={isTrialEligible} />
+            )}
 
             {/* Stats / Jar Preview */}
             <div className="flex flex-col items-center justify-center py-8 mb-8">
@@ -417,6 +471,29 @@ export default function DashboardPage() {
                         <Utensils className="w-6 h-6 text-orange-400" />
                     </div>
                     <span className="font-medium text-white text-center">Dining Concierge</span>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                        if (isPremium) {
+                            setIsBarModalOpen(true);
+                        } else {
+                            setIsPremiumModalOpen(true);
+                        }
+                    }}
+                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 relative overflow-hidden"
+                >
+                    {!isPremium && (
+                        <div className="absolute top-3 right-3">
+                            <Lock className="w-4 h-4 text-slate-500" />
+                        </div>
+                    )}
+                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                        <Wine className="w-6 h-6 text-purple-400" />
+                    </div>
+                    <span className="font-medium text-white text-center">Bar Concierge</span>
                 </motion.div>
             </div>
 

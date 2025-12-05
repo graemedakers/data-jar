@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { isCouplePremium } from '@/lib/premium';
 
 export async function POST(request: Request) {
     try {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
             include: { couple: true },
         });
 
-        if (!user || !(user.couple as any)?.isPremium) {
+        if (!user || !isCouplePremium(user.couple)) {
             return NextResponse.json({ error: 'Premium required' }, { status: 403 });
         }
 

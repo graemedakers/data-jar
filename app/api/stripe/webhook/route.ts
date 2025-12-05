@@ -49,6 +49,7 @@ export async function POST(req: Request) {
                     name,
                     passwordHash,
                     coupleId: couple.id,
+                    hasUsedTrial: true,
                 },
             });
         } else if (metadata?.coupleId) {

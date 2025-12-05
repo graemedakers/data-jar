@@ -40,6 +40,7 @@ export async function POST(request: Request) {
                     name,
                     passwordHash,
                     coupleId: couple.id,
+                    hasUsedTrial: true, // User starts their trial immediately
                 },
             });
 

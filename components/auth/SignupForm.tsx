@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion } from "framer-motion";
-import { ArrowRight, Lock, Mail, User, Users, MapPin } from "lucide-react";
+import { ArrowRight, Lock, Mail, User, Users, MapPin, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export function SignupForm() {
@@ -13,6 +13,33 @@ export function SignupForm() {
     const searchParams = useSearchParams();
     const inviteCode = searchParams.get("code");
     const [isLoading, setIsLoading] = useState(false);
+    const [isValidating, setIsValidating] = useState(!!inviteCode);
+    const [codeError, setCodeError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (inviteCode) {
+            setIsValidating(true);
+            fetch('/api/couple/validate-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: inviteCode })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.valid) {
+                        setCodeError(data.error || "Invalid invite code");
+                    }
+                })
+                .catch(err => {
+                    console.error("Validation error:", err);
+                    setCodeError("Failed to validate code");
+                })
+                .finally(() => setIsValidating(false));
+        } else {
+            setIsValidating(false);
+            setCodeError(null);
+        }
+    }, [inviteCode]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,7 +77,7 @@ export function SignupForm() {
                 if (data.checkoutUrl) {
                     window.location.href = data.checkoutUrl;
                 } else {
-                    router.push("/");
+                    router.push("/dashboard");
                 }
             } else {
                 alert(data.error || "Signup failed");
@@ -62,6 +89,43 @@ export function SignupForm() {
             setIsLoading(false);
         }
     };
+
+    if (isValidating) {
+        return (
+            <div className="w-full max-w-md glass-card p-8 text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full mx-auto mb-4" />
+                <p className="text-slate-300">Validating invite code...</p>
+            </div>
+        );
+    }
+
+    if (codeError) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-md"
+            >
+                <div className="glass-card p-8 text-center">
+                    <div className="w-16 h-16 mx-auto bg-red-500/20 rounded-full flex items-center justify-center mb-6">
+                        <AlertCircle className="w-8 h-8 text-red-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Invalid Invite Link</h2>
+                    <p className="text-slate-400 mb-8">
+                        {codeError === 'This jar is already full'
+                            ? "This jar already has two partners. You can create your own jar instead."
+                            : "This invite link is invalid or has expired. Please ask your partner for a new link, or create your own jar."}
+                    </p>
+                    <Button
+                        onClick={() => router.push('/signup')}
+                        className="w-full"
+                    >
+                        Create a New Jar
+                    </Button>
+                </div>
+            </motion.div>
+        );
+    }
 
     return (
         <motion.div

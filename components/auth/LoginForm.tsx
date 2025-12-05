@@ -38,7 +38,7 @@ export function LoginForm() {
             const data = await res.json();
 
             if (res.ok) {
-                router.push("/"); // Redirect to home/dashboard
+                router.push("/dashboard"); // Redirect to dashboard
             } else {
                 alert(data.error || "Login failed");
             }

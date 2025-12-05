@@ -16,6 +16,7 @@ model Couple {
   location      String?  // e.g. "New York, NY" or "London, UK"
   createdAt     DateTime @default(now())
   isPremium     Boolean  @default(false)
+  isTrialEligible Boolean @default(true)
   deletedLogs   DeletedLog[]
 }
 
@@ -40,7 +41,10 @@ model User {
   createdAt              DateTime @default(now())
   homeTown               String?
   interests              String?  // Comma separated list of interests
+  hasUsedTrial           Boolean  @default(false)
 }
+
+
 
 model Idea {
   id             String   @id @default(uuid())

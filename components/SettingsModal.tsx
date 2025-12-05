@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion, AnimatePresence } from "framer-motion";
 import { DeleteLogModal } from "@/components/DeleteLogModal";
-import { X, MapPin, Trash2, History } from "lucide-react";
+import { X, MapPin, Trash2, History, RefreshCw, UserMinus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -21,6 +21,8 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
     const [interests, setInterests] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+    const [isCreator, setIsCreator] = useState(false);
+    const [hasPartner, setHasPartner] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -32,6 +34,8 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                     if (data?.user) {
                         setHomeTown(data.user.homeTown || "");
                         setInterests(data.user.interests || "");
+                        setIsCreator(!!data.user.isCreator);
+                        setHasPartner(!!data.user.hasPartner);
                     }
                 });
         }
@@ -87,7 +91,6 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                 alert(data.message);
                 onClose();
                 router.refresh();
-                // Force a hard reload to ensure ideas list is cleared if router.refresh() is insufficient
                 window.location.reload();
             } else {
                 const data = await res.json();
@@ -96,6 +99,61 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
         } catch (error) {
             console.error(error);
             alert("Error emptying jar");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleRegenerateCode = async () => {
+        if (!confirm("Are you sure you want to regenerate your invite code? The old code will stop working.")) return;
+
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/couple/regenerate-code', {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                alert(`Success! Your new invite code is: ${data.newCode}`);
+                // Refresh to update the code in the dashboard
+                router.refresh();
+            } else {
+                const data = await res.json();
+                alert(`Failed to regenerate code: ${data.details || data.error || "Unknown error"}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error regenerating code");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDeletePartner = async () => {
+        if (!confirm("Are you sure you want to delete your partner? This will remove them from the couple, delete ALL ideas they created, and delete ALL history of past dates. This action cannot be undone.")) return;
+
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/couple/delete-partner', {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                alert(data.message);
+                onClose();
+                router.refresh();
+                window.location.reload();
+            } else {
+                const data = await res.json();
+                alert(`Failed to delete partner: ${data.details || data.error || "Unknown error"}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error deleting partner");
         } finally {
             setIsLoading(false);
         }
@@ -167,6 +225,25 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                                 </Button>
                             </form>
 
+                            {isCreator && (
+                                <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
+                                    <h3 className="text-sm font-bold text-white mb-2">Manage Partner</h3>
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        className="w-full justify-start text-slate-300 hover:text-white"
+                                        onClick={handleRegenerateCode}
+                                        disabled={isLoading}
+                                    >
+                                        <RefreshCw className="w-4 h-4 mr-2" />
+                                        Regenerate Invite Code
+                                    </Button>
+                                    <p className="text-xs text-slate-400 ml-1">
+                                        Create a new invite code if you need to share it again or invalidate the old one.
+                                    </p>
+                                </div>
+                            )}
+
                             <div className="mt-6 pt-6 border-t border-white/10">
                                 <Button
                                     type="button"
@@ -179,24 +256,41 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                                 </Button>
                             </div>
 
-                            <div className="mt-6 pt-6 border-t border-white/10">
-                                <h3 className="text-sm font-bold text-red-400 mb-4 flex items-center gap-2">
-                                    <Trash2 className="w-4 h-4" />
-                                    Danger Zone
-                                </h3>
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                                    onClick={handleEmptyJar}
-                                    disabled={isLoading}
-                                >
-                                    Empty Jar (Delete All Ideas)
-                                </Button>
-                                <p className="text-xs text-slate-500 mt-2 text-center">
-                                    This will remove ALL ideas, including past dates history.
-                                </p>
-                            </div>
+                            {isCreator && (
+                                <div className="mt-6 pt-6 border-t border-white/10">
+                                    <h3 className="text-sm font-bold text-red-400 mb-4 flex items-center gap-2">
+                                        <Trash2 className="w-4 h-4" />
+                                        Danger Zone
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                                            onClick={handleEmptyJar}
+                                            disabled={isLoading}
+                                        >
+                                            Empty Jar (Delete All Ideas)
+                                        </Button>
+
+                                        {hasPartner && (
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                                                onClick={handleDeletePartner}
+                                                disabled={isLoading}
+                                            >
+                                                <UserMinus className="w-4 h-4 mr-2" />
+                                                Delete Partner
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-2 text-center">
+                                        These actions are irreversible.
+                                    </p>
+                                </div>
+                            )}
                         </motion.div>
                     </div>
                 )}

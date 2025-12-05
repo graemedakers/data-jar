@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Utensils, MapPin, Loader2, Sparkles, ExternalLink, Plus, Zap, Star } from "lucide-react";
+import { X, Wine, Beer, MapPin, Loader2, Sparkles, ExternalLink, Plus, Zap, Star, Martini } from "lucide-react";
 import { Button } from "./ui/Button";
 
-interface DiningConciergeModalProps {
+interface BarConciergeModalProps {
     isOpen: boolean;
     onClose: () => void;
     userLocation?: string;
@@ -13,9 +13,9 @@ interface DiningConciergeModalProps {
     onGoTonight?: (idea: any) => void;
 }
 
-export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, onGoTonight }: DiningConciergeModalProps) {
+export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, onGoTonight }: BarConciergeModalProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+    const [selectedDrinks, setSelectedDrinks] = useState<string[]>([]);
     const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
     const [location, setLocation] = useState(userLocation || "");
     const [price, setPrice] = useState("moderate");
@@ -23,14 +23,14 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
     const resultsRef = useRef<HTMLDivElement>(null);
 
     // Constants for selection options
-    const CUISINE_OPTIONS = [
-        "Italian", "Japanese", "Mexican", "Thai", "Indian", "Chinese",
-        "Mediterranean", "Burgers", "Pizza", "Seafood", "Steak", "Vegan", "Dessert"
+    const DRINK_OPTIONS = [
+        "Cocktails", "Wine", "Craft Beer", "Whiskey", "Gin", "Tequila/Mezcal",
+        "Pub", "Dive Bar", "Rooftop", "Speakeasy", "Sake", "Non-Alcoholic"
     ];
 
     const VIBE_OPTIONS = [
         "Romantic", "Casual", "Lively", "Cozy", "Upscale", "Hidden Gem",
-        "Outdoor", "Quiet", "Trendy", "Kid Friendly", "Late Night", "Live Music"
+        "Outdoor", "Quiet", "Trendy", "Dance", "Live Music", "Sports"
     ];
 
     // Using a ref to track if we have initialized for this open session
@@ -38,7 +38,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
 
     if (isOpen && !prevOpen) {
         setLocation(userLocation || "");
-        setSelectedCuisines([]);
+        setSelectedDrinks([]);
         setSelectedVibes([]);
         setRecommendations([]);
         setPrevOpen(true);
@@ -66,11 +66,11 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
     const handleGetRecommendations = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('/api/dining-concierge', {
+            const res = await fetch('/api/bar-concierge', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    cuisine: selectedCuisines.join(", "),
+                    drinks: selectedDrinks.join(", "),
                     vibe: selectedVibes.join(", "),
                     location,
                     price
@@ -104,7 +104,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                     activityLevel: "LOW",
                     cost: rec.price.length > 2 ? "$$$" : rec.price.length > 1 ? "$$" : "$",
                     timeOfDay: "EVENING",
-                    category: "MEAL"
+                    category: "MEAL" // Using MEAL for consistency, or could be ACTIVITY
                 }),
             });
 
@@ -191,12 +191,12 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                     >
                         <div className="p-6 border-b border-white/10 flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
-                                    <Utensils className="w-5 h-5 text-orange-400" />
+                                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                                    <Wine className="w-5 h-5 text-purple-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-white">Dining Concierge</h2>
-                                    <p className="text-sm text-slate-400">Find the perfect spot for dinner</p>
+                                    <h2 className="text-xl font-bold text-white">Bar Concierge</h2>
+                                    <p className="text-sm text-slate-400">Find the perfect spot for a drink</p>
                                 </div>
                             </div>
                             <button
@@ -226,14 +226,14 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
 
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300">Cuisine Preference (Select multiple)</label>
+                                        <label className="text-sm font-medium text-slate-300">Drinks Preference (Select multiple)</label>
                                         <div className="flex flex-wrap gap-2">
-                                            {CUISINE_OPTIONS.map((c) => (
+                                            {DRINK_OPTIONS.map((c) => (
                                                 <button
                                                     key={c}
-                                                    onClick={() => toggleSelection(c, selectedCuisines, setSelectedCuisines)}
-                                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${selectedCuisines.includes(c)
-                                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                                                    onClick={() => toggleSelection(c, selectedDrinks, setSelectedDrinks)}
+                                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${selectedDrinks.includes(c)
+                                                        ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
                                                         : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                                                         }`}
                                                 >
@@ -250,7 +250,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                                     key={v}
                                                     onClick={() => toggleSelection(v, selectedVibes, setSelectedVibes)}
                                                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${selectedVibes.includes(v)
-                                                        ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
+                                                        ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20'
                                                         : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                                                         }`}
                                                 >
@@ -269,7 +269,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                                 type="button"
                                                 onClick={() => setPrice(p)}
                                                 className={`flex-1 py-2 px-4 rounded-lg border text-sm font-medium transition-all ${price === p
-                                                    ? 'bg-orange-500/20 border-orange-500 text-orange-200'
+                                                    ? 'bg-purple-500/20 border-purple-500 text-purple-200'
                                                     : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                                                     }`}
                                             >
@@ -284,16 +284,16 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                 <Button
                                     type="button"
                                     onClick={() => {
-                                        console.log("Find Restaurants clicked");
+                                        console.log("Find Bars clicked");
                                         handleGetRecommendations();
                                     }}
                                     disabled={isLoading}
-                                    className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-lg shadow-orange-500/20"
+                                    className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white shadow-lg shadow-purple-500/20"
                                 >
                                     {isLoading ? (
                                         <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Finding Spots...</>
                                     ) : (
-                                        <><Sparkles className="w-5 h-5 mr-2" /> Find Restaurants</>
+                                        <><Sparkles className="w-5 h-5 mr-2" /> Find Bars</>
                                     )}
                                 </Button>
                             </div>
@@ -311,7 +311,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                                     </div>
                                                     <p className="text-sm text-slate-300 mt-1">{rec.description}</p>
                                                     <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
-                                                        <span className="flex items-center gap-1"><Utensils className="w-3 h-3" /> {rec.cuisine}</span>
+                                                        <span className="flex items-center gap-1"><Martini className="w-3 h-3" /> {rec.speciality}</span>
                                                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {rec.address}</span>
                                                         {rec.google_rating && (
                                                             <span className="flex items-center gap-1 text-yellow-400">

@@ -20,7 +20,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Premium required' }, { status: 403 });
         }
 
-        const { cuisine, vibe, location, price } = await request.json().catch(() => ({}));
+        const { drinks, vibe, location, price } = await request.json().catch(() => ({}));
 
         const coupleLocation = (user.couple as any)?.location;
         const userHomeTown = (user as any).homeTown;
@@ -50,16 +50,14 @@ export async function POST(request: Request) {
                 targetLocation = "your local area";
             }
         } else {
-            // If a specific location/activity was provided (e.g. "Hiking" or "The Alamo"), 
-            // rely ONLY on that information.
+            // If a specific location/activity was provided
             extraInstructions += `The user is asking about "${targetLocation}". 
-            - If "${targetLocation}" is a specific place or city (e.g. "The Alamo", "Paris", "123 Main St"), find restaurants near THAT place.
-            - If "${targetLocation}" is a generic activity or contains details (e.g. "Hiking", "Context: ..."), first IDENTIFY the best specific venue for this activity based ONLY on the provided text, then find restaurants near THAT venue.
-            - CRITICAL: If the input contains a specific address or venue name, prioritize restaurants within walking distance (5-10 mins) of that location.\n`;
+            - If "${targetLocation}" is a specific place or city, find bars near THAT place.
+            - CRITICAL: If the input contains a specific address or venue name, prioritize bars within walking distance (5-10 mins) of that location.\n`;
         }
 
         if (userInterests) {
-            extraInstructions += `The user is interested in: ${userInterests}. Consider this when selecting the vibe or cuisine if applicable.\n`;
+            extraInstructions += `The user is interested in: ${userInterests}. Consider this when selecting the vibe or drinks if applicable.\n`;
         }
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -70,24 +68,24 @@ export async function POST(request: Request) {
             return NextResponse.json({
                 recommendations: [
                     {
-                        name: "Mock Bistro",
-                        description: "A cozy spot with great pasta.",
-                        cuisine: cuisine || "Italian",
-                        price: "$$",
-                        address: "123 Main St, " + (targetLocation.split(" and ")[0] || "City")
-                    },
-                    {
-                        name: "The Mockingbird",
+                        name: "The Mockingbird Lounge",
                         description: "Lively atmosphere and amazing cocktails.",
-                        cuisine: "Modern American",
+                        speciality: "Cocktails",
                         price: "$$$",
                         address: "456 Oak Ave, " + (targetLocation.split(" and ")[0] || "City")
                     },
                     {
-                        name: "Home Town Taco",
-                        description: "Best street tacos in town.",
-                        cuisine: "Mexican",
+                        name: "Mock Pub",
+                        description: "Classic pub with a great beer selection.",
+                        speciality: "Beer",
                         price: "$",
+                        address: "123 Main St, " + (targetLocation.split(" and ")[0] || "City")
+                    },
+                    {
+                        name: "Vineyard Vibes",
+                        description: "Cozy wine bar with a fireplace.",
+                        speciality: "Wine",
+                        price: "$$",
                         address: "789 Pine Ln, " + (userHomeTown || targetLocation.split(" and ")[0] || "City")
                     }
                 ]
@@ -95,24 +93,24 @@ export async function POST(request: Request) {
         }
 
         const prompt = `
-        Act as a local dining concierge for ${targetLocation}.
-        Recommend 5 distinct restaurants based on the following preferences:
-        - Cuisine: ${cuisine || "Any good local food"}
+        Act as a local nightlife concierge for ${targetLocation}.
+        Recommend 5 distinct bars or places to have a drink based on the following preferences:
+        - Drinks Speciality: ${drinks || "Any good local drinks"}
         - Vibe/Atmosphere: ${vibe || "Any"}
         - Price Range: ${price || "Any"}
         
         ${extraInstructions}
         
-        IMPORTANT: Perform a check to ensure the restaurant is currently OPEN for business and has NOT permanently closed.
+        IMPORTANT: Perform a check to ensure the bar/venue is currently OPEN for business and has NOT permanently closed. Do NOT exclude any currently operating bar within the location bounds.
         
-        For each restaurant, provide:
+        For each venue, provide:
         - Name
-        - A brief, appetizing description (1 sentence)
-        - Cuisine type
+        - A brief, enticing description (1 sentence)
+        - Drinks Speciality (e.g. Wine, Cocktails, Craft Beer, Dive Bar)
         - Price range ($, $$, $$$)
         - Approximate address or neighborhood
         - A likely website URL (or a Google Search URL if specific site unknown)
-        - Typical opening hours for dinner (e.g. "5pm - 10pm")
+        - Typical opening hours for evening (e.g. "5pm - 2am")
         - Approximate Google Rating (e.g. 4.5)
         
         Return the result as a JSON object with a "recommendations" array.
@@ -120,13 +118,13 @@ export async function POST(request: Request) {
         {
             "recommendations": [
                 {
-                    "name": "Restaurant Name",
-                    "description": "Delicious food in a great setting.",
-                    "cuisine": "Italian",
+                    "name": "Bar Name",
+                    "description": "Great spot for drinks.",
+                    "speciality": "Cocktails",
                     "price": "$$",
                     "address": "123 Main St, Neighborhood",
                     "website": "https://example.com",
-                    "opening_hours": "5pm - 10pm",
+                    "opening_hours": "5pm - 2am",
                     "google_rating": 4.5
                 }
             ]
@@ -173,7 +171,7 @@ export async function POST(request: Request) {
         throw new Error(`All models failed. Last error: ${lastError}`);
 
     } catch (error: any) {
-        console.error('Dining Concierge error:', error);
+        console.error('Bar Concierge error:', error);
         return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
     }
 }
