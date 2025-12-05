@@ -64,6 +64,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     category: formData.category,
+                    duration: formData.duration,
                     // We can optionally send other fields if we want the AI to respect them too,
                     // but the user specifically asked for category.
                     // Let's send them as "preferences" if they are not default?
