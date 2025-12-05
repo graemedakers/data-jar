@@ -27,7 +27,7 @@ Date Jar allows you and your partner to create a shared collection of date ideas
 ### Sign Up
 1.  Navigate to the landing page.
 2.  Click the **"Get Started"** button.
-3.  Enter your names (e.g., "Alex & Sam").
+3.  Enter your name (e.g., "Alex").
 4.  Enter your email address and a secure password.
 5.  **Location:** Enter your city (e.g., "New York, NY"). This helps us suggest relevant ideas.
 6.  Click **"Create Jar"**.

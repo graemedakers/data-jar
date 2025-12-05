@@ -50,7 +50,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                     <div className="space-y-4">
                         <h3 className="text-xl font-bold text-white">Getting Started</h3>
                         <ul className="list-disc list-inside space-y-2 text-slate-300">
-                            <li><strong>Sign Up:</strong> Create an account with your partner's name and your location.</li>
+                            <li><strong>Sign Up:</strong> Create an account with your name and your location.</li>
                             <li><strong>One Account:</strong> You only need one account per couple. Share the login or invite your partner.</li>
                             <li><strong>Location:</strong> Setting your location helps us suggest relevant ideas.</li>
                         </ul>
