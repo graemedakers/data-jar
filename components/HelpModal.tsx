@@ -77,7 +77,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-slate-300">
                             <li><strong>Preferences:</strong> Enter your craving (e.g., "Sushi", "Italian") and desired vibe (e.g., "Romantic", "Lively").</li>
-                            <li><strong>Recommendations:</strong> The AI will find 3 top-rated local restaurants matching your criteria.</li>
+                            <li><strong>Recommendations:</strong> The AI will find 5 top-rated local restaurants matching your criteria.</li>
                             <li><strong>Go Tonight:</strong> Found a winner? Click <span className="text-yellow-400">Go Tonight</span> to instantly select it as your date. We'll even fetch opening hours and provide a direct link to their website!</li>
                             <li><strong>Add to Jar:</strong> Want to save it for later? Click "Add" to drop it in your jar for a future spin.</li>
                         </ul>
@@ -108,7 +108,14 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         </div>
                         <div className="space-y-2">
                             <h4 className="font-bold text-secondary">AI Surprise Me</h4>
-                            <p className="text-slate-300">Stuck? Click "Add Idea" then the <Sparkles className="inline w-4 h-4" /> <strong>Surprise Me</strong> button to let AI generate a creative idea for you.</p>
+                            <p className="text-slate-300">Stuck on what to do? The AI can generate custom date ideas tailored to your location and interests.</p>
+                            <ol className="list-decimal list-inside space-y-1 text-slate-300 text-sm mt-2">
+                                <li>Click <strong>"Add Idea"</strong> from the dashboard.</li>
+                                <li>Click the <strong><Sparkles className="inline w-3 h-3 text-yellow-400" /> Surprise Me</strong> button.</li>
+                                <li>Select a category (Activity, Meal, or Event).</li>
+                                <li>The AI will use your <strong>Interests</strong> (from Settings) to generate a unique plan.</li>
+                                <li>Review the idea and click "Add" to drop it in your jar.</li>
+                            </ol>
                         </div>
                     </div>
                 );
@@ -222,27 +229,27 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
-                        className="glass-card w-full max-w-4xl h-[80vh] flex overflow-hidden relative"
+                        className="glass-card w-full max-w-4xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden relative"
                     >
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 p-2 text-white/50 hover:text-white transition-colors z-10"
+                            className="absolute top-4 right-4 p-2 text-white/50 hover:text-white transition-colors z-20"
                         >
                             <X className="w-6 h-6" />
                         </button>
 
                         {/* Sidebar */}
-                        <div className="w-1/3 border-r border-white/10 bg-black/20 p-4 overflow-y-auto">
-                            <div className="flex items-center gap-2 mb-6 px-2">
+                        <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-white/10 bg-black/20 p-4 shrink-0 flex flex-col md:block">
+                            <div className="flex items-center gap-2 mb-4 md:mb-6 px-2 pr-12 md:pr-2">
                                 <HelpCircle className="w-6 h-6 text-primary" />
-                                <h2 className="text-xl font-bold text-white">Help Center</h2>
+                                <h2 className="text-xl font-bold text-white whitespace-nowrap">Help Center</h2>
                             </div>
-                            <nav className="space-y-1">
+                            <nav className="flex flex-row md:flex-col gap-2 md:gap-0 md:space-y-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 min-h-0 no-scrollbar">
                                 {sections.map((section) => (
                                     <button
                                         key={section.id}
                                         onClick={() => setActiveSection(section.id)}
-                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${activeSection === section.id
+                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0 ${activeSection === section.id
                                             ? "bg-primary/20 text-white border border-primary/30"
                                             : "text-slate-400 hover:text-white hover:bg-white/5"
                                             }`}
@@ -255,7 +262,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 p-8 overflow-y-auto bg-gradient-to-br from-white/5 to-transparent">
+                        <div className="flex-1 p-6 md:p-8 overflow-y-auto bg-gradient-to-br from-white/5 to-transparent">
                             <motion.div
                                 key={activeSection}
                                 initial={{ opacity: 0, x: 10 }}

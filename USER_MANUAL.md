@@ -68,7 +68,7 @@ You can add ideas manually or let our AI suggest them.
 1.  Click **"Add Idea"**.
 2.  Click the **"Surprise Me"** button (Sparkles icon).
 3.  Select a category (Activity, Meal, Event).
-4.  Wait a moment for the AI to generate a creative date idea tailored to your location.
+4.  Wait a moment for the AI to generate a creative date idea tailored to your location and specific **Interests** (set in Settings).
 5.  Review the details and click **"Add to Jar"**.
 
 ---
