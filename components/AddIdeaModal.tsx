@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Plus, Clock, Activity, DollarSign, Home, Trees, Sparkles, Loader2, Lock, Utensils, Calendar } from "lucide-react";
+import { X, Plus, Clock, Activity, DollarSign, Home, Trees, Sparkles, Loader2, Lock, Utensils, Calendar, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface AddIdeaModalProps {
@@ -74,7 +74,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                 const data = await res.json();
                 setFormData({
                     description: data.description,
-                    details: data.details || "", // Populate details from AI
+                    details: (data.details || "") + (data.url ? `\n\nMore Info: ${data.url}` : ""), // Populate details from AI
                     indoor: data.indoor,
                     duration: String(data.duration),
                     activityLevel: data.activityLevel,
@@ -148,26 +148,6 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                         <div className="max-h-[85vh] overflow-y-auto px-4 pb-6">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300 ml-1">Description</label>
-                                    <Input
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        placeholder="e.g. Build a blanket fort"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300 ml-1">Details (Optional)</label>
-                                    <textarea
-                                        value={formData.details}
-                                        onChange={(e) => setFormData({ ...formData, details: e.target.value })}
-                                        placeholder="Add more info, e.g. what to bring, specific location..."
-                                        className="glass-input w-full min-h-[80px] py-2 px-3 resize-none"
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-300 ml-1">Category</label>
                                     <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
                                         <button
@@ -192,6 +172,49 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                                             <Calendar className="w-4 h-4" /> Event
                                         </button>
                                     </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300 ml-1">
+                                        {formData.category === 'MEAL' ? "Meal Idea" : formData.category === 'EVENT' ? "Event Name" : "Activity Description"}
+                                    </label>
+                                    <Input
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        placeholder={
+                                            formData.category === 'MEAL' ? "e.g. Try that new Italian place downtown" :
+                                                formData.category === 'EVENT' ? "e.g. Jazz in the Park" :
+                                                    "e.g. Build a blanket fort"
+                                        }
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-medium text-slate-300 ml-1">Details (Optional)</label>
+                                        {formData.details.match(/https?:\/\/[^\s]+/) && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 px-2"
+                                                onClick={() => {
+                                                    const match = formData.details.match(/https?:\/\/[^\s]+/);
+                                                    if (match) window.open(match[0], '_blank');
+                                                }}
+                                            >
+                                                <ExternalLink className="w-3 h-3 mr-1" />
+                                                Visit Website
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <textarea
+                                        value={formData.details}
+                                        onChange={(e) => setFormData({ ...formData, details: e.target.value })}
+                                        placeholder="Add more info, e.g. what to bring, specific location..."
+                                        className="glass-input w-full min-h-[80px] py-2 px-3 resize-none"
+                                    />
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -317,11 +340,8 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                                                 <div className="flex flex-col items-center leading-none py-1">
                                                     <div className="flex items-center">
                                                         <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                                                        <span>Surprise Me</span>
+                                                        <span>Surprise {formData.category.charAt(0) + formData.category.slice(1).toLowerCase()}</span>
                                                     </div>
-                                                    <span className="text-[10px] opacity-70 font-normal mt-1">
-                                                        Based on {formData.category.charAt(0) + formData.category.slice(1).toLowerCase()}
-                                                    </span>
                                                 </div>
                                             </>
                                         )}

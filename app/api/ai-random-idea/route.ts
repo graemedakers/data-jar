@@ -114,6 +114,7 @@ export async function POST(request: Request) {
         - cost: string (one of: "FREE", "$", "$$", "$$$")
         - timeOfDay: string (one of: "ANY", "DAY", "EVENING")
         - category: string (must be one of: "ACTIVITY", "MEAL", "EVENT")
+        - url: string (optional, URL to the specific venue or event website if applicable)
 
         Example:
         {
