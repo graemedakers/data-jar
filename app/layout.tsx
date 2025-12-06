@@ -47,20 +47,11 @@ export const metadata: Metadata = {
     title: "Date Jar | Pick Your Next Date",
     description: "Stop asking 'What do you want to do?'. Let the Date Jar decide.",
     siteName: "Date Jar",
-    images: [
-      {
-        url: '/og-image.jpg', // Assuming you might add one later, or use a default
-        width: 1200,
-        height: 630,
-        alt: 'Date Jar App',
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Date Jar | Pick Your Next Date",
     description: "A fun way for couples to decide on their next date.",
-    images: ['/og-image.jpg'],
   },
   icons: {
     icon: "/favicon.ico",

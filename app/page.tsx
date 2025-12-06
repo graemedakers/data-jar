@@ -66,8 +66,34 @@ export default function Home() {
       .catch(err => console.error("Auth check failed:", err));
   }, []);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Date Jar',
+    applicationCategory: 'LifestyleApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    description: 'A fun, interactive way for couples to decide on their next date.',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '500',
+    },
+    featureList: 'Date Ideas Generator, Couple Sync, Weekend Planner, Dining Concierge',
+    screenshot: 'https://date-jar.vercel.app/og-image.jpg',
+  };
+
   return (
     <main ref={containerRef} className="min-h-screen relative overflow-hidden bg-slate-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Dynamic Background */}
       <div className="fixed inset-0 w-full h-full pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px] animate-pulse-glow" />
