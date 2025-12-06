@@ -44,6 +44,8 @@ model User {
   hasUsedTrial           Boolean  @default(false)
   emailVerified          DateTime?
   verificationToken      String?
+  passwordResetToken     String?
+  passwordResetTokenExp  DateTime?
 }
 
 
