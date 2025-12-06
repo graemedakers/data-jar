@@ -57,7 +57,7 @@ export async function POST(request: Request) {
             Task: Suggest a BETTER alternative for the "${slotType}" slot at ${slotTime}.
             
             CRITICAL CONSTRAINTS:
-            1. LOCATION: Must be within 5-10 mins walk of the other venues in the plan.
+            1. LOCATION: Must be within walking distance (or very short public transport hop) of the other venues. MATCH THE NEIGHBORHOOD.
             2. STATUS: Must be currently OPEN for business. Verified.
             3. BUDGET: ${cost || "Medium"}.
             4. VIBE: ${partnerInterests ? `Appeal to: ${partnerInterests}` : "Romantic and fun"}.
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
             User Preferences (Secondary): ${userInterests}
             
             CRITICAL INSTRUCTIONS:
-            1. LOCALITY: All three venues MUST be within EASY WALKING DISTANCE of each other (max 5-10 minute walk between them). Focus on the town/city center or a dense entertainment district. Do NOT suggest venues that require driving.
+            1. LOCALITY: Choose a SINGLE Neighborhood or District and STICK TO IT. All three venues MUST be close enough to walk between (ideal) or a very short tram/bus ride. Do NOT suggest venues scattered across the city. They must form a logical, compact route.
             2. FLOW: The evening must follow this schedule:
                - Part 1: Pre-dinner drinks at a nice bar or lounge.
                - Part 2: Dinner at a compatible restaurant.
