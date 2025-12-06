@@ -104,7 +104,7 @@ export async function POST(request: Request) {
         Do not include markdown formatting. Just the raw JSON.
         `;
 
-        const models = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+        const models = ["gemini-2.0-flash-lite-preview-02-05", "gemini-flash-latest", "gemini-2.0-flash"];
         let errors: string[] = [];
 
         for (const model of models) {

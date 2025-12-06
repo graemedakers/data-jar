@@ -40,6 +40,27 @@ function StepCard({ number, title, description }: { number: string, title: strin
   );
 }
 
+function FaqItem({ question, answer }: { question: string, answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-white/5 last:border-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full py-4 text-left group"
+      >
+        <span className="text-lg font-medium text-white group-hover:text-accent transition-colors">{question}</span>
+        <span className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-white" style={{ transform: 'rotate(90deg)' }} />
+        </span>
+      </button>
+      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0'}`}>
+        <p className="text-slate-400 leading-relaxed">{answer}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -143,13 +164,13 @@ export default function Home() {
               <span>Reignite the spark</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-400 tracking-tight leading-[1.1]">
-              Never Ask <br />
-              <span className="text-accent">"What Should We Do?"</span> <br />
-              Again.
+              The Ultimate <br />
+              <span className="text-accent">Date Idea Generator</span> <br />
+              For Couples.
             </h1>
             <p className="text-lg text-slate-400 max-w-xl mx-auto md:mx-0 leading-relaxed">
-              The ultimate app for couples to curate, manage, and discover amazing date ideas.
-              Let fate decide your next adventure or use our smart tools to plan the perfect weekend.
+              Stop scrolling and start dating. Our <strong>shared app for couples</strong> helps you curate, manage, and discover <strong>romantic date ideas</strong>.
+              Let fate decide your next adventure or use our <strong>smart date planner</strong> for the perfect weekend.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
               <Button
@@ -205,37 +226,37 @@ export default function Home() {
             <FeatureCard
               icon={Shuffle}
               title="Spin the Jar"
-              description="Can't decide? Let the jar pick for you. Filter by cost, duration, or vibe and let fate handle the rest."
+              description="Overcome decision paralysis with our random date generator. Filter by cost, duration, or vibe and let fate decide."
               delay={0.1}
             />
             <FeatureCard
               icon={Users}
               title="Partner Sync"
-              description="Invite your partner to your jar. Both of you can add ideas, and changes sync instantly across devices."
+              description="The perfect app for couples. Invite your partner to your jar and sync date ideas instantly across both devices."
               delay={0.2}
             />
             <FeatureCard
               icon={Calendar}
               title="Weekend Planner"
-              description="Need a full itinerary? Our smart planner analyzes your location and preferences to build a custom weekend plan."
+              description="Build a complete romantic itinerary. Our smart AI planner creates custom weekend plans based on your location."
               delay={0.3}
             />
             <FeatureCard
               icon={Utensils}
               title="Dining Concierge"
-              description="Find the perfect dinner spot. Get curated restaurant recommendations with ratings and reviews."
+              description="Find romantic restaurants for date night. Get curated recommendations with ratings specifically for couples."
               delay={0.4}
             />
             <FeatureCard
               icon={Wine}
               title="Bar Scout"
-              description="Discover hidden speakeasies and rooftop bars. Perfect for when you want to grab a drink after dinner."
+              description="Discover hidden speakeasies and rooftop bars. The best nightlife spots for after-dinner drinks."
               delay={0.5}
             />
             <FeatureCard
               icon={Star}
               title="Rate & Remember"
-              description="Keep a history of your dates. Rate them, add notes, and build a scrapbook of memories."
+              description="Keep a digital scrapbook of your relationship. Rate dates, add private notes, and cherish your memories."
               delay={0.6}
             />
           </div>
@@ -267,6 +288,35 @@ export default function Home() {
               number="3"
               title="Spin & Go"
               description="When date night comes, spin the jar to pick an activity. No more indecision!"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 px-6 bg-slate-950/50 relative z-10">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Frequently Asked Questions</h2>
+            <p className="text-slate-400">Everything you need to know about your new favorite couples app.</p>
+          </div>
+
+          <div className="glass-card p-6 md:p-8 space-y-2">
+            <FaqItem
+              question="How does the date idea generator work?"
+              answer="Simply add your own ideas or use our pre-filled categories. When you're ready, filter by budget, time, or energy level, and 'Spin the Jar' to get a random suggestion that fits your mood perfectly."
+            />
+            <FaqItem
+              question="Is Date Jar free for couples?"
+              answer="Yes! You can create a jar, add unlimited ideas, and sync with your partner for free. We also offer a premium tier for advanced features like the AI Weekend Planner and Dining Concierge."
+            />
+            <FaqItem
+              question="Can I find restaurants for date night?"
+              answer="Absolutely. Our Dining Concierge feature helps you find top-rated romantic restaurants near you, complete with reviews, ratings, and price levels."
+            />
+            <FaqItem
+              question="Does it sync between two phones?"
+              answer="Yes. Date Jar is designed for couples. Once you invite your partner using your unique code, your jars are instantly linked. Any idea added or removed on one phone appears on the other immediately."
             />
           </div>
         </div>

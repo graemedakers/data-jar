@@ -26,7 +26,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
     // Constants for selection options
     const CUISINE_OPTIONS = [
         "Italian", "Japanese", "Mexican", "Thai", "Indian", "Chinese",
-        "Australian", "Burgers", "Pizza", "Seafood", "Steak", "Vegan", "Dessert", "Breakfast / Cafe"
+        "Australian", "Burgers", "Pizza", "Seafood", "Steak", "Vegan", "Dessert", "Breakfast / Cafe", "Coffee"
     ];
 
     const VIBE_OPTIONS = [
@@ -82,7 +82,10 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                 const data = await res.json();
                 setRecommendations(data.recommendations);
             } else {
-                alert("Failed to get recommendations. Please try again.");
+                const errorData = await res.json().catch(() => ({}));
+                const errorMessage = errorData.error || "Failed to get recommendations.";
+                const errorDetails = errorData.details ? `\n\nDetails: ${errorData.details}` : "";
+                alert(errorMessage + errorDetails);
             }
         } catch (error) {
             console.error(error);
