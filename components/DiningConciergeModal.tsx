@@ -11,9 +11,10 @@ interface DiningConciergeModalProps {
     userLocation?: string;
     onIdeaAdded?: () => void;
     onGoTonight?: (idea: any) => void;
+    onFavoriteUpdated?: () => void;
 }
 
-export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, onGoTonight }: DiningConciergeModalProps) {
+export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, onGoTonight, onFavoriteUpdated }: DiningConciergeModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
     const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
@@ -181,27 +182,47 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
 
     const handleFavorite = async (rec: any) => {
         try {
-            const res = await fetch('/api/favorites', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: rec.name,
-                    address: rec.address,
-                    description: rec.description,
-                    websiteUrl: rec.website,
-                    googleRating: rec.google_rating,
-                    type: "RESTAURANT"
-                }),
-            });
+            if (rec.isFavorite) {
+                // Remove favorite
+                const res = await fetch(`/api/favorites?name=${encodeURIComponent(rec.name)}`, {
+                    method: 'DELETE',
+                });
 
-            if (res.ok) {
-                alert("Saved to favorites!");
+                if (res.ok) {
+                    setRecommendations(prev => prev.map(item =>
+                        item.name === rec.name ? { ...item, isFavorite: false } : item
+                    ));
+                    if (onFavoriteUpdated) onFavoriteUpdated();
+                } else {
+                    alert("Failed to remove favorite.");
+                }
             } else {
-                alert("Failed to save favorite.");
+                // Add favorite
+                const res = await fetch('/api/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: rec.name,
+                        address: rec.address,
+                        description: rec.description,
+                        websiteUrl: rec.website,
+                        googleRating: rec.google_rating,
+                        type: "RESTAURANT"
+                    }),
+                });
+
+                if (res.ok) {
+                    setRecommendations(prev => prev.map(item =>
+                        item.name === rec.name ? { ...item, isFavorite: true } : item
+                    ));
+                    if (onFavoriteUpdated) onFavoriteUpdated();
+                } else {
+                    alert("Failed to save favorite.");
+                }
             }
         } catch (error) {
             console.error(error);
-            alert("Error saving favorite.");
+            alert("Error updating favorite.");
         }
     };
 
@@ -363,8 +384,15 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                                             <ExternalLink className="w-4 h-4 mr-1" /> Web
                                                         </Button>
                                                     )}
-                                                    <Button size="sm" onClick={() => handleFavorite(rec)} className="text-xs bg-white/10 hover:bg-white/20 text-pink-400">
-                                                        <Heart className="w-4 h-4 mr-1" /> Save
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => handleFavorite(rec)}
+                                                        className={`text-xs ${rec.isFavorite
+                                                            ? 'bg-pink-500/20 text-pink-300 hover:bg-pink-500/30'
+                                                            : 'bg-white/10 hover:bg-white/20 text-pink-400'}`}
+                                                    >
+                                                        <Heart className={`w-4 h-4 mr-1 ${rec.isFavorite ? 'fill-current' : ''}`} />
+                                                        {rec.isFavorite ? 'Saved' : 'Save'}
                                                     </Button>
                                                     <Button size="sm" onClick={() => handleAddToJar(rec)} className="text-xs bg-white/10 hover:bg-white/20">
                                                         <Plus className="w-4 h-4 mr-1" /> Jar

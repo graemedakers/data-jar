@@ -81,6 +81,8 @@ export default function DashboardPage() {
 
     const [diningSearchLocation, setDiningSearchLocation] = useState<string | null>(null);
 
+    const [favoritesCount, setFavoritesCount] = useState(0);
+
     // New state for Premium Banner
     const [hasPaid, setHasPaid] = useState(false);
     const [coupleCreatedAt, setCoupleCreatedAt] = useState<string>("");
@@ -98,8 +100,21 @@ export default function DashboardPage() {
         }
     };
 
+    const fetchFavorites = async () => {
+        try {
+            const res = await fetch('/api/favorites', { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setFavoritesCount(data.length);
+            }
+        } catch (error) {
+            console.error('Failed to fetch favorites', error);
+        }
+    };
+
     useEffect(() => {
         fetchIdeas();
+        fetchFavorites();
         fetch('/api/auth/me')
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch user');
@@ -219,7 +234,10 @@ export default function DashboardPage() {
 
             <FavoritesModal
                 isOpen={isFavoritesOpen}
-                onClose={() => setIsFavoritesOpen(false)}
+                onClose={() => {
+                    setIsFavoritesOpen(false);
+                    fetchFavorites();
+                }}
             />
 
             <AddIdeaModal
@@ -279,6 +297,7 @@ export default function DashboardPage() {
                 onGoTonight={(idea) => {
                     setSelectedIdea(idea);
                 }}
+                onFavoriteUpdated={fetchFavorites}
             />
 
             <BarConciergeModal
@@ -291,6 +310,7 @@ export default function DashboardPage() {
                 onGoTonight={(idea) => {
                     setSelectedIdea(idea);
                 }}
+                onFavoriteUpdated={fetchFavorites}
             />
 
             <DateNightPlannerModal
@@ -366,8 +386,13 @@ export default function DashboardPage() {
                     )}
 
                     <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={() => setIsFavoritesOpen(true)}>
+                        <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10 relative" onClick={() => setIsFavoritesOpen(true)}>
                             <Heart className="w-5 h-5 text-pink-400" />
+                            {favoritesCount > 0 && (
+                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center border border-slate-900 pointer-events-none">
+                                    {favoritesCount}
+                                </span>
+                            )}
                         </Button>
                         <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={() => setIsSettingsModalOpen(true)}>
                             <Settings className="w-5 h-5" />

@@ -33,6 +33,32 @@ export async function POST(request: Request) {
     }
 }
 
+export async function DELETE(request: Request) {
+    try {
+        const session = await getSession();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const name = searchParams.get('name');
+
+        if (!name) {
+            return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+        }
+
+        // Using raw SQL to bypass valid Prisma Client generation issues
+        await prisma.$executeRaw`
+            DELETE FROM "FavoriteVenue" WHERE "coupleId" = ${session.user.coupleId} AND "name" = ${name}
+        `;
+
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        console.error("Error deleting favorite:", error);
+        return NextResponse.json({ error: "Failed to delete favorite" }, { status: 500 });
+    }
+}
+
 export async function GET(request: Request) {
     try {
         const session = await getSession();
