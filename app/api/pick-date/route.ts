@@ -103,7 +103,7 @@ export async function POST(request: Request) {
 
                     const resend = new Resend(process.env.RESEND_API_KEY);
                     await resend.emails.send({
-                        from: 'Date Jar <onboarding@resend.dev>',
+                        from: process.env.EMAIL_FROM || 'Date Jar <onboarding@resend.dev>',
                         to: recipients,
                         subject: `Date Night Decided: ${selectedIdea.description}!`,
                         html: `

@@ -1,8 +1,6 @@
 
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendVerificationEmail(email: string, token: string) {
     if (!process.env.RESEND_API_KEY) {
         console.warn("RESEND_API_KEY is not set. Skipping email verification.");
@@ -12,9 +10,11 @@ export async function sendVerificationEmail(email: string, token: string) {
 
     const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/verify?token=${token}`;
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     try {
         await resend.emails.send({
-            from: 'Date Jar <onboarding@resend.dev>',
+            from: process.env.EMAIL_FROM || 'Date Jar <onboarding@resend.dev>',
             to: email,
             subject: 'Verify your email for Date Jar',
             html: `
