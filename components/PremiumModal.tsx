@@ -96,7 +96,7 @@ export function PremiumModal({ isOpen, onClose, title, description }: PremiumMod
                                 className="w-full text-lg h-14 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity shadow-lg shadow-primary/25"
                             >
                                 <Sparkles className="w-5 h-5 mr-2" />
-                                Activate for $5
+                                Activate for AU$10
                             </Button>
                             <p className="text-xs text-slate-500 mt-4 mb-2">
                                 One-time payment per couple. No monthly fees.
