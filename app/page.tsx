@@ -123,7 +123,7 @@ export default function Home() {
             </h1>
             <p className="text-lg text-slate-400 max-w-xl mx-auto md:mx-0 leading-relaxed">
               The ultimate app for couples to curate, manage, and discover amazing date ideas.
-              Let fate decide your next adventure or use our AI to plan the perfect weekend.
+              Let fate decide your next adventure or use our smart tools to plan the perfect weekend.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
               <Button
@@ -191,13 +191,13 @@ export default function Home() {
             <FeatureCard
               icon={Calendar}
               title="Weekend Planner"
-              description="Need a full itinerary? Our AI analyzes your location and preferences to build a custom weekend plan."
+              description="Need a full itinerary? Our smart planner analyzes your location and preferences to build a custom weekend plan."
               delay={0.3}
             />
             <FeatureCard
               icon={Utensils}
               title="Dining Concierge"
-              description="Find the perfect dinner spot. Get AI-curated restaurant recommendations with ratings and reviews."
+              description="Find the perfect dinner spot. Get curated restaurant recommendations with ratings and reviews."
               delay={0.4}
             />
             <FeatureCard
@@ -230,7 +230,7 @@ export default function Home() {
             <StepCard
               number="1"
               title="Create Your Jar"
-              description="Sign up and create a digital jar. Add your favorite date ideas or use our AI to generate some."
+              description="Sign up and create a digital jar. Add your favorite date ideas or use our generator to find some."
             />
             <StepCard
               number="2"

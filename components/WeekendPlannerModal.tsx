@@ -121,7 +121,7 @@ export function WeekendPlannerModal({ isOpen, onClose, userLocation, onIdeaAdded
 
                     {debugInfo && (
                         <div className="text-xs text-yellow-500 bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20">
-                            <p className="font-bold mb-1">AI Unavailable (Offline Mode)</p>
+                            <p className="font-bold mb-1">Service Unavailable (Offline Mode)</p>
                             <p className="opacity-80 font-mono break-all">{debugInfo}</p>
                         </div>
                     )}

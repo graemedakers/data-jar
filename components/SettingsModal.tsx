@@ -216,7 +216,7 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                                         placeholder="e.g. Hiking, Sushi, Jazz, Art"
                                     />
                                     <p className="text-xs text-slate-400 ml-1">
-                                        Comma separated. Used to personalize AI suggestions.
+                                        Comma separated. Used to personalize smart suggestions.
                                     </p>
                                 </div>
 

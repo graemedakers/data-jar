@@ -59,6 +59,7 @@ export default function DashboardPage() {
     const [selectedIdea, setSelectedIdea] = useState<any>(null);
     const [userLocation, setUserLocation] = useState<string | null>(null);
     const [homeTown, setHomeTown] = useState<string | null>(null);
+    const [interests, setInterests] = useState<string | null>(null);
     const [inviteCode, setInviteCode] = useState<string | null>(null);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [editingIdea, setEditingIdea] = useState<any>(null);
@@ -104,6 +105,7 @@ export default function DashboardPage() {
                     if (data.user.location) setUserLocation(data.user.location);
                     if (data.user.homeTown) setHomeTown(data.user.homeTown);
                     if (data.user.coupleReferenceCode) setInviteCode(data.user.coupleReferenceCode);
+                    if (data.user.interests) setInterests(data.user.interests);
                     const userIsPremium = !!data.user.isPremium;
                     setIsPremium(userIsPremium);
 
@@ -242,6 +244,7 @@ export default function DashboardPage() {
                             if (data?.user) {
                                 if (data.user.location) setUserLocation(data.user.location);
                                 if (data.user.homeTown) setHomeTown(data.user.homeTown);
+                                if (data.user.interests) setInterests(data.user.interests);
                             }
                         });
                 }}
@@ -369,11 +372,33 @@ export default function DashboardPage() {
                         </div>
                         <div>
                             <h3 className="text-sm font-bold text-white">Setup your profile</h3>
-                            <p className="text-xs text-slate-400">Add your location to get better AI recommendations.</p>
+                            <p className="text-xs text-slate-400">Add your location to get better smart recommendations.</p>
                         </div>
                     </div>
                     <Button size="sm" onClick={() => setIsSettingsModalOpen(true)} className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border-none">
                         Configure
+                    </Button>
+                </motion.div>
+            )}
+
+            {/* Interests Prompt */}
+            {!isLoadingUser && userLocation && !interests && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between gap-4"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                            <Star className="w-4 h-4 text-purple-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white">Personalize your dates</h3>
+                            <p className="text-xs text-slate-400">Add your interests to get better smart suggestions.</p>
+                        </div>
+                    </div>
+                    <Button size="sm" onClick={() => setIsSettingsModalOpen(true)} className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border-none">
+                        Add Interests
                     </Button>
                 </motion.div>
             )}

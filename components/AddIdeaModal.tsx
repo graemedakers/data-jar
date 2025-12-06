@@ -88,7 +88,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                 alert(`Failed to generate idea: ${errorData.details || "Unknown error"}`);
             }
         } catch (error) {
-            console.error("AI Generation Error:", error);
+            console.error("Idea Generation Error:", error);
             alert("Error generating idea. Check console for details.");
         } finally {
             setIsGeneratingAI(false);
