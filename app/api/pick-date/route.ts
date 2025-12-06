@@ -101,7 +101,7 @@ export async function POST(request: Request) {
                     const recipients = [userEmail];
                     if (partner) recipients.push(partner.email);
 
-                    const resend = new Resend(process.env.RESEND_API_KEY);
+                    const resend = new Resend(process.env.RESEND_API_KEY || 're_123');
                     await resend.emails.send({
                         from: process.env.EMAIL_FROM || 'Date Jar <onboarding@resend.dev>',
                         to: recipients,
