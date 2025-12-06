@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion } from "framer-motion";
-import { ArrowRight, Lock, Mail, User, Users, MapPin, AlertCircle } from "lucide-react";
+import { ArrowRight, Lock, Mail, User, Users, MapPin, AlertCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -161,6 +161,11 @@ export function SignupForm() {
             className="w-full max-w-md"
         >
             <div className="glass-card relative overflow-hidden">
+                {/* Close Button */}
+                <Link href="/" className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10">
+                    <X className="w-5 h-5" />
+                </Link>
+
                 {/* Header */}
                 <div className="text-center mb-8">
                     <motion.div

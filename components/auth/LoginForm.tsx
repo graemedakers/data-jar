@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion } from "framer-motion";
-import { Heart, ArrowRight, Lock, Mail } from "lucide-react";
+import { Heart, ArrowRight, Lock, Mail, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -64,6 +64,11 @@ export function LoginForm() {
                 className="w-full max-w-md"
             >
                 <div className="glass-card relative overflow-hidden">
+                    {/* Close Button */}
+                    <Link href="/" className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10">
+                        <X className="w-5 h-5" />
+                    </Link>
+
                     {/* Header */}
                     <div className="text-center mb-8">
                         <motion.div
