@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendDateNotificationEmail } from '@/lib/mailer';
 
 
 
@@ -88,43 +88,19 @@ export async function POST(request: Request) {
             });
 
             // Send Email Notification
-            if (userEmail && process.env.RESEND_API_KEY) {
-                try {
-                    // Find partner's email
-                    const partner = await prisma.user.findFirst({
-                        where: {
-                            coupleId: coupleId,
-                            email: { not: userEmail }
-                        }
-                    });
+            if (userEmail) {
+                // Find partner's email
+                const partner = await prisma.user.findFirst({
+                    where: {
+                        coupleId: coupleId,
+                        email: { not: userEmail }
+                    }
+                });
 
-                    const recipients = [userEmail];
-                    if (partner) recipients.push(partner.email);
+                const recipients = [userEmail];
+                if (partner) recipients.push(partner.email);
 
-                    const resend = new Resend(process.env.RESEND_API_KEY || 're_123');
-                    await resend.emails.send({
-                        from: process.env.EMAIL_FROM || 'Date Jar <onboarding@resend.dev>',
-                        to: recipients,
-                        subject: `Date Night Decided: ${selectedIdea.description}!`,
-                        html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #ec4899;">It's a Date!</h1>
-                <p>The jar has spoken. Your date for tonight is:</p>
-                <div style="background: #fdf2f8; padding: 20px; border-radius: 12px; margin: 20px 0;">
-                  <h2 style="margin: 0; color: #be185d;">${selectedIdea.description}</h2>
-                  <p style="margin: 10px 0 0; color: #6b7280;">
-                    ${selectedIdea.indoor ? '🏠 Indoor' : '🌳 Outdoor'} • 
-                    ${selectedIdea.duration}h • 
-                    ${selectedIdea.cost}
-                  </p>
-                </div>
-                <p>Have a wonderful time!</p>
-              </div>
-            `
-                    });
-                } catch (emailError) {
-                    console.error('Failed to send email:', emailError);
-                }
+                await sendDateNotificationEmail(recipients, selectedIdea);
             }
         }
 

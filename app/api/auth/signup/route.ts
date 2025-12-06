@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import { login } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 import crypto from 'crypto';
-import { sendVerificationEmail } from '@/lib/email';
+import { sendVerificationEmail } from '@/lib/mailer';
 
 export async function POST(request: Request) {
     try {
