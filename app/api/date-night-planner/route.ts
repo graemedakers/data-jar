@@ -89,6 +89,7 @@ export async function POST(request: Request) {
                - Part 1: Pre-dinner drinks at a nice bar or lounge.
                - Part 2: Dinner at a compatible restaurant.
                - Part 3: An evening event or activity (show, comedy, live music, interactive activity, etc.).
+                 **CRITICAL**: This final slot CANNOT be another bar, club, or restaurant. It must be a distinct activity (e.g., bowling, comedy, theater, arcade, night market, walk, dessert *only if it's a dedicated dessert place not a restaurant*). Avoid just "more drinks".
             3. REALITY CHECK: Verify these places exist and are CURRENTLY OPEN for business. Do NOT suggest venues that are "Permanently Closed" or "Temporarily Closed". 
                - SPECIAL CAUTION: Recent years have seen many closures. BE SKEPTICAL.
                - User Report: Venues like "The Butterfly Club" in Melbourne have been reported closed. Do not suggest them.
