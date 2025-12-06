@@ -19,7 +19,8 @@ import { BarConciergeModal } from "@/components/BarConciergeModal";
 import { Wine } from "lucide-react";
 import { PremiumBanner } from "@/components/PremiumBanner";
 import { DateNightPlannerModal } from "@/components/DateNightPlannerModal";
-import { Moon } from "lucide-react";
+import { Moon, Heart } from "lucide-react";
+import { FavoritesModal } from "@/components/FavoritesModal";
 
 function InviteCodeDisplay({ mobile, code }: { mobile?: boolean; code: string | null }) {
     const [copied, setCopied] = useState(false);
@@ -74,6 +75,7 @@ export default function DashboardPage() {
     const [isDiningModalOpen, setIsDiningModalOpen] = useState(false);
     const [isBarModalOpen, setIsBarModalOpen] = useState(false);
     const [isDateNightOpen, setIsDateNightOpen] = useState(false);
+    const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
     const router = useRouter();
 
@@ -213,6 +215,11 @@ export default function DashboardPage() {
             <PremiumModal
                 isOpen={isPremiumModalOpen}
                 onClose={() => setIsPremiumModalOpen(false)}
+            />
+
+            <FavoritesModal
+                isOpen={isFavoritesOpen}
+                onClose={() => setIsFavoritesOpen(false)}
             />
 
             <AddIdeaModal
@@ -359,6 +366,9 @@ export default function DashboardPage() {
                     )}
 
                     <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={() => setIsFavoritesOpen(true)}>
+                            <Heart className="w-5 h-5 text-pink-400" />
+                        </Button>
                         <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={() => setIsSettingsModalOpen(true)}>
                             <Settings className="w-5 h-5" />
                         </Button>

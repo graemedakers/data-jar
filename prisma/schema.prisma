@@ -18,6 +18,7 @@ model Couple {
   isPremium     Boolean  @default(false)
   isTrialEligible Boolean @default(true)
   deletedLogs   DeletedLog[]
+  favorites     FavoriteVenue[]
 }
 
 model DeletedLog {
@@ -47,6 +48,7 @@ model User {
   verificationToken      String?
   passwordResetToken     String?
   passwordResetTokenExp  DateTime?
+  favorites              FavoriteVenue[]
 }
 
 
@@ -90,4 +92,23 @@ model Rating {
   updatedAt DateTime @updatedAt
 
   @@unique([ideaId, userId])
+}
+
+model FavoriteVenue {
+  id          String   @id @default(uuid())
+  coupleId    String
+  couple      Couple   @relation(fields: [coupleId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  name        String
+  address     String?
+  description String?
+  websiteUrl  String?
+  googleRating Float?
+  type        String   @default("VENUE") // "RESTAURANT", "BAR", "VENUE"
+
+  createdAt   DateTime @default(now())
+
+  @@index([coupleId])
 }

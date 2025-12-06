@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Wine, Beer, MapPin, Loader2, Sparkles, ExternalLink, Plus, Zap, Star, Martini } from "lucide-react";
+import { X, Wine, Beer, MapPin, Loader2, Sparkles, ExternalLink, Plus, Zap, Star, Martini, Heart } from "lucide-react";
 import { Button } from "./ui/Button";
 
 interface BarConciergeModalProps {
@@ -179,6 +179,32 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
         }
     };
 
+    const handleFavorite = async (rec: any) => {
+        try {
+            const res = await fetch('/api/favorites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: rec.name,
+                    address: rec.address,
+                    description: rec.description,
+                    websiteUrl: rec.website,
+                    googleRating: rec.google_rating,
+                    type: "BAR"
+                }),
+            });
+
+            if (res.ok) {
+                alert("Saved to favorites!");
+            } else {
+                alert("Failed to save favorite.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error saving favorite.");
+        }
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -337,8 +363,11 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
                                                             <ExternalLink className="w-4 h-4 mr-1" /> Web
                                                         </Button>
                                                     )}
+                                                    <Button size="sm" onClick={() => handleFavorite(rec)} className="text-xs bg-white/10 hover:bg-white/20 text-pink-400">
+                                                        <Heart className="w-4 h-4 mr-1" /> Save
+                                                    </Button>
                                                     <Button size="sm" onClick={() => handleAddToJar(rec)} className="text-xs bg-white/10 hover:bg-white/20">
-                                                        <Plus className="w-4 h-4 mr-1" /> Add
+                                                        <Plus className="w-4 h-4 mr-1" /> Jar
                                                     </Button>
                                                     <Button size="sm" onClick={() => handleGoTonight(rec)} className="text-xs bg-gradient-to-r from-yellow-400/20 to-orange-400/20 text-yellow-200 border border-yellow-400/30 hover:bg-yellow-400/30">
                                                         <Zap className="w-4 h-4 mr-1" /> Go Tonight
