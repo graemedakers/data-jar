@@ -13,8 +13,10 @@ async function decrypt(input: string): Promise<any> {
 }
 
 export async function middleware(request: NextRequest) {
-    // Protect dashboard routes
-    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    // Protect dashboard and feature routes
+    if (request.nextUrl.pathname.startsWith('/dashboard') ||
+        request.nextUrl.pathname.startsWith('/jar') ||
+        request.nextUrl.pathname.startsWith('/memories')) {
         const session = request.cookies.get('session')?.value;
 
         if (!session) {
@@ -35,5 +37,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*'],
+    matcher: ['/dashboard/:path*', '/jar/:path*', '/memories/:path*'],
 }

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { AddIdeaModal } from "@/components/AddIdeaModal";
 import { motion } from "framer-motion";
-import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Copy, Calendar, Activity, Utensils, Check, Star } from "lucide-react";
+import { Plus, Settings, LogOut, Sparkles, Lock, Trash2, Copy, Calendar, Activity, Utensils, Check, Star, ArrowRight, History, Layers } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Jar3D } from "@/components/Jar3D";
 import { useRouter } from "next/navigation";
@@ -206,7 +206,7 @@ export default function DashboardPage() {
     const combinedLocation = [userLocation, homeTown].filter(Boolean).join(" and ");
 
     return (
-        <main className="min-h-screen p-4 md:p-6 pb-24 relative overflow-hidden">
+        <main className="min-h-screen p-4 md:p-8 pb-24 relative overflow-hidden w-full max-w-[1600px] mx-auto">
             <PremiumModal
                 isOpen={isPremiumModalOpen}
                 onClose={() => setIsPremiumModalOpen(false)}
@@ -318,13 +318,13 @@ export default function DashboardPage() {
             {/* Header */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 md:gap-0">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Your Jar</h1>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">Your Jar</h1>
                     <p className="text-slate-400 text-sm">Manage your date ideas</p>
                 </div>
                 <div className="flex gap-2 items-center w-full md:w-auto justify-between md:justify-end">
                     {/* Invite Code Badge */}
-                    <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
-                        <span className="text-xs text-slate-400">Invite Code:</span>
+                    <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-colors">
+                        <span className="text-xs text-slate-400 font-medium">Invite Code:</span>
                         <span className="text-xs font-mono text-white select-all">
                             {/* We need to fetch this from the user object */}
                             <InviteCodeDisplay code={inviteCode} />
@@ -340,7 +340,7 @@ export default function DashboardPage() {
                         <Button
                             variant="secondary"
                             size="sm"
-                            className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 text-yellow-200 border-yellow-400/30 hover:bg-yellow-400/30"
+                            className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 text-yellow-200 border-yellow-400/30 hover:bg-yellow-400/30 rounded-full"
                             onClick={() => setIsPremiumModalOpen(true)}
                         >
                             <Sparkles className="w-4 h-4 mr-2" />
@@ -349,308 +349,214 @@ export default function DashboardPage() {
                     )}
 
                     <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" className="!p-2" onClick={() => setIsSettingsModalOpen(true)}>
+                        <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={() => setIsSettingsModalOpen(true)}>
                             <Settings className="w-5 h-5" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="!p-2" onClick={handleLogout}>
+                        <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={handleLogout}>
                             <LogOut className="w-5 h-5" />
                         </Button>
                     </div>
                 </div>
             </header>
 
-            {/* Settings Prompt */}
-            {!isLoadingUser && !userLocation && (
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between gap-4"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                            <Settings className="w-4 h-4 text-blue-400" />
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-white">Setup your profile</h3>
-                            <p className="text-xs text-slate-400">Add your location to get better smart recommendations.</p>
-                        </div>
-                    </div>
-                    <Button size="sm" onClick={() => setIsSettingsModalOpen(true)} className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border-none">
-                        Configure
-                    </Button>
-                </motion.div>
-            )}
-
-            {/* Interests Prompt */}
-            {!isLoadingUser && userLocation && !interests && (
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between gap-4"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                            <Star className="w-4 h-4 text-purple-400" />
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-white">Personalize your dates</h3>
-                            <p className="text-xs text-slate-400">Add your interests to get better smart suggestions.</p>
-                        </div>
-                    </div>
-                    <Button size="sm" onClick={() => setIsSettingsModalOpen(true)} className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border-none">
-                        Add Interests
-                    </Button>
-                </motion.div>
-            )}
-
             {/* Premium Banner */}
             {!isLoadingUser && (
-                <PremiumBanner hasPaid={hasPaid} coupleCreatedAt={coupleCreatedAt} isTrialEligible={isTrialEligible} />
+                <div className="mb-8">
+                    <PremiumBanner hasPaid={hasPaid} coupleCreatedAt={coupleCreatedAt} isTrialEligible={isTrialEligible} />
+                </div>
             )}
 
-            {/* Stats / Jar Preview */}
-            <div className="flex flex-col items-center justify-center py-8 mb-8">
-                <div className="scale-75 origin-center">
-                    <Jar3D />
+            {/* Main Layout Grid */}
+            <div className="flex flex-col gap-12 max-w-6xl mx-auto">
+
+                {/* Upper Section: Jar Control Center */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-center relative">
+
+                    {/* Left Column: Input & Management */}
+                    <div className="space-y-6 order-2 xl:order-1">
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={handleAddIdeaClick}
+                            className="w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 cursor-pointer transition-all bg-gradient-to-br from-violet-600/20 to-violet-900/40 border border-violet-500/30 hover:border-violet-500/50 shadow-lg shadow-violet-900/10 group"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="w-12 h-12 shrink-0 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-200 group-hover:scale-110 transition-transform relative z-10 border border-violet-500/30">
+                                <Plus className="w-6 h-6" />
+                            </div>
+                            <div className="text-left relative z-10">
+                                <span className="block text-lg font-bold text-white group-hover:text-violet-200 transition-colors">Add Idea</span>
+                                <span className="text-sm text-violet-200/60 group-hover:text-violet-200/80 transition-colors leading-tight">Fill your jar</span>
+                            </div>
+                        </motion.button>
+
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => router.push('/jar')}
+                            className="glass-card p-6 flex items-center gap-4 cursor-pointer group hover:bg-white/10"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:bg-blue-500/30 transition-colors shrink-0">
+                                <Layers className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white">Open Jar</h3>
+                                <p className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">View {ideas.filter(i => !i.selectedAt).length} ideas</p>
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+                        </motion.div>
+                    </div>
+
+                    {/* Center Column: The Visualization */}
+                    <div className="order-1 xl:order-2 flex flex-col items-center justify-center relative">
+                        <div className="relative w-full aspect-square max-w-[400px] flex items-center justify-center">
+                            {/* Decorative Glow */}
+                            <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-50 pointer-events-none" />
+
+                            <div className="relative z-10 scale-125 transform transition-transform hover:scale-130 duration-700">
+                                <Jar3D />
+                            </div>
+                        </div>
+                        <div className="mt-[-20px] relative z-10 text-center">
+                            <p className="text-3xl font-bold text-white">{availableIdeasCount}</p>
+                            <p className="text-sm text-slate-400 uppercase tracking-wider font-medium">Ideas Waiting</p>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Action & History */}
+                    <div className="space-y-6 order-3 xl:order-3">
+                        <motion.button
+                            whileHover={availableIdeasCount > 0 ? { scale: 1.02 } : {}}
+                            whileTap={availableIdeasCount > 0 ? { scale: 0.95 } : {}}
+                            onClick={() => availableIdeasCount > 0 && setIsFilterModalOpen(true)}
+                            className={`w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 transition-all cursor-pointer border shadow-lg group ${availableIdeasCount > 0
+                                ? 'bg-gradient-to-br from-pink-600/20 to-pink-900/40 border-pink-500/30 hover:border-pink-500/50 shadow-pink-900/10'
+                                : 'bg-slate-800/20 border-slate-700 opacity-50 grayscale cursor-not-allowed'}`}
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-pink-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center relative z-10 border transition-transform group-hover:scale-110 ${availableIdeasCount > 0 ? 'bg-pink-500/20 text-pink-200 border-pink-500/30' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>
+                                <Sparkles className={`w-6 h-6 ${isSpinning ? 'animate-spin' : ''}`} />
+                            </div>
+                            <div className="text-left relative z-10">
+                                <span className={`block text-lg font-bold transition-colors ${availableIdeasCount > 0 ? 'text-white group-hover:text-pink-200' : 'text-slate-400'}`}>{isSpinning ? 'Spinning...' : 'Spin the Jar'}</span>
+                                <span className={`text-sm transition-colors leading-tight ${availableIdeasCount > 0 ? 'text-pink-200/60 group-hover:text-pink-200/80' : 'text-slate-500'}`}>Let fate decide</span>
+                            </div>
+                        </motion.button>
+
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => router.push('/memories')}
+                            className="glass-card p-6 flex items-center gap-4 cursor-pointer group hover:bg-white/10"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/30 transition-colors shrink-0">
+                                <History className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white">Memories</h3>
+                                <p className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">{ideas.filter(i => i.selectedAt).length} dates done</p>
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+                        </motion.div>
+                    </div>
                 </div>
-                <p className="text-center text-slate-400 mt-[-40px]">
-                    {availableIdeasCount} ideas in the jar
-                </p>
-            </div>
 
-            {/* Actions Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleAddIdeaClick}
-                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10"
-                >
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-                        <Plus className="w-6 h-6 text-primary" />
-                    </div>
-                    <span className="font-medium text-white text-center">Add Idea</span>
-                </motion.div>
-
-                <motion.div
-                    whileHover={availableIdeasCount > 0 ? { scale: 1.02 } : {}}
-                    whileTap={availableIdeasCount > 0 ? { scale: 0.98 } : {}}
-                    onClick={() => availableIdeasCount > 0 && setIsFilterModalOpen(true)}
-                    className={`glass-card flex flex-col items-center justify-center gap-3 p-6 transition-all group ${availableIdeasCount > 0
-                        ? "cursor-pointer hover:bg-white/10"
-                        : "opacity-50 cursor-not-allowed grayscale"
-                        }`}
-                >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${availableIdeasCount > 0
-                        ? "bg-secondary/20 group-hover:bg-secondary/30"
-                        : "bg-slate-700"
-                        }`}>
-                        <Sparkles className={`w-6 h-6 ${availableIdeasCount > 0 ? "text-secondary" : "text-slate-500"} ${isSpinning ? 'animate-spin' : ''}`} />
-                    </div>
-                    <span className={`font-medium ${availableIdeasCount > 0 ? "text-white" : "text-slate-500"} text-center`}>
-                        {isSpinning ? 'Spinning...' : 'Spin Jar'}
-                    </span>
-                </motion.div>
-
-                <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                        if (isPremium) {
-                            setIsPlannerOpen(true);
-                        } else {
-                            setIsPremiumModalOpen(true);
-                        }
-                    }}
-                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 relative overflow-hidden"
-                >
-                    {!isPremium && (
-                        <div className="absolute top-3 right-3">
-                            <Lock className="w-4 h-4 text-slate-500" />
-                        </div>
-                    )}
-                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                        <Calendar className="w-6 h-6 text-purple-400" />
-                    </div>
-                    <span className="font-medium text-white text-center">Weekend Plan</span>
-                </motion.div>
-
-                <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                        if (isPremium) {
-                            setIsDiningModalOpen(true);
-                        } else {
-                            setIsPremiumModalOpen(true);
-                        }
-                    }}
-                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 relative overflow-hidden"
-                >
-                    {!isPremium && (
-                        <div className="absolute top-3 right-3">
-                            <Lock className="w-4 h-4 text-slate-500" />
-                        </div>
-                    )}
-                    <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center group-hover:bg-orange-500/30 transition-colors">
-                        <Utensils className="w-6 h-6 text-orange-400" />
-                    </div>
-                    <span className="font-medium text-white text-center">Dining Concierge</span>
-                </motion.div>
-
-                <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                        if (isPremium) {
-                            setIsBarModalOpen(true);
-                        } else {
-                            setIsPremiumModalOpen(true);
-                        }
-                    }}
-                    className="glass-card flex flex-col items-center justify-center gap-3 p-6 cursor-pointer group hover:bg-white/10 relative overflow-hidden"
-                >
-                    {!isPremium && (
-                        <div className="absolute top-3 right-3">
-                            <Lock className="w-4 h-4 text-slate-500" />
-                        </div>
-                    )}
-                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                        <Wine className="w-6 h-6 text-purple-400" />
-                    </div>
-                    <span className="font-medium text-white text-center">Bar Scout</span>
-                </motion.div>
-            </div>
-
-            {/* Ideas Lists */}
-            <div className="mt-8 max-w-md mx-auto space-y-8">
-
-                {/* Active Ideas */}
+                {/* Lower Section: Smart Tools Grid */}
                 <div>
-                    <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <span>In the Jar</span>
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
-                            {ideas.filter(i => !i.selectedAt).length}
-                        </span>
-                    </h3>
-                    <div className="space-y-3">
-                        {ideas.filter(i => !i.selectedAt).length === 0 ? (
-                            <p className="text-slate-400 text-center py-4 text-sm">No ideas in the jar. Add some!</p>
-                        ) : (
-                            ideas.filter(i => !i.selectedAt).map((idea) => (
-                                <div
-                                    key={idea.id}
-                                    className={`glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 group transition-colors ${idea.isMasked ? 'opacity-75 bg-white/5' : 'hover:bg-white/5'}`}
-                                >
-                                    <div
-                                        className={`flex-1 ${!idea.isMasked ? 'cursor-pointer' : ''}`}
-                                        onClick={() => !idea.isMasked && setEditingIdea(idea)}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            {idea.isMasked && <Lock className="w-3 h-3 text-slate-400" />}
-                                            <p className={`font-medium ${idea.isMasked ? 'text-slate-400 italic' : 'text-white'}`}>{idea.description}</p>
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            {idea.category === 'MEAL' && <Utensils className="w-3 h-3 text-orange-400" />}
-                                            {idea.category === 'EVENT' && <Calendar className="w-3 h-3 text-purple-400" />}
-                                            {(!idea.category || idea.category === 'ACTIVITY') && <Activity className="w-3 h-3 text-blue-400" />}
-                                            <p className="text-xs text-slate-400">
-                                                {idea.indoor ? 'Indoor' : 'Outdoor'} • {idea.duration}h • {idea.cost} • {idea.timeOfDay === 'ANY' ? 'Anytime' : idea.timeOfDay === 'DAY' ? 'Day' : 'Evening'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
-                                        <div className={`w-2 h-2 rounded-full ${idea.activityLevel === 'HIGH' ? 'bg-red-400' : idea.activityLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-green-400'}`} />
-                                        {!idea.isMasked && (
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    // No need for stopPropagation now, but keeping it is safe
-                                                    e.stopPropagation();
-                                                    handleDeleteClick(idea.id);
-                                                }}
-                                                className="relative z-10 p-2 text-slate-500 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors"
-                                                title="Delete Idea"
-                                            >
-                                                <Trash2 className="w-4 h-4 pointer-events-none" />
-                                            </button>
-                                        )}
-                                    </div>
+                    <h3 className="text-center text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Concierge & Tools</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <motion.div
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-slate-900/40 backdrop-blur-md border border-purple-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-purple-900/20 hover:border-purple-500/40 transition-all shadow-lg shadow-black/20"
+                            onClick={() => isPremium ? setIsPlannerOpen(true) : setIsPremiumModalOpen(true)}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-300 ring-1 ring-purple-500/30">
+                                    <Calendar className="w-6 h-6" />
                                 </div>
-                            ))
-                        )}
+                                {!isPremium && <Lock className="w-5 h-5 text-slate-500" />}
+                            </div>
+                            <div>
+                                <span className="block text-xl font-bold text-white mb-2">Weekend Planner</span>
+                                <span className="text-sm text-slate-400 leading-relaxed block group-hover:text-purple-200/70 transition-colors">Let AI build a full weekend itinerary automatically.</span>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-slate-900/40 backdrop-blur-md border border-orange-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-orange-900/20 hover:border-orange-500/40 transition-all shadow-lg shadow-black/20"
+                            onClick={() => isPremium ? setIsDiningModalOpen(true) : setIsPremiumModalOpen(true)}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-300 ring-1 ring-orange-500/30">
+                                    <Utensils className="w-6 h-6" />
+                                </div>
+                                {!isPremium && <Lock className="w-5 h-5 text-slate-500" />}
+                            </div>
+                            <div>
+                                <span className="block text-xl font-bold text-white mb-2">Dining Concierge</span>
+                                <span className="text-sm text-slate-400 leading-relaxed block group-hover:text-orange-200/70 transition-colors">Find the perfect dinner spot for tonight.</span>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-slate-900/40 backdrop-blur-md border border-pink-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-pink-900/20 hover:border-pink-500/40 transition-all shadow-lg shadow-black/20"
+                            onClick={() => isPremium ? setIsBarModalOpen(true) : setIsPremiumModalOpen(true)}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center text-pink-300 ring-1 ring-pink-500/30">
+                                    <Wine className="w-6 h-6" />
+                                </div>
+                                {!isPremium && <Lock className="w-5 h-5 text-slate-500" />}
+                            </div>
+                            <div>
+                                <span className="block text-xl font-bold text-white mb-2">Bar Scout</span>
+                                <span className="text-sm text-slate-400 leading-relaxed block group-hover:text-pink-200/70 transition-colors">Discover top-rated bars and lounges nearby.</span>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
 
-                {/* Past Dates */}
-                {ideas.filter(i => i.selectedAt).length > 0 && (
-                    <div>
-                        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                            <span>Past Dates</span>
-                            <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-                                {ideas.filter(i => i.selectedAt).length}
-                            </span>
-                        </h3>
-                        <div className="space-y-3">
-                            {ideas.filter(i => i.selectedAt).sort((a, b) => new Date(b.selectedAt).getTime() - new Date(a.selectedAt).getTime()).map((idea) => (
-                                <div key={idea.id} className="glass p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 opacity-75 hover:opacity-100 transition-opacity">
-                                    <div>
-                                        <p className="text-white font-medium line-through text-slate-400">{idea.description}</p>
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            Selected on {new Date(idea.selectedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 w-full sm:w-auto">
-                                        <div className="text-xs text-secondary font-medium px-2 py-1 bg-secondary/10 rounded-md flex items-center gap-2">
-                                            <span>Completed</span>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDuplicate(idea);
-                                                }}
-                                                className="relative z-10 p-1.5 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
-                                                title="Add to Jar Again"
-                                            >
-                                                <Copy className="w-3 h-3 pointer-events-none" />
-                                            </button>
-                                            <div className="w-px h-3 bg-slate-700 mx-1" />
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteClick(idea.id);
-                                                }}
-                                                className="relative z-10 p-1.5 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-red-400"
-                                                title="Delete from History"
-                                            >
-                                                <Trash2 className="w-3 h-3 pointer-events-none" />
-                                            </button>
-                                        </div>
+                {/* Setup / Personalize Prompts (Bottom area if needed) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto w-full">
+                    {!isLoadingUser && !userLocation && (
+                        <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            onClick={() => setIsSettingsModalOpen(true)}
+                            className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center gap-3 hover:bg-blue-500/20 transition-colors text-left"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                                <Settings className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <span className="block text-sm font-bold text-white">Setup Profile</span>
+                                <span className="text-xs text-blue-200/70">Add location for better suggestions</span>
+                            </div>
+                        </motion.button>
+                    )}
+                    {!isLoadingUser && userLocation && !interests && (
+                        <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            onClick={() => setIsSettingsModalOpen(true)}
+                            className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center gap-3 hover:bg-purple-500/20 transition-colors text-left"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
+                                <Star className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <span className="block text-sm font-bold text-white">Personalize</span>
+                                <span className="text-xs text-purple-200/70">Add interests for smart ideas</span>
+                            </div>
+                        </motion.button>
+                    )}
+                </div>
 
-                                        {idea.rating ? (
-                                            <div
-                                                className="flex items-center gap-1 cursor-pointer hover:scale-105 transition-transform"
-                                                onClick={() => setRatingIdea(idea)}
-                                            >
-                                                {[...Array(idea.rating)].map((_, i) => (
-                                                    <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <button
-                                                onClick={() => setRatingIdea(idea)}
-                                                className="text-xs text-slate-400 hover:text-yellow-400 underline decoration-dotted transition-colors"
-                                            >
-                                                Rate this date
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
         </main>
     );
