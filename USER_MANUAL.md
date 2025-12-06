@@ -11,8 +11,9 @@ Welcome to **Date Jar**, the application designed to spice up your relationship 
 6. [Premium Features](#premium-features)
 7. [Concierge Services](#concierge-services)
 8. [Weekend Planner](#weekend-planner)
-9. [Managing History](#managing-history)
-10. [Settings & Inviting Your Partner](#settings--inviting-your-partner)
+9. [Date Night Planner](#date-night-planner)
+10. [Managing History](#managing-history)
+11. [Settings & Inviting Your Partner](#settings--inviting-your-partner)
 
 ---
 
@@ -52,29 +53,9 @@ Once logged in, you will see your **Dashboard**.
 
 ## 4. Adding Date Ideas
 
-You can add ideas manually or let our AI suggest them.
+You can add ideas manually or let our assistant suggest them.
 
 ### Manual Entry
-1.  Click the **"Add Idea"** button (Plus icon).
-2.  **Description:** Type a short title (e.g., "Picnic in the Park").
-3.  **Setting:** Choose "Indoor" or "Outdoor".
-4.  **Duration:** Select how long the date will take (e.g., "2 hours").
-5.  **Cost:** Select the price range (Free, $, $$, $$$).
-6.  **Energy:** Select the activity level (Chill, Moderate, Active).
-7.  **Time:** Select "Day", "Evening", or "Anytime".
-8.  Click **"Add to Jar"**.
-
-### AI "Surprise Me"
-1.  Click **"Add Idea"**.
-2.  Click the **"Surprise Me"** button (Sparkles icon).
-3.  Select a category (Activity, Meal, Event).
-4.  Wait a moment for the AI to generate a creative date idea tailored to your location and specific **Interests** (set in Settings).
-5.  Review the details and click **"Add to Jar"**.
-
----
-
-## 5. Spinning the Jar
-
 Ready for a date? Click the **"Spin Jar"** button to get a random suggestion.
 
 ### Filters
@@ -89,7 +70,7 @@ You can narrow down the selection to fit your current mood:
 ### The Reveal & Locations
 Once the jar picks an idea:
 1.  **Accept Date:** Click to mark it as "Selected". This moves it from the Jar to your History.
-2.  **Find Specific Places:** If the idea is generic (e.g., "Go Bowling"), click the **"Find Specific Places & Tickets"** button. Our AI will scout your location for the best venues, complete with ratings and links.
+2.  **Find Specific Places:** If the idea is generic (e.g., "Go Bowling"), click the **"Find Specific Places & Tickets"** button. Our assistant will scout your location for the best venues, complete with ratings and links.
 3.  **Find Food Nearby:** If you're going on an activity date, use the **"Find food nearby"** button to instantly launch the Dining Concierge, pre-filled with the activity's location.
 
 ---
@@ -97,7 +78,7 @@ Once the jar picks an idea:
 ## 6. Premium Features
 
 Date Jar Premium unlocks powerful tools to enhance your dating life.
-- **Unlimited AI Ideas:** Generate endless creative date ideas.
+- **Unlimited Smart Ideas:** Generate endless creative date ideas.
 - **Dining Concierge:** Find the perfect restaurant instantly.
 - **Bar Concierge:** Discover great spots for drinks.
 - **Weekend Planner:** Get a full itinerary for your weekend.
@@ -129,12 +110,32 @@ Date Jar Premium unlocks powerful tools to enhance your dating life.
 
 Need a plan for the whole weekend?
 1.  Click **"Weekend Plan"** (Calendar icon).
-2.  The AI will generate a curated list of 5 activities tailored to your location and the current weather/season.
+2.  The planner will generate a curated list of 5 activities tailored to your location and the current weather/season.
 3.  Add any interesting ideas directly to your jar with one click.
 
 ---
 
-## 9. Managing History
+## 9. Date Night Planner
+
+Want a complete evening plan without the hassle? The **Date Night Planner** uses smart technology to curate a cohesive itinerary for you.
+
+### 1. Plan Date Night
+1. Click the **"Plan Date Night"** button on the dashboard.
+2. The planner generates a timeline including **Drinks**, **Dinner**, and an **Event/Activity**.
+3. All venues are chosen to be within walking distance of each other for a smooth evening.
+
+### 2. Customize the Plan
+- **Regenerate:** Don't like a specific venue (e.g., the bar is too loud)? Click the **Refresh** icon on that item card. The planner will find a better alternative nearby without changing the rest of your plan.
+- **Edit Details:** Need to fix a booking link or update an address? Click the **Pencil** icon to manually edit any part of the itinerary item.
+
+### 3. Take Action
+- **View Map:** Click to see your entire walking route on Google Maps.
+- **Add to Jar:** Save this perfect plan for a future lucky spin.
+- **Go Tonight:** Lock it in instantly!
+
+---
+
+## 10. Managing History
 
 ### Past Dates
 Scroll down on the dashboard to see **Past Dates**.
@@ -150,20 +151,7 @@ To see a record of deleted items:
 
 ---
 
-## 10. Settings & Configuration
-
-Customize your Date Jar experience by clicking the **Settings** icon (Gear) on the dashboard.
-
-### Profile Settings
-- **Couple Location:** The general city or area for your dates (e.g., "New York, NY"). This is the default search area for the Concierge and Weekend Planner.
-- **Your Home Town:** Your specific neighborhood (e.g., "Brooklyn"). This helps refine searches to be closer to where you live.
-- **Your Interests:** A comma-separated list of things you love (e.g., "Sushi, Hiking, Jazz, Art"). The AI uses this to tailor "Surprise Me" suggestions specifically to your tastes.
-
-### Partner Management
-- **Invite Partner:** Use the code displayed on the dashboard to invite your significant other.
-- **Regenerate Code:** (Creator only) If you need a new invite link or want to invalidate an old one, use this option in Settings.
-
-### Data & Privacy
+## 11. Settings & Configuration
 - **View Deletion History:** View a log of who deleted which date ideas and when. Useful for tracking accidental deletions.
 
 ### Danger Zone (Creator Only)

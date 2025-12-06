@@ -18,6 +18,8 @@ import { DiningConciergeModal } from "@/components/DiningConciergeModal";
 import { BarConciergeModal } from "@/components/BarConciergeModal";
 import { Wine } from "lucide-react";
 import { PremiumBanner } from "@/components/PremiumBanner";
+import { DateNightPlannerModal } from "@/components/DateNightPlannerModal";
+import { Moon } from "lucide-react";
 
 function InviteCodeDisplay({ mobile, code }: { mobile?: boolean; code: string | null }) {
     const [copied, setCopied] = useState(false);
@@ -71,6 +73,7 @@ export default function DashboardPage() {
     const [isPlannerOpen, setIsPlannerOpen] = useState(false);
     const [isDiningModalOpen, setIsDiningModalOpen] = useState(false);
     const [isBarModalOpen, setIsBarModalOpen] = useState(false);
+    const [isDateNightOpen, setIsDateNightOpen] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
     const router = useRouter();
 
@@ -283,6 +286,13 @@ export default function DashboardPage() {
                 }}
             />
 
+            <DateNightPlannerModal
+                isOpen={isDateNightOpen}
+                onClose={() => setIsDateNightOpen(false)}
+                userLocation={combinedLocation || undefined}
+                onIdeaAdded={fetchIdeas}
+            />
+
             <RateDateModal
                 isOpen={!!ratingIdea}
                 onClose={() => {
@@ -464,7 +474,7 @@ export default function DashboardPage() {
                 {/* Lower Section: Smart Tools Grid */}
                 <div>
                     <h3 className="text-center text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Concierge & Tools</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                         <motion.div
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
@@ -516,6 +526,24 @@ export default function DashboardPage() {
                             <div>
                                 <span className="block text-xl font-bold text-white mb-2">Bar Scout</span>
                                 <span className="text-sm text-slate-400 leading-relaxed block group-hover:text-pink-200/70 transition-colors">Discover top-rated bars and lounges nearby.</span>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-slate-900/40 backdrop-blur-md border border-rose-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-rose-900/20 hover:border-rose-500/40 transition-all shadow-lg shadow-black/20"
+                            onClick={() => isPremium ? setIsDateNightOpen(true) : setIsPremiumModalOpen(true)}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="w-12 h-12 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-300 ring-1 ring-rose-500/30">
+                                    <Moon className="w-6 h-6" />
+                                </div>
+                                {!isPremium && <Lock className="w-5 h-5 text-slate-500" />}
+                            </div>
+                            <div>
+                                <span className="block text-xl font-bold text-white mb-2">Date Night Planner</span>
+                                <span className="text-sm text-slate-400 leading-relaxed block group-hover:text-rose-200/70 transition-colors">Plan a complete evening: Drinks, Dinner & Event.</span>
                             </div>
                         </motion.div>
                     </div>

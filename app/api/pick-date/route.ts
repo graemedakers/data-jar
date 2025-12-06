@@ -42,6 +42,9 @@ export async function POST(request: Request) {
                 if (idea.category !== category) return false;
             }
 
+            // EXCLUDE PLANNED DATES from random spins
+            if (idea.category === 'PLANNED_DATE') return false;
+
             // Duration filter (if specified)
             if (maxDuration !== undefined && idea.duration > maxDuration) return false;
 

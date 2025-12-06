@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, Lock, Trash2, Activity, Utensils, Calendar } from "lucide-react";
+import { ArrowLeft, Plus, Lock, Trash2, Activity, Utensils, Calendar, Moon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { AddIdeaModal } from "@/components/AddIdeaModal";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
@@ -75,6 +75,33 @@ export default function JarPage() {
         }
     };
 
+    const handleGoTonight = async (e: React.MouseEvent, idea: any) => {
+        e.stopPropagation();
+        try {
+            const res = await fetch(`/api/ideas/${idea.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    selectedAt: new Date().toISOString(),
+                    selectedDate: new Date().toISOString()
+                }),
+                credentials: 'include',
+            });
+
+            if (res.ok) {
+                // Navigate to dashboard implies selecting it.
+                await fetchIdeas();
+                router.push('/dashboard');
+            } else {
+                const err = await res.text();
+                console.error("Go Tonight Failed:", err);
+                alert("Failed to start date night: " + err);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const activeIdeas = ideas.filter(i => !i.selectedAt);
 
     return (
@@ -138,14 +165,25 @@ export default function JarPage() {
                             <div className="mb-3 flex items-start justify-between">
                                 <div className={`p-2 rounded-lg ${idea.category === 'MEAL' ? 'bg-orange-500/20 text-orange-400' :
                                     idea.category === 'EVENT' ? 'bg-purple-500/20 text-purple-400' :
-                                        'bg-blue-500/20 text-blue-400'
+                                        idea.category === 'PLANNED_DATE' ? 'bg-pink-500/20 text-pink-400' :
+                                            'bg-blue-500/20 text-blue-400'
                                     }`}>
                                     {idea.category === 'MEAL' && <Utensils className="w-4 h-4" />}
                                     {idea.category === 'EVENT' && <Calendar className="w-4 h-4" />}
+                                    {idea.category === 'PLANNED_DATE' && <Moon className="w-4 h-4" />}
                                     {(!idea.category || idea.category === 'ACTIVITY') && <Activity className="w-4 h-4" />}
                                 </div>
-                                <div className="flex gap-1">
-                                    <div className={`w-2 h-2 rounded-full mt-1.5 ${idea.activityLevel === 'HIGH' ? 'bg-red-400' : idea.activityLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-green-400'}`} title={`Activity: ${idea.activityLevel}`} />
+                                <div className="flex gap-2 items-center">
+                                    {idea.category === 'PLANNED_DATE' && !idea.isMasked && (
+                                        <Button
+                                            size="sm"
+                                            className="h-7 text-[10px] bg-pink-500 hover:bg-pink-600 border-0"
+                                            onClick={(e) => handleGoTonight(e, idea)}
+                                        >
+                                            Go Tonight
+                                        </Button>
+                                    )}
+                                    <div className={`w-2 h-2 rounded-full ${idea.activityLevel === 'HIGH' ? 'bg-red-400' : idea.activityLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-green-400'}`} title={`Activity: ${idea.activityLevel}`} />
                                 </div>
                             </div>
 
@@ -161,9 +199,19 @@ export default function JarPage() {
                                     <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/5">
                                         {idea.cost}
                                     </span>
-                                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/5">
-                                        {idea.indoor ? 'Indoor' : 'Outdoor'}
-                                    </span>
+                                    {idea.category === 'PLANNED_DATE' ? (
+                                        <>
+                                            {idea.notes && (
+                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 w-full text-center mt-1">
+                                                    {idea.notes.replace('Planned for: ', '')}
+                                                </span>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/5">
+                                            {idea.indoor ? 'Indoor' : 'Outdoor'}
+                                        </span>
+                                    )}
                                 </div>
                             )}
 

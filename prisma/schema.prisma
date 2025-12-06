@@ -38,6 +38,7 @@ model User {
   coupleId               String
   couple                 Couple   @relation(fields: [coupleId], references: [id])
   createdIdeas           Idea[]   @relation("CreatedBy")
+  ratings                Rating[]
   createdAt              DateTime @default(now())
   homeTown               String?
   interests              String?  // Comma separated list of interests
@@ -71,7 +72,22 @@ model Idea {
   
   selectedAt     DateTime? // If null, it's still in the jar
   selectedDate   DateTime? // The actual date they went on (optional)
-  rating         Int?      // 1-5 stars
+  rating         Int?      // 1-5 stars (Legacy/Average)
   notes          String?   // "Best pizza ever!"
   details        String?   // "Wear comfortable shoes", "Bring a swimsuit"
+  ratings        Rating[]
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  ideaId    String
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  value     Int      // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ideaId, userId])
 }

@@ -88,4 +88,41 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         console.error('Error updating idea:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
+
+}
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const session = await getSession();
+    if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    try {
+        const body = await request.json();
+
+        // Verify ownership
+        const idea = await prisma.idea.findUnique({
+            where: { id },
+        });
+
+        if (!idea) {
+            return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
+        }
+
+        if (idea.coupleId !== session.user.coupleId) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        const updatedIdea = await prisma.idea.update({
+            where: { id },
+            data: body,
+        });
+
+        return NextResponse.json(updatedIdea);
+    } catch (error) {
+        console.error('Error updating idea (PATCH):', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
 }

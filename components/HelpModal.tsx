@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle, Calendar, Utensils, Wine } from "lucide-react";
+import { X, BookOpen, MapPin, Plus, Sparkles, History, Settings, HelpCircle, Calendar, Utensils, Wine, Compass, RefreshCcw, Pencil, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface HelpModalProps {
@@ -24,6 +24,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
         { id: "intro", title: "Introduction", icon: BookOpen },
         { id: "getting-started", title: "Getting Started", icon: MapPin },
         { id: "dashboard", title: "The Dashboard", icon: History },
+        { id: "date-night-planner", title: "Date Night Planner", icon: Compass },
         { id: "dining-concierge", title: "Dining Concierge", icon: Utensils },
         { id: "bar-concierge", title: "Bar Scout", icon: Wine },
         { id: "adding-ideas", title: "Adding Ideas", icon: Plus },
@@ -68,16 +69,56 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         </ul>
                     </div>
                 );
+            case "date-night-planner":
+                return (
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold text-white">Date Night Planner <span className="text-xs bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-0.5 rounded-full ml-2">NEW</span></h3>
+                        <p className="text-slate-300">
+                            Want a complete evening plan without the hassle? The Date Night Planner curates a cohesive itinerary for you.
+                        </p>
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-white text-sm border-b border-white/10 pb-1">How it Works</h4>
+                            <ol className="list-decimal list-inside space-y-1 text-slate-300 text-sm">
+                                <li>Click <strong>Plan Date Night</strong> regarding your couple's location.</li>
+                                <li>The planner generates a timeline including Drinks, Dinner, and an Event/Activity.</li>
+                                <li>All venues are chosen to be within walking distance of each other for a smooth evening.</li>
+                            </ol>
+                        </div>
+
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-white text-sm border-b border-white/10 pb-1">Customizing the Plan</h4>
+                            <ul className="list-disc list-inside space-y-2 text-slate-300 text-sm">
+                                <li>
+                                    <strong><RefreshCcw className="inline w-3 h-3 text-slate-400" /> Regenerate:</strong>
+                                    Don't like a specific venue (e.g., the bar is too loud)? Click the refresh icon on that item card. The planner will find a better alternative nearby without changing the rest of your plan.
+                                </li>
+                                <li>
+                                    <strong><Pencil className="inline w-3 h-3 text-slate-400" /> Edit Details:</strong>
+                                    Need to fix a booking link or update an address? Click the pencil icon to manually edit any part of the itinerary item.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-white text-sm border-b border-white/10 pb-1">Taking Action</h4>
+                            <ul className="list-disc list-inside space-y-2 text-slate-300 text-sm">
+                                <li><strong>View Map:</strong> See your entire walking route on Google Maps.</li>
+                                <li><strong>Add to Jar:</strong> Save this perfect plan for a future lucky spin.</li>
+                                <li><strong>Go Tonight:</strong> Lock it in instantly!</li>
+                            </ul>
+                        </div>
+                    </div>
+                );
             case "dining-concierge":
                 return (
                     <div className="space-y-4">
                         <h3 className="text-xl font-bold text-white">Dining Concierge <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-0.5 rounded-full ml-2">PREMIUM</span></h3>
                         <p className="text-slate-300">
-                            Can't decide where to eat? Let our AI Concierge find the perfect spot for you.
+                            Can't decide where to eat? Let our Concierge find the perfect spot for you.
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-slate-300">
                             <li><strong>Preferences:</strong> Enter your craving (e.g., "Sushi", "Italian") and desired vibe (e.g., "Romantic", "Lively").</li>
-                            <li><strong>Recommendations:</strong> The AI will find 5 top-rated local restaurants matching your criteria.</li>
+                            <li><strong>Recommendations:</strong> The planner will find 5 top-rated local restaurants matching your criteria.</li>
                             <li><strong>Go Tonight:</strong> Found a winner? Click <span className="text-yellow-400">Go Tonight</span> to instantly select it as your date. We'll even fetch opening hours and provide a direct link to their website!</li>
                             <li><strong>Add to Jar:</strong> Want to save it for later? Click "Add" to drop it in your jar for a future spin.</li>
                         </ul>
@@ -107,13 +148,13 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                             <p className="text-slate-300">Click the <Plus className="inline w-4 h-4" /> button. Fill in details like Description, Setting (Indoor/Outdoor), Cost, and Time.</p>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-bold text-secondary">AI Surprise Me</h4>
-                            <p className="text-slate-300">Stuck on what to do? The AI can generate custom date ideas tailored to your location and interests.</p>
+                            <h4 className="font-bold text-secondary">Surprise Me</h4>
+                            <p className="text-slate-300">Stuck on what to do? The assistant can generate custom date ideas tailored to your location and interests.</p>
                             <ol className="list-decimal list-inside space-y-1 text-slate-300 text-sm mt-2">
                                 <li>Click <strong>"Add Idea"</strong> from the dashboard.</li>
                                 <li>Click the <strong><Sparkles className="inline w-3 h-3 text-yellow-400" /> Surprise Me</strong> button.</li>
                                 <li>Select a category (Activity, Meal, or Event).</li>
-                                <li>The AI will use your <strong>Interests</strong> (from Settings) to generate a unique plan.</li>
+                                <li>The planner will use your <strong>Interests</strong> (from Settings) to generate a unique plan.</li>
                                 <li>Review the idea and click "Add" to drop it in your jar.</li>
                             </ol>
                         </div>
@@ -124,12 +165,12 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                     <div className="space-y-4">
                         <h3 className="text-xl font-bold text-white">Weekend Planner</h3>
                         <p className="text-slate-300">
-                            Need a full plan for the upcoming weekend? The AI Weekend Planner creates a curated list of 5 distinct date ideas based on your location and the current day of the week.
+                            Need a full plan for the upcoming weekend? The Weekend Planner creates a curated list of 5 distinct date ideas based on your location and the current day of the week.
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-slate-300">
                             <li><strong>Smart Timing:</strong> If it's Monday-Thursday, it plans for the upcoming weekend. If it's Friday-Sunday, it plans for the current weekend.</li>
                             <li><strong>Local Context:</strong> Uses your location to find relevant events and weather-appropriate activities.</li>
-                            <li><strong>Offline Mode:</strong> Even if the AI is busy, you'll get a set of great fallback suggestions so you're never left without a plan.</li>
+                            <li><strong>Offline Mode:</strong> Even if the assistant is busy, you'll get a set of great fallback suggestions so you're never left without a plan.</li>
                         </ul>
                     </div>
                 );
@@ -156,7 +197,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                                 <h4 className="font-bold text-white text-sm">The Reveal & Locations</h4>
                                 <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
                                     <li><strong>Accept Date:</strong> Marks the idea as "Selected" and moves it to your history.</li>
-                                    <li><strong>Find Places:</strong> For generic ideas (e.g., "Go Bowling"), click <strong>"Find Specific Places"</strong> to let AI find top-rated venues near you.</li>
+                                    <li><strong>Find Places:</strong> For generic ideas (e.g., "Go Bowling"), click <strong>"Find Specific Places"</strong> to find top-rated venues near you.</li>
                                     <li><strong>Find Food:</strong> Planning an activity? Use the <strong>"Find food nearby"</strong> button to instantly search for restaurants near that location using the Dining Concierge.</li>
                                 </ul>
                             </div>
@@ -187,7 +228,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                                 <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
                                     <li><strong>Couple Location:</strong> The general city or area for your dates (e.g., "New York, NY"). This is the default search area for the Concierge.</li>
                                     <li><strong>Your Home Town:</strong> Your specific neighborhood (e.g., "Brooklyn"). Helps refine searches to be closer to home.</li>
-                                    <li><strong>Your Interests:</strong> A comma-separated list of things you love (e.g., "Sushi, Hiking, Jazz"). The AI uses this to tailor "Surprise Me" suggestions specifically to you.</li>
+                                    <li><strong>Your Interests:</strong> A comma-separated list of things you love (e.g., "Sushi, Hiking, Jazz"). We use this to tailor "Surprise Me" suggestions specifically to you.</li>
                                 </ul>
                             </div>
 

@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, Star, Copy, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Star, Copy, Trash2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RateDateModal } from "@/components/RateDateModal";
 import { AddIdeaModal } from "@/components/AddIdeaModal";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
+import { ViewMemoryModal } from "@/components/ViewMemoryModal";
 
 export default function MemoriesPage() {
     const router = useRouter();
     const [ideas, setIdeas] = useState<any[]>([]);
     const [ratingIdea, setRatingIdea] = useState<any>(null);
+    const [viewingIdea, setViewingIdea] = useState<any>(null);
     const [duplicatingIdea, setDuplicatingIdea] = useState<any>(null);
     const [ideaToDelete, setIdeaToDelete] = useState<string | null>(null);
 
@@ -132,6 +134,13 @@ export default function MemoriesPage() {
 
                             <div className="flex gap-2 shrink-0">
                                 <button
+                                    onClick={() => setViewingIdea(idea)}
+                                    className="p-2 hover:bg-white/10 rounded-full text-slate-400 hover:text-blue-400 transition-colors"
+                                    title="View Details"
+                                >
+                                    <Eye className="w-5 h-5" />
+                                </button>
+                                <button
                                     onClick={() => handleDuplicate(idea)}
                                     className="p-2 hover:bg-white/10 rounded-full text-slate-400 hover:text-white transition-colors"
                                     title="Add Again"
@@ -150,6 +159,12 @@ export default function MemoriesPage() {
                     ))}
                 </div>
             )}
+
+            <ViewMemoryModal
+                isOpen={!!viewingIdea}
+                onClose={() => setViewingIdea(null)}
+                idea={viewingIdea}
+            />
 
             <RateDateModal
                 isOpen={!!ratingIdea}

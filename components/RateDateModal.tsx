@@ -20,8 +20,23 @@ export function RateDateModal({ isOpen, onClose, idea }: RateDateModalProps) {
 
     useEffect(() => {
         if (idea) {
-            setRating(idea.rating || 0);
-            setNotes(idea.notes || "");
+            // Initial reset
+            setRating(0);
+            setNotes("");
+
+            // Fetch independent ratings
+            fetch(`/api/ideas/${idea.id}/rate`)
+                .then(res => res.json())
+                .then((data: any[]) => {
+                    if (Array.isArray(data)) {
+                        const myRating = data.find(r => r.isMe);
+                        if (myRating) {
+                            setRating(myRating.value);
+                            setNotes(myRating.comment || "");
+                        }
+                    }
+                })
+                .catch(err => console.error(err));
         }
     }, [idea]);
 
