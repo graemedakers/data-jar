@@ -87,8 +87,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
             } else {
                 const errorData = await res.json().catch(() => ({}));
                 const errorMessage = errorData.error || "Failed to get recommendations.";
-                const errorDetails = errorData.details ? `\n\nDetails: ${errorData.details}` : "";
-                alert(errorMessage + errorDetails);
+                alert(`Error ${res.status}: ${errorMessage}`);
             }
         } catch (error) {
             console.error(error);
