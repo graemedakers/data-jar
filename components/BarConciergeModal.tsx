@@ -309,7 +309,7 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-300">Price Range</label>
-                                    <div className="flex gap-2">
+                                    <div className="flex flex-wrap gap-2">
                                         {['any', 'cheap', 'moderate', 'expensive'].map((p) => (
                                             <button
                                                 key={p}
