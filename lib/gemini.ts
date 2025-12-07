@@ -1,9 +1,8 @@
 
 const DEFAULT_MODELS = [
-    "gemini-2.0-flash-lite-preview-02-05", // Fast, often free tier friendly
-    "gemini-flash-latest",                 // Stable alias
-    "gemini-2.0-flash",                    // Primary new model
-    "gemini-1.5-flash"                     // Fallback
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-pro"
 ];
 
 interface GenerateOptions {

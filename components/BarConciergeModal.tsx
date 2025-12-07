@@ -84,7 +84,8 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
                 const data = await res.json();
                 setRecommendations(data.recommendations);
             } else {
-                alert("Failed to get recommendations. Please try again.");
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || "Failed to get recommendations. Please try again.");
             }
         } catch (error) {
             console.error(error);
