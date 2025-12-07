@@ -48,26 +48,41 @@ export async function POST(request: Request) {
         Do not include markdown formatting. Just the raw JSON.
         `;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt }]
-                }]
-            })
-        });
+        const models = ["gemini-2.0-flash-lite-preview-02-05", "gemini-flash-latest", "gemini-2.0-flash"];
+        let lastError = null;
+        let text = "";
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Gemini API Error:", errorText);
-            throw new Error(`Gemini API returned ${response.status}`);
+        for (const model of models) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.warn(`Model ${model} failed: ${response.status}`);
+                    lastError = errorText;
+                    continue;
+                }
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    text = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    break; // Success
+                }
+            } catch (e: any) {
+                console.warn(`Model ${model} error:`, e);
+                lastError = e.message;
+            }
         }
 
-        const data = await response.json();
-        const text = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+        if (!text) {
+            throw new Error(`All models failed. Last error: ${lastError}`);
+        }
 
         // simple parsing to ensure we get an array
         let recommendations = [];
