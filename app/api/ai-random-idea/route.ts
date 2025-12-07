@@ -4,8 +4,18 @@ import { prisma } from '@/lib/prisma';
 import { isCouplePremium } from '@/lib/premium';
 
 export async function POST(request: Request) {
+    let category: string | undefined;
+
     try {
         const session = await getSession();
+        // ... (rest of logic)
+
+        // We'll parse the request body later, or do it here.
+        // But to minimize diff, let's just make 'category' available to the whole function scope.
+        // Wait, 'category' comes from request.json().
+
+        // Let's refactor slightly to parse body early.
+
         if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -20,7 +30,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Premium required' }, { status: 403 });
         }
 
-        const { category, duration } = await request.json().catch(() => ({}));
+        const body = await request.json().catch(() => ({}));
+        category = body.category;
+        const { duration } = body;
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
@@ -153,9 +165,54 @@ export async function POST(request: Request) {
 
     } catch (error: any) {
         console.error('AI Random Idea error:', error);
-        return NextResponse.json({
-            error: 'Internal Server Error',
-            details: error.message
-        }, { status: 500 });
+
+        // Fallback to a mock idea if AI fails (e.g. Quota Exceeded)
+        // Select a random template based on category if possible, or general otherwise
+        const fallbacks = [
+            {
+                description: "Stargazing Picnic (AI Offline)",
+                details: "Pack a cozy blanket, some hot chocolate or wine, and drive to a spot away from city lights. Spend the evening pointing out constellations.",
+                indoor: false,
+                duration: "2.0",
+                activityLevel: "LOW",
+                cost: "FREE",
+                timeOfDay: "EVENING",
+                category: "ACTIVITY"
+            },
+            {
+                description: "Homemade Pizza Night (AI Offline)",
+                details: "Buy pre-made dough (or make your own!) and a bunch of fun toppings. Compete to see who can make the best-looking or best-tasting pizza.",
+                indoor: true,
+                duration: "2.0",
+                activityLevel: "MEDIUM",
+                cost: "$$",
+                timeOfDay: "EVENING",
+                category: "MEAL"
+            },
+            {
+                description: "Local Museum Tour (AI Offline)",
+                details: "Visit a local museum you haven't been to in a while. Dedicate a couple of hours to really reading the plaques and discussing the exhibits.",
+                indoor: true,
+                duration: "3.0",
+                activityLevel: "LOW",
+                cost: "$",
+                timeOfDay: "DAY",
+                category: "ACTIVITY"
+            }
+        ];
+
+        // Pick one randomly
+        const fallbackIdea = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+
+        // Force the category to match request if needed, though random is often fine for fallback
+        if (category) {
+            fallbackIdea.category = category;
+            if (category === 'MEAL') {
+                fallbackIdea.description = "Surprise Dinner Spot (AI Offline)";
+                fallbackIdea.details = `Head to your favorite local restaurant for a spontaneous dinner date. (AI could not generate a specific spot at this time).`;
+            }
+        }
+
+        return NextResponse.json(fallbackIdea);
     }
 }
