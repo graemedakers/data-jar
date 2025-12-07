@@ -146,66 +146,10 @@ export async function POST(request: Request) {
         Do not include markdown formatting like \`\`\`json. Just the raw JSON string.
         `;
 
-        const models = ["gemini-2.0-flash-lite-preview-02-05", "gemini-flash-latest", "gemini-2.0-flash"];
-        let lastError = null;
-
-        for (const model of models) {
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: prompt }]
-                        }]
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.warn(`Model ${model} failed: ${response.status} - ${errorText}`);
-                    lastError = `Model ${model} failed: ${response.status}`;
-                    continue; // Try next model
-                }
-
-                const data = await response.json();
-                if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-                    throw new Error("Invalid API response format");
-                }
-
-                const text = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const idea = JSON.parse(text);
-                return NextResponse.json(idea);
-
-            } catch (e) {
-                console.warn(`Error with model ${model}:`, e);
-                lastError = e;
-            }
-        }
-
-        // If we get here, all models failed
-        console.error("All Gemini models failed.");
-
-        // Try to list available models to debug
-        let availableModels = "Could not fetch models";
-        try {
-            const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-            if (listRes.ok) {
-                const listData = await listRes.json();
-                availableModels = listData.models.map((m: any) => m.name).join(", ");
-            } else {
-                availableModels = `List failed: ${listRes.status}`;
-            }
-        } catch (e) {
-            availableModels = "List fetch error";
-        }
-
-        return NextResponse.json({
-            error: 'All AI models failed',
-            details: `${lastError}. Available models: ${availableModels}`
-        }, { status: 500 });
+        // Use the centralized reliable helper
+        const { reliableGeminiCall } = await import('@/lib/gemini');
+        const idea = await reliableGeminiCall(prompt);
+        return NextResponse.json(idea);
 
     } catch (error: any) {
         console.error('AI Random Idea error:', error);
