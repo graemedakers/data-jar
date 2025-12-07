@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: "Date Jar | The Ultimate Date Idea Generator for Couples",
     template: "%s | Date Jar",
   },
-  description: "A fun, interactive way for couples to decide on their next date. Create a shared jar of ideas and let fate decide!",
+  description: "Stop asking \"what should we do?\" Spin the jar for fun date ideas, sync with your partner, and plan the perfect weekend. Try Date Jar for free today!",
   keywords: [
     "date ideas", "couples app", "relationship", "date night", "random date generator",
     "decision maker", "date planner", "couple activities", "romantic date ideas", "relationship app"

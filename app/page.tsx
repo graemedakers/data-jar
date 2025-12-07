@@ -106,6 +106,43 @@ export default function Home() {
     },
     featureList: 'Date Ideas Generator, Couple Sync, Weekend Planner, Dining Concierge',
     screenshot: 'https://date-jar.vercel.app/og-image.jpg',
+    mainEntity: {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How does the date idea generator work?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: "Simply add your own ideas or use our pre-filled categories. When you're ready, filter by budget, time, or energy level, and 'Spin the Jar' to get a random suggestion that fits your mood perfectly."
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Is Date Jar free for couples?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes! You can create a jar, add unlimited ideas, and sync with your partner for free. We also offer a premium tier for advanced features like the AI Weekend Planner and Dining Concierge.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I find restaurants for date night?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Absolutely. Our Dining Concierge feature helps you find top-rated romantic restaurants near you, complete with reviews, ratings, and price levels.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Does it sync between two phones?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Date Jar is designed for couples. Once you invite your partner using your unique code, your jars are instantly linked. Any idea added or removed on one phone appears on the other immediately.'
+          }
+        }
+      ]
+    }
   };
 
   return (
