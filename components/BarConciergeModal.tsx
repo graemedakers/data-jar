@@ -375,7 +375,7 @@ export function BarConciergeModal({ isOpen, onClose, userLocation, onIdeaAdded, 
                                                         </button>
                                                     )}
                                                 </div>
-                                                <div className="flex flex-row sm:flex-col gap-2 justify-end">
+                                                <div className="flex flex-wrap sm:flex-col gap-2 justify-start sm:justify-end">
                                                     <Button size="sm" variant="ghost" className="text-xs" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rec.name + " " + rec.address)}`, '_blank')}>
                                                         <ExternalLink className="w-4 h-4 mr-1" /> Map
                                                     </Button>
