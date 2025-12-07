@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Utensils, MapPin, Loader2, Sparkles, ExternalLink, Plus, Zap, Star, Heart } from "lucide-react";
 import { Button } from "./ui/Button";
+import { useConciergeActions } from "@/hooks/useConciergeActions";
 
 interface DiningConciergeModalProps {
     isOpen: boolean;
@@ -56,13 +57,15 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
         }
     }, [recommendations]);
 
-    const toggleSelection = (item: string, list: string[], setList: (l: string[]) => void) => {
-        if (list.includes(item)) {
-            setList(list.filter(i => i !== item));
-        } else {
-            setList([...list, item]);
-        }
-    };
+    const { handleAddToJar, handleGoTonight, handleFavorite, toggleSelection } = useConciergeActions({
+        onIdeaAdded,
+        onGoTonight,
+        onFavoriteUpdated,
+        onClose,
+        setRecommendations
+    });
+
+
 
     const handleGetRecommendations = async () => {
         setIsLoading(true);
@@ -95,139 +98,7 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
         }
     };
 
-    const handleAddToJar = async (rec: any) => {
-        try {
-            const res = await fetch('/api/ideas', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    description: rec.name,
-                    details: `${rec.description}\n\nAddress: ${rec.address}\nPrice: ${rec.price}\nWebsite: ${rec.website || 'N/A'}`,
-                    indoor: true,
-                    duration: "2.0",
-                    activityLevel: "LOW",
-                    cost: rec.price.length > 2 ? "$$$" : rec.price.length > 1 ? "$$" : "$",
-                    timeOfDay: "EVENING",
-                    category: "MEAL"
-                }),
-            });
 
-            if (res.ok) {
-                if (onIdeaAdded) onIdeaAdded();
-                alert("Added to jar!");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Failed to add to jar.");
-        }
-    };
-
-    const handleGoTonight = async (rec: any) => {
-        const ideaData = {
-            description: rec.name,
-            details: `${rec.description}\n\nAddress: ${rec.address}\nPrice: ${rec.price}\nWebsite: ${rec.website || 'N/A'}\nHours: ${rec.opening_hours || 'N/A'}\nRating: ${rec.google_rating || 'N/A'}`,
-            indoor: true,
-            duration: 2.0,
-            activityLevel: "LOW",
-            cost: rec.price.length > 2 ? "$$$" : rec.price.length > 1 ? "$$" : "$",
-            timeOfDay: "EVENING",
-            category: "MEAL"
-        };
-
-        try {
-            // Save to DB for history
-            const res = await fetch('/api/ideas', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...ideaData,
-                    selectedAt: new Date().toISOString() // Mark as selected immediately
-                }),
-            });
-
-            let savedIdea = {};
-            if (res.ok) {
-                savedIdea = await res.json();
-                if (onIdeaAdded) onIdeaAdded(); // Refresh dashboard list
-            }
-
-            // Pass rich object to DateReveal
-            if (onGoTonight) {
-                onGoTonight({
-                    ...savedIdea,
-                    ...ideaData,
-                    website: rec.website,
-                    address: rec.address,
-                    openingHours: rec.opening_hours,
-                    googleRating: rec.google_rating,
-                    // Ensure ID is present if save failed (fallback)
-                    id: (savedIdea as any).id || 'temp-' + Date.now(),
-                });
-                onClose();
-            }
-
-        } catch (error) {
-            console.error("Failed to save idea", error);
-            // Still proceed with showing the modal even if save fails
-            if (onGoTonight) {
-                onGoTonight({
-                    ...ideaData,
-                    website: rec.website,
-                    address: rec.address,
-                    openingHours: rec.opening_hours,
-                    googleRating: rec.google_rating,
-                    id: 'temp-' + Date.now(),
-                });
-                onClose();
-            }
-        }
-    };
-
-    const handleFavorite = async (rec: any) => {
-        try {
-            if (rec.isFavorite) {
-                // Remove favorite
-                const res = await fetch(`/api/favorites?name=${encodeURIComponent(rec.name)}`, {
-                    method: 'DELETE',
-                });
-
-                if (res.ok) {
-                    setRecommendations(prev => prev.map(item =>
-                        item.name === rec.name ? { ...item, isFavorite: false } : item
-                    ));
-                    if (onFavoriteUpdated) onFavoriteUpdated();
-                } else {
-                    alert("Failed to remove favorite.");
-                }
-            } else {
-                // Add favorite
-                const res = await fetch('/api/favorites', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: rec.name,
-                        address: rec.address,
-                        description: rec.description,
-                        websiteUrl: rec.website,
-                        googleRating: rec.google_rating,
-                        type: "RESTAURANT"
-                    }),
-                });
-
-                if (res.ok) {
-                    setRecommendations(prev => prev.map(item =>
-                        item.name === rec.name ? { ...item, isFavorite: true } : item
-                    ));
-                    if (onFavoriteUpdated) onFavoriteUpdated();
-                } else {
-                    alert("Failed to save favorite.");
-                }
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Error updating favorite.");
-        }
-    };
 
     return (
         <AnimatePresence>
@@ -353,8 +224,18 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                     <h3 className="text-lg font-semibold text-white">Top Picks for You</h3>
                                     <div className="grid grid-cols-1 gap-4">
                                         {recommendations.map((rec, index) => (
-                                            <div key={index} className="glass p-4 rounded-xl flex flex-col sm:flex-row gap-4 hover:bg-white/5 transition-colors">
-                                                <div className="flex-1">
+                                            <div key={index} className="glass p-4 rounded-xl flex flex-col sm:flex-row gap-4 hover:bg-white/5 transition-colors relative">
+                                                <button
+                                                    onClick={() => handleFavorite(rec, "RESTAURANT")}
+                                                    className={`absolute top-3 right-3 p-2 rounded-full transition-all z-10 ${rec.isFavorite
+                                                        ? 'text-pink-500 bg-pink-500/10'
+                                                        : 'text-slate-400 hover:text-pink-400 hover:bg-white/5'
+                                                        }`}
+                                                >
+                                                    <Heart className={`w-5 h-5 ${rec.isFavorite ? 'fill-current' : ''}`} />
+                                                </button>
+
+                                                <div className="flex-1 pr-8">
                                                     <div className="flex justify-between items-start">
                                                         <h4 className="font-bold text-white text-lg">{rec.name}</h4>
                                                         <span className="text-xs font-bold px-2 py-1 bg-white/10 rounded text-slate-300">{rec.price}</span>
@@ -387,16 +268,6 @@ export function DiningConciergeModal({ isOpen, onClose, userLocation, onIdeaAdde
                                                             <ExternalLink className="w-4 h-4 mr-1" /> Web
                                                         </Button>
                                                     )}
-                                                    <Button
-                                                        size="sm"
-                                                        onClick={() => handleFavorite(rec)}
-                                                        className={`text-xs ${rec.isFavorite
-                                                            ? 'bg-pink-500/20 text-pink-300 hover:bg-pink-500/30'
-                                                            : 'bg-white/10 hover:bg-white/20 text-pink-400'}`}
-                                                    >
-                                                        <Heart className={`w-4 h-4 mr-1 ${rec.isFavorite ? 'fill-current' : ''}`} />
-                                                        {rec.isFavorite ? 'Saved' : 'Save'}
-                                                    </Button>
                                                     <Button size="sm" onClick={() => handleAddToJar(rec)} className="text-xs bg-white/10 hover:bg-white/20">
                                                         <Plus className="w-4 h-4 mr-1" /> Jar
                                                     </Button>

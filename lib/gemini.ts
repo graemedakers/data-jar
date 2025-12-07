@@ -1,0 +1,73 @@
+
+const DEFAULT_MODELS = [
+    "gemini-2.0-flash-lite-preview-02-05", // Fast, often free tier friendly
+    "gemini-flash-latest",                 // Stable alias
+    "gemini-2.0-flash",                    // Primary new model
+    "gemini-1.5-flash"                     // Fallback
+];
+
+interface GenerateOptions {
+    apiKey?: string;
+    models?: string[];
+    temperature?: number;
+}
+
+/**
+ * reliableGeminiCall
+ * 
+ * Executes a prompt against a list of Gemini models, handling failover and 429/404 errors automatically.
+ * Returns the parsed JSON response.
+ */
+export async function reliableGeminiCall<T>(prompt: string, options: GenerateOptions = {}): Promise<T> {
+    const apiKey = options.apiKey || process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is not defined");
+    }
+
+    const models = options.models || DEFAULT_MODELS;
+    let lastError = null;
+
+    for (const model of models) {
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                // If 429 (Quota), we might want to wait, but for now we just try the next model
+                // If 404 (Not Found), definitely try next
+                const status = response.status;
+                throw new Error(`Model ${model} failed with status ${status}: ${errorText}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+                throw new Error(`Model ${model} returned invalid structure.`);
+            }
+
+            const text = data.candidates[0].content.parts[0].text;
+
+            // Clean markdown if present (though responseMimeType usually handles this, it's safer to strip)
+            const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+            return JSON.parse(cleanText) as T;
+
+        } catch (error: any) {
+            // console.warn(`Gemini attempt failed for ${model}:`, error.message);
+            lastError = error;
+            // Continue to next model
+        }
+    }
+
+    throw new Error(`All AI models failed. Last error: ${lastError?.message || lastError}`);
+}

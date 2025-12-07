@@ -77,6 +77,13 @@ model Idea {
   rating         Int?      // 1-5 stars (Legacy/Average)
   notes          String?   // "Best pizza ever!"
   details        String?   // "Wear comfortable shoes", "Bring a swimsuit"
+  
+  // Rich Data Fields
+  address        String?
+  website        String?
+  googleRating   Float?
+  openingHours   String?
+  
   ratings        Rating[]
 }
 

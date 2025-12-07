@@ -1,5 +1,7 @@
 "use client";
+import { getItinerary } from "@/lib/utils";
 
+import { ItineraryPreview } from "./ItineraryPreview";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,8 +32,9 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
 
     useEffect(() => {
         if (isOpen) {
+            let initialFormData;
             if (initialData) {
-                setFormData({
+                initialFormData = {
                     description: initialData.description,
                     details: initialData.details || "",
                     indoor: initialData.indoor,
@@ -40,9 +43,9 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                     cost: initialData.cost,
                     timeOfDay: initialData.timeOfDay || "ANY",
                     category: initialData.category || "ACTIVITY",
-                });
+                };
             } else {
-                setFormData({
+                initialFormData = {
                     description: "",
                     details: "",
                     indoor: true,
@@ -51,10 +54,13 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                     cost: "$",
                     timeOfDay: "ANY",
                     category: "ACTIVITY",
-                });
+                };
             }
+            setFormData(initialFormData);
         }
     }, [isOpen, initialData]);
+
+    const itinerary = getItinerary(formData.details);
 
     const handleSurpriseMe = async () => {
         setIsGeneratingAI(true);
@@ -137,230 +143,247 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                     >
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 p-2 text-white/50 hover:text-white transition-colors"
+                            className="absolute top-4 right-4 p-2 text-white/50 hover:text-white transition-colors z-20"
                         >
                             <X className="w-6 h-6" />
                         </button>
 
-                        <h2 className="text-2xl font-bold text-white mb-6">
-                            {initialData && initialData.id ? "Edit Idea" : initialData ? "Duplicate Idea" : "Add New Idea"}
-                        </h2>
+                        {/* Title Section */}
+                        <div className="flex items-center justify-between pr-12 mb-6">
+                            <h2 className="text-2xl font-bold text-white">
+                                {itinerary ? "Date Plan Preview" :
+                                    initialData && initialData.id ? "Edit Idea" : initialData ? "Duplicate Idea" : "Add New Idea"}
+                            </h2>
+                        </div>
 
                         <div className="max-h-[85vh] overflow-y-auto px-4 pb-6">
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300 ml-1">Category</label>
-                                    <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, category: 'ACTIVITY' })}
-                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'ACTIVITY' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
-                                        >
-                                            <Activity className="w-4 h-4" /> Activity
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, category: 'MEAL' })}
-                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'MEAL' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
-                                        >
-                                            <Utensils className="w-4 h-4" /> Meal
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, category: 'EVENT' })}
-                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'EVENT' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
-                                        >
-                                            <Calendar className="w-4 h-4" /> Event
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300 ml-1">
-                                        {formData.category === 'MEAL' ? "Meal Idea" : formData.category === 'EVENT' ? "Event Name" : "Activity Description"}
-                                    </label>
-                                    <Input
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        placeholder={
-                                            formData.category === 'MEAL' ? "e.g. Try that new Italian place downtown" :
-                                                formData.category === 'EVENT' ? "e.g. Jazz in the Park" :
-                                                    "e.g. Build a blanket fort"
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <label className="text-sm font-medium text-slate-300 ml-1">Details (Optional)</label>
-                                        {formData.details.match(/https?:\/\/[^\s]+/) && (
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-6 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 px-2"
-                                                onClick={() => {
-                                                    const match = formData.details.match(/https?:\/\/[^\s]+/);
-                                                    if (match) window.open(match[0], '_blank');
-                                                }}
-                                            >
-                                                <ExternalLink className="w-3 h-3 mr-1" />
-                                                Visit Website
-                                            </Button>
-                                        )}
-                                    </div>
-                                    <textarea
-                                        value={formData.details}
-                                        onChange={(e) => setFormData({ ...formData, details: e.target.value })}
-                                        placeholder="Add more info, e.g. what to bring, specific location..."
-                                        className="glass-input w-full min-h-[80px] py-2 px-3 resize-none"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {itinerary ? (
+                                <ItineraryPreview itinerary={itinerary} />
+                            ) : (
+                                <form onSubmit={handleSubmit} className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300 ml-1">Setting</label>
+                                        <label className="text-sm font-medium text-slate-300 ml-1">Category</label>
                                         <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
                                             <button
                                                 type="button"
-                                                onClick={() => setFormData({ ...formData, indoor: true })}
-                                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.indoor ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"
-                                                    }`}
+                                                onClick={() => setFormData({ ...formData, category: 'ACTIVITY' })}
+                                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'ACTIVITY' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
                                             >
-                                                <Home className="w-4 h-4" /> Indoor
+                                                <Activity className="w-4 h-4" /> Activity
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setFormData({ ...formData, indoor: false })}
-                                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${!formData.indoor ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"
-                                                    }`}
+                                                onClick={() => setFormData({ ...formData, category: 'MEAL' })}
+                                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'MEAL' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
                                             >
-                                                <Trees className="w-4 h-4" /> Outdoor
+                                                <Utensils className="w-4 h-4" /> Meal
                                             </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300 ml-1">Duration</label>
-                                        <div className="relative">
-                                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                            <select
-                                                value={formData.duration}
-                                                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                                                className="glass-input pl-10 appearance-none cursor-pointer w-full"
-                                            >
-                                                <option value="0.25">15 mins</option>
-                                                <option value="0.5">30 mins</option>
-                                                <option value="1.0">1 hour</option>
-                                                <option value="2.0">2 hours</option>
-                                                <option value="4.0">Half Day</option>
-                                                <option value="8.0">Full Day</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300 ml-1">Cost</label>
-                                        <div className="relative">
-                                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                            <select
-                                                value={formData.cost}
-                                                onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
-                                                className="glass-input pl-10 appearance-none cursor-pointer w-full"
-                                            >
-                                                <option value="FREE">Free</option>
-                                                <option value="$">$ (Cheap)</option>
-                                                <option value="$$">$$ (Moderate)</option>
-                                                <option value="$$$">$$$ (Expensive)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300 ml-1">Energy</label>
-                                        <div className="relative">
-                                            <Activity className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                            <select
-                                                value={formData.activityLevel}
-                                                onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value })}
-                                                className="glass-input pl-10 appearance-none cursor-pointer w-full"
-                                            >
-                                                <option value="LOW">Chill</option>
-                                                <option value="MEDIUM">Moderate</option>
-                                                <option value="HIGH">Active</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-300 ml-1">Time of Day</label>
-                                    <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
-                                        {['ANY', 'DAY', 'EVENING'].map((time) => (
                                             <button
-                                                key={time}
                                                 type="button"
-                                                onClick={() => setFormData({ ...formData, timeOfDay: time })}
-                                                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${formData.timeOfDay === time
-                                                    ? "bg-secondary text-white shadow-lg"
-                                                    : "text-slate-400 hover:text-white"
-                                                    }`}
+                                                onClick={() => setFormData({ ...formData, category: 'EVENT' })}
+                                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.category === 'EVENT' ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
                                             >
-                                                {time === 'ANY' ? 'Anytime' : time === 'DAY' ? 'Day' : 'Evening'}
+                                                <Calendar className="w-4 h-4" /> Event
                                             </button>
-                                        ))}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                                    {!(initialData?.id) && (
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            className="flex-1 relative overflow-hidden py-3"
-                                            onClick={() => {
-                                                if (!isPremium && onUpgrade) {
-                                                    onUpgrade();
-                                                } else {
-                                                    handleSurpriseMe();
-                                                }
-                                            }}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-300 ml-1">
+                                            {formData.category === 'MEAL' ? "Meal Idea" : formData.category === 'EVENT' ? "Event Name" : "Activity Description"}
+                                        </label>
+                                        <Input
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder={
+                                                formData.category === 'MEAL' ? "e.g. Try that new Italian place downtown" :
+                                                    formData.category === 'EVENT' ? "e.g. Jazz in the Park" :
+                                                        "e.g. Build a blanket fort"
+                                            }
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-sm font-medium text-slate-300 ml-1">Details (Optional)</label>
+                                            {formData.details.match(/https?:\/\/[^\s]+/) && !getItinerary(formData.details) && (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 px-2"
+                                                    onClick={() => {
+                                                        const match = formData.details.match(/https?:\/\/[^\s]+/);
+                                                        if (match) window.open(match[0], '_blank');
+                                                    }}
+                                                >
+                                                    <ExternalLink className="w-3 h-3 mr-1" />
+                                                    Visit Website
+                                                </Button>
+                                            )}
+                                        </div>
+                                        <textarea
+                                            value={formData.details}
+                                            onChange={(e) => setFormData({ ...formData, details: e.target.value })}
+                                            placeholder="Add more info, e.g. what to bring, specific location..."
+                                            className={`glass-input w-full min-h-[80px] py-2 px-3 resize-none ${getItinerary(formData.details) ? 'font-mono text-xs opacity-70' : ''}`}
+                                        />
+                                        {getItinerary(formData.details) && (
+                                            <p className="text-[10px] text-slate-400 text-right">
+                                                This is a Date Plan Itinerary. Switch to Preview to view nicely.
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-300 ml-1">Setting</label>
+                                            <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, indoor: true })}
+                                                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${formData.indoor ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"
+                                                        }`}
+                                                >
+                                                    <Home className="w-4 h-4" /> Indoor
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, indoor: false })}
+                                                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${!formData.indoor ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-white"
+                                                        }`}
+                                                >
+                                                    <Trees className="w-4 h-4" /> Outdoor
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-300 ml-1">Duration</label>
+                                            <div className="relative">
+                                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <select
+                                                    value={formData.duration}
+                                                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                                                    className="glass-input pl-10 appearance-none cursor-pointer w-full"
+                                                >
+                                                    <option value="0.25">15 mins</option>
+                                                    <option value="0.5">30 mins</option>
+                                                    <option value="1.0">1 hour</option>
+                                                    <option value="2.0">2 hours</option>
+                                                    <option value="4.0">Half Day</option>
+                                                    <option value="8.0">Full Day</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-300 ml-1">Cost</label>
+                                            <div className="relative">
+                                                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <select
+                                                    value={formData.cost}
+                                                    onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+                                                    className="glass-input pl-10 appearance-none cursor-pointer w-full"
+                                                >
+                                                    <option value="FREE">Free</option>
+                                                    <option value="$">$ (Cheap)</option>
+                                                    <option value="$$">$$ (Moderate)</option>
+                                                    <option value="$$$">$$$ (Expensive)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-300 ml-1">Energy</label>
+                                            <div className="relative">
+                                                <Activity className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <select
+                                                    value={formData.activityLevel}
+                                                    onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value })}
+                                                    className="glass-input pl-10 appearance-none cursor-pointer w-full"
+                                                >
+                                                    <option value="LOW">Chill</option>
+                                                    <option value="MEDIUM">Moderate</option>
+                                                    <option value="HIGH">Active</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-300 ml-1">Time of Day</label>
+                                        <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
+                                            {['ANY', 'DAY', 'EVENING'].map((time) => (
+                                                <button
+                                                    key={time}
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, timeOfDay: time })}
+                                                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${formData.timeOfDay === time
+                                                        ? "bg-secondary text-white shadow-lg"
+                                                        : "text-slate-400 hover:text-white"
+                                                        }`}
+                                                >
+                                                    {time === 'ANY' ? 'Anytime' : time === 'DAY' ? 'Day' : 'Evening'}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                                        {!(initialData?.id) && (
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                className="flex-1 relative overflow-hidden py-3"
+                                                onClick={() => {
+                                                    if (!isPremium && onUpgrade) {
+                                                        onUpgrade();
+                                                    } else {
+                                                        handleSurpriseMe();
+                                                    }
+                                                }}
+                                                disabled={isLoading || isGeneratingAI}
+                                            >
+                                                {isGeneratingAI ? (
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        {!isPremium && (
+                                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] z-10">
+                                                                <Lock className="w-4 h-4 text-white" />
+                                                            </div>
+                                                        )}
+                                                        <div className="flex flex-col items-center justify-center py-0.5">
+                                                            <div className="flex items-center text-sm font-bold text-white">
+                                                                <Sparkles className="w-4 h-4 mr-1.5 text-yellow-300 fill-yellow-300/20" />
+                                                                <span>Surprise Me</span>
+                                                            </div>
+                                                            <span className="text-[10px] text-slate-200/80 font-medium mt-0.5 text-center leading-tight">
+                                                                Generating <strong>{formData.category === 'MEAL' ? 'Meal' : formData.category === 'EVENT' ? 'Event' : 'Activity'}</strong>.
+                                                                <span className="block opacity-60 text-[9px] font-normal">Change Category above to switch</span>
+                                                            </span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </Button>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            className={`${initialData?.id ? "w-full" : "flex-[2]"} inline-flex items-center justify-center transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none glass-button px-8 py-3 text-base`}
                                             disabled={isLoading || isGeneratingAI}
                                         >
-                                            {isGeneratingAI ? (
-                                                <Loader2 className="w-5 h-5 animate-spin" />
-                                            ) : (
-                                                <>
-                                                    {!isPremium && (
-                                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] z-10">
-                                                            <Lock className="w-4 h-4 text-white" />
-                                                        </div>
-                                                    )}
-                                                    <div className="flex flex-col items-center leading-none py-1">
-                                                        <div className="flex items-center">
-                                                            <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                                                            <span>Surprise {formData.category.charAt(0) + formData.category.slice(1).toLowerCase()}</span>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </Button>
-                                    )}
-                                    <button
-                                        type="submit"
-                                        className={`${initialData?.id ? "w-full" : "flex-[2]"} inline-flex items-center justify-center transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none glass-button px-8 py-3 text-base`}
-                                        disabled={isLoading || isGeneratingAI}
-                                    >
-                                        {isLoading ? (
-                                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                        ) : null}
-                                        {initialData && initialData.id ? "Save Changes" : <><Plus className="w-5 h-5 mr-2" /> Add to Jar</>}
-                                    </button>
-                                </div>
-                            </form>
+                                            {isLoading ? (
+                                                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                            ) : null}
+                                            {initialData && initialData.id ? "Save Changes" : <><Plus className="w-5 h-5 mr-2" /> Add to Jar</>}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
                         </div>
                     </motion.div>
                 </div>

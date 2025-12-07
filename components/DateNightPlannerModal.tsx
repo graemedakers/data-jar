@@ -160,21 +160,21 @@ export function DateNightPlannerModal({ isOpen, onClose, userLocation, onIdeaAdd
         setIsAdding(true);
 
         try {
-            // We combine the itinerary into one detailed card
-            const description = `Date Night in ${itinerary.neighborhood}`;
-            let details = itinerary.schedule.map(item =>
-                `• ${item.time}: ${item.activity_type} at ${item.venue_name}\n  ${item.description}\n  Address: ${item.address}\n  Link: ${item.booking_link}\n  Map: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.venue_name + " " + item.address)}`
-            ).join("\n\n");
+            // Store structured data for rich rendering
+            const detailsJson = JSON.stringify({
+                type: 'ITINERARY',
+                neighborhood: itinerary.neighborhood,
+                schedule: itinerary.schedule
+            });
 
-            // Add full route link
-            details += `\n\n🗺️ Full Evening Route Map: https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(itinerary.schedule[0].venue_name + " " + itinerary.schedule[0].address)}&destination=${encodeURIComponent(itinerary.schedule[2].venue_name + " " + itinerary.schedule[2].address)}&waypoints=${encodeURIComponent(itinerary.schedule[1].venue_name + " " + itinerary.schedule[1].address)}`;
+            const description = `Date Night in ${itinerary.neighborhood}`;
 
             const res = await fetch('/api/ideas', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     description: description,
-                    details: details,
+                    details: detailsJson,
                     indoor: true, // Mixed usually
                     duration: 4.0, // Whole evening
                     activityLevel: "MEDIUM",
@@ -204,11 +204,18 @@ export function DateNightPlannerModal({ isOpen, onClose, userLocation, onIdeaAdd
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-2xl bg-slate-900 border-slate-800 text-white max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <DialogTitle className="flex items-center gap-2 text-2xl">
                         <Sparkles className="w-6 h-6 text-pink-400" />
                         <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Date Night Planner</span>
                     </DialogTitle>
+                    <Button
+                        variant="ghost"
+                        onClick={onClose}
+                        className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-10 w-10 p-0"
+                    >
+                        <X className="w-6 h-6" />
+                    </Button>
                 </DialogHeader>
 
                 <div className="space-y-6 py-4">

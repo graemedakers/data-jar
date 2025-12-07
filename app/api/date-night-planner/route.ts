@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { isCouplePremium } from '@/lib/premium';
+import { reliableGeminiCall } from '@/lib/gemini';
+
 
 export async function POST(request: Request) {
     try {
@@ -155,37 +157,14 @@ export async function POST(request: Request) {
             });
         }
 
-        const models = ["gemini-2.0-flash-lite-preview-02-05", "gemini-flash-latest", "gemini-2.0-flash"];
         let lastError = null;
-
-        for (const model of models) {
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
-                });
-
-                if (!response.ok) {
-                    const txt = await response.text();
-                    throw new Error(`Model ${model} status ${response.status}: ${txt}`);
-                }
-
-                const data = await response.json();
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) throw new Error("No content returned");
-
-                const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const json = JSON.parse(cleanText);
-                return NextResponse.json(json);
-
-            } catch (e: any) {
-                console.warn(`Model ${model} failed`, e);
-                lastError = e.message;
-            }
+        try {
+            const result = await reliableGeminiCall(prompt);
+            return NextResponse.json(result);
+        } catch (error: any) {
+            console.error("Gemini failed, falling back to mock", error);
+            lastError = error.message;
+            // Fallthrough to mock
         }
 
         console.error("All AI models failed. Falling back to dynamic mock data. Last error:", lastError);

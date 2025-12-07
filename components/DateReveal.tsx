@@ -1,3 +1,5 @@
+import { getItinerary } from "@/lib/utils";
+import { ItineraryPreview } from "./ItineraryPreview";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Clock, DollarSign, Activity, Sparkles, Loader2, MapPin, ExternalLink, Star, Utensils } from "lucide-react";
 import { Button } from "./ui/Button";
@@ -57,6 +59,8 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
         }
     };
 
+    const itinerary = idea ? getItinerary(idea.details) : null;
+
     // Reset state when modal closes or idea changes
     if (!idea && (recommendations.length > 0 || showAI)) {
         setRecommendations([]);
@@ -110,6 +114,19 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                             {/* Dining Details Section */}
                             {(idea.website || idea.address || idea.openingHours) && (
                                 <div className="bg-white/5 rounded-xl p-4 space-y-3 text-left">
+                                    {idea.details && (
+                                        <div className="mb-4 pb-4 border-b border-white/10">
+                                            <p className="text-slate-200 leading-relaxed text-sm">
+                                                {idea.details.split('\n').filter(line =>
+                                                    !line.trim().startsWith('Address:') &&
+                                                    !line.trim().startsWith('Website:') &&
+                                                    !line.trim().startsWith('Hours:') &&
+                                                    !line.trim().startsWith('Rating:') &&
+                                                    !line.trim().startsWith('Price:')
+                                                ).join('\n').trim()}
+                                            </p>
+                                        </div>
+                                    )}
                                     {idea.address && (
                                         <div className="flex items-start gap-3">
                                             <div className="p-2 bg-white/10 rounded-full shrink-0">
@@ -179,117 +196,123 @@ export function DateReveal({ idea, onClose, userLocation, onFindDining }: DateRe
                             {/* Only show categories and AI if it's NOT a dining concierge result (i.e. no address/website) */}
                             {!(idea.website || idea.address || idea.openingHours) && (
                                 <>
-                                    {/* Idea Details */}
-                                    <div className="bg-white/5 rounded-xl p-6 border border-white/10 text-left">
-                                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                            <Sparkles className="w-4 h-4 text-secondary" />
-                                            The Plan
-                                        </h4>
-                                        <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">
-                                            {idea.details ? (
-                                                idea.details.split(/(https?:\/\/[^\s]+)/g).map((part, i) => (
-                                                    part.match(/https?:\/\/[^\s]+/) ? (
-                                                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline break-all">
-                                                            {part}
-                                                        </a>
-                                                    ) : part
-                                                ))
-                                            ) : "No specific details provided. Be spontaneous!"}
-                                        </p>
-                                        <div className="mt-4 flex flex-wrap gap-2">
-                                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                                                {idea.duration * 60} mins
-                                            </span>
-                                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                                                {idea.cost}
-                                            </span>
-                                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                                                {idea.indoor ? 'Indoor' : 'Outdoor'}
-                                            </span>
-                                        </div>
+                                    {itinerary ? (
+                                        <ItineraryPreview itinerary={itinerary} />
+                                    ) : (
+                                        <>
+                                            {/* Idea Details */}
+                                            <div className="bg-white/5 rounded-xl p-6 border border-white/10 text-left">
+                                                <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                                    <Sparkles className="w-4 h-4 text-secondary" />
+                                                    The Plan
+                                                </h4>
+                                                <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">
+                                                    {idea.details ? (
+                                                        idea.details.split(/(https?:\/\/[^\s]+)/g).map((part, i) => (
+                                                            part.match(/https?:\/\/[^\s]+/) ? (
+                                                                <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline break-all">
+                                                                    {part}
+                                                                </a>
+                                                            ) : part
+                                                        ))
+                                                    ) : "No specific details provided. Be spontaneous!"}
+                                                </p>
+                                                <div className="mt-4 flex flex-wrap gap-2">
+                                                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                                        {idea.duration * 60} mins
+                                                    </span>
+                                                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                                        {idea.cost}
+                                                    </span>
+                                                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                                        {idea.indoor ? 'Indoor' : 'Outdoor'}
+                                                    </span>
+                                                </div>
 
-                                        {onFindDining && idea.address && (
-                                            <Button
-                                                onClick={() => {
-                                                    // Use description (Name) and address for specific location
-                                                    const query = `${idea.description}, ${idea.address}`;
-                                                    onFindDining(query);
-                                                }}
-                                                variant="ghost"
-                                                className="w-full mt-4 border border-white/10 hover:bg-white/5 text-orange-300 hover:text-orange-200"
-                                            >
-                                                <Utensils className="w-4 h-4 mr-2" />
-                                                Find food nearby
-                                            </Button>
-                                        )}
-                                    </div>
+                                                {onFindDining && idea.address && (
+                                                    <Button
+                                                        onClick={() => {
+                                                            // Use description (Name) and address for specific location
+                                                            const query = `${idea.description}, ${idea.address}`;
+                                                            onFindDining(query);
+                                                        }}
+                                                        variant="ghost"
+                                                        className="w-full mt-4 border border-white/10 hover:bg-white/5 text-orange-300 hover:text-orange-200"
+                                                    >
+                                                        <Utensils className="w-4 h-4 mr-2" />
+                                                        Find food nearby
+                                                    </Button>
+                                                )}
+                                            </div>
 
-                                    {/* AI Recommendations Section - Only show if no link in details (implies generic idea) */}
-                                    {!idea.details?.match(/https?:\/\/[^\s]+/) && (
-                                        <div className="space-y-4">
-                                            {!showAI ? (
-                                                <Button
-                                                    onClick={handleGetAI}
-                                                    variant="ghost"
-                                                    className="w-full border border-white/10 hover:bg-white/5 text-slate-300"
-                                                >
-                                                    <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
-                                                    Find Specific Places & Tickets
-                                                </Button>
-                                            ) : (
-                                                <div className="bg-white/5 rounded-xl p-4 text-left space-y-3 animate-in fade-in slide-in-from-bottom-4">
-                                                    <h4 className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                                                        <MapPin className="w-4 h-4 text-yellow-400" />
-                                                        Suggested Places
-                                                    </h4>
-
-                                                    {isLoadingAI ? (
-                                                        <div className="flex items-center justify-center py-4 text-slate-400 gap-2">
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                                            <span className="text-sm">Scouting locations...</span>
-                                                        </div>
+                                            {/* AI Recommendations Section - Only show if no link in details (implies generic idea) */}
+                                            {!idea.details?.match(/https?:\/\/[^\s]+/) && (
+                                                <div className="space-y-4">
+                                                    {!showAI ? (
+                                                        <Button
+                                                            onClick={handleGetAI}
+                                                            variant="ghost"
+                                                            className="w-full border border-white/10 hover:bg-white/5 text-slate-300"
+                                                        >
+                                                            <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
+                                                            Find Specific Places & Tickets
+                                                        </Button>
                                                     ) : (
-                                                        <div className="space-y-3">
-                                                            {recommendations.map((rec: any, i) => (
-                                                                <div key={i} className="bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-black/30 transition-colors">
-                                                                    <div className="flex justify-between items-start gap-2">
-                                                                        <div>
-                                                                            <h5 className="font-medium text-white text-sm">{rec.title}</h5>
-                                                                            <p className="text-xs text-slate-400 mt-1">{rec.description}</p>
-                                                                        </div>
-                                                                        <div className="flex flex-col gap-1">
-                                                                            {rec.url && (
-                                                                                <a
-                                                                                    href={rec.url}
-                                                                                    target="_blank"
-                                                                                    rel="noopener noreferrer"
-                                                                                    className="shrink-0 p-2 bg-white/10 hover:bg-white/20 rounded-full text-secondary transition-colors"
-                                                                                    title="View Info / Tickets"
-                                                                                >
-                                                                                    <ExternalLink className="w-3 h-3" />
-                                                                                </a>
-                                                                            )}
-                                                                            {onFindDining && (
-                                                                                <button
-                                                                                    onClick={() => onFindDining(rec.title)}
-                                                                                    className="shrink-0 p-2 bg-orange-500/10 hover:bg-orange-500/20 rounded-full text-orange-400 transition-colors"
-                                                                                    title="Find Food Nearby"
-                                                                                >
-                                                                                    <Utensils className="w-3 h-3" />
-                                                                                </button>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
+                                                        <div className="bg-white/5 rounded-xl p-4 text-left space-y-3 animate-in fade-in slide-in-from-bottom-4">
+                                                            <h4 className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                                                                <MapPin className="w-4 h-4 text-yellow-400" />
+                                                                Suggested Places
+                                                            </h4>
+
+                                                            {isLoadingAI ? (
+                                                                <div className="flex items-center justify-center py-4 text-slate-400 gap-2">
+                                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                                    <span className="text-sm">Scouting locations...</span>
                                                                 </div>
-                                                            ))}
-                                                            {recommendations.length === 0 && (
-                                                                <p className="text-sm text-slate-400 italic">No specific places found. Try a Google search!</p>
+                                                            ) : (
+                                                                <div className="space-y-3">
+                                                                    {recommendations.map((rec: any, i) => (
+                                                                        <div key={i} className="bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-black/30 transition-colors">
+                                                                            <div className="flex justify-between items-start gap-2">
+                                                                                <div>
+                                                                                    <h5 className="font-medium text-white text-sm">{rec.title}</h5>
+                                                                                    <p className="text-xs text-slate-400 mt-1">{rec.description}</p>
+                                                                                </div>
+                                                                                <div className="flex flex-col gap-1">
+                                                                                    {rec.url && (
+                                                                                        <a
+                                                                                            href={rec.url}
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            className="shrink-0 p-2 bg-white/10 hover:bg-white/20 rounded-full text-secondary transition-colors"
+                                                                                            title="View Info / Tickets"
+                                                                                        >
+                                                                                            <ExternalLink className="w-3 h-3" />
+                                                                                        </a>
+                                                                                    )}
+                                                                                    {onFindDining && (
+                                                                                        <button
+                                                                                            onClick={() => onFindDining(rec.title)}
+                                                                                            className="shrink-0 p-2 bg-orange-500/10 hover:bg-orange-500/20 rounded-full text-orange-400 transition-colors"
+                                                                                            title="Find Food Nearby"
+                                                                                        >
+                                                                                            <Utensils className="w-3 h-3" />
+                                                                                        </button>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                    {recommendations.length === 0 && (
+                                                                        <p className="text-sm text-slate-400 italic">No specific places found. Try a Google search!</p>
+                                                                    )}
+                                                                </div>
                                                             )}
                                                         </div>
                                                     )}
                                                 </div>
                                             )}
-                                        </div>
+                                        </>
                                     )}
                                 </>
                             )}

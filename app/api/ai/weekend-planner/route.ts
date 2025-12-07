@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { isCouplePremium } from '@/lib/premium';
+import { reliableGeminiCall } from '@/lib/gemini';
+
 
 export async function POST(request: Request) {
     try {
@@ -104,71 +106,15 @@ export async function POST(request: Request) {
         Do not include markdown formatting. Just the raw JSON.
         `;
 
-        const models = ["gemini-2.0-flash-lite-preview-02-05", "gemini-flash-latest", "gemini-2.0-flash"];
         let errors: string[] = [];
 
-        for (const model of models) {
-            try {
-                console.log(`Attempting model: ${model}`);
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
-                    })
-                });
-
-                if (!response.ok) {
-                    const errText = await response.text();
-                    console.error(`Model ${model} failed with status ${response.status}: ${errText}`);
-                    errors.push(`Model ${model} status ${response.status}: ${errText}`);
-
-                    if (response.status === 429) {
-                        // Wait 2s before trying next model
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-                    continue;
-                }
-
-                const data = await response.json();
-                if (!data.candidates?.[0]?.content) {
-                    console.error(`Model ${model} returned invalid structure`, data);
-                    errors.push(`Model ${model} returned invalid structure`);
-                    continue;
-                }
-
-                const text = data.candidates[0].content.parts[0].text;
-
-                // Clean up markdown code blocks if present
-                const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
-                // Attempt to find the JSON array if there's extra text
-                const jsonStart = cleanText.indexOf('[');
-                const jsonEnd = cleanText.lastIndexOf(']');
-
-                let jsonString = cleanText;
-                if (jsonStart !== -1 && jsonEnd !== -1) {
-                    jsonString = cleanText.substring(jsonStart, jsonEnd + 1);
-                }
-
-                try {
-                    const suggestions = JSON.parse(jsonString);
-                    if (Array.isArray(suggestions)) {
-                        return NextResponse.json({ suggestions });
-                    } else {
-                        console.warn(`Model ${model} returned JSON but not an array`);
-                        errors.push(`Model ${model} returned JSON but not an array`);
-                    }
-                } catch (parseError) {
-                    console.warn(`JSON parse failed for model ${model}:`, parseError);
-                    errors.push(`JSON parse failed for model ${model}: ${parseError}`);
-                    continue; // Try next model
-                }
-
-            } catch (e: any) {
-                console.warn(`Model ${model} failed`, e);
-                errors.push(`Model ${model} exception: ${e.message}`);
-            }
+        try {
+            const suggestions = await reliableGeminiCall(prompt);
+            return NextResponse.json({ suggestions });
+        } catch (error: any) {
+            console.error("Gemini failed, falling back to mock", error);
+            errors.push(error.message);
+            // Fallthrough to mock
         }
 
         // Fallback to mock data if AI fails

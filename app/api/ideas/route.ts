@@ -1,5 +1,6 @@
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -10,27 +11,33 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { description, indoor, duration, activityLevel, cost, timeOfDay, details, category, selectedAt, notes } = body;
+        const { description, indoor, duration, activityLevel, cost, timeOfDay, details, category, selectedAt, notes, address, website, googleRating, openingHours } = body;
 
         if (!description) {
             return NextResponse.json({ error: 'Description is required' }, { status: 400 });
         }
 
+        const createData: Prisma.IdeaUncheckedCreateInput = {
+            description,
+            details: details || null,
+            indoor: Boolean(indoor),
+            duration: typeof duration === 'string' ? parseFloat(duration) : Number(duration),
+            activityLevel,
+            cost,
+            timeOfDay: timeOfDay || 'ANY',
+            category: category || 'ACTIVITY',
+            selectedAt: selectedAt ? new Date(selectedAt) : null,
+            coupleId: session.user.coupleId,
+            createdById: session.user.id,
+            notes: notes || null,
+            address: address || null,
+            website: website || null,
+            googleRating: googleRating ? parseFloat(String(googleRating)) : null,
+            openingHours: openingHours || null,
+        };
+
         const idea = await prisma.idea.create({
-            data: {
-                description,
-                details: details || null, // Ensure it's null if undefined/empty string
-                indoor: Boolean(indoor), // Ensure boolean
-                duration: typeof duration === 'string' ? parseFloat(duration) : duration,
-                activityLevel,
-                cost,
-                timeOfDay: timeOfDay || 'ANY',
-                category: category || 'ACTIVITY',
-                selectedAt: selectedAt ? new Date(selectedAt) : null,
-                coupleId: session.user.coupleId,
-                createdById: session.user.id,
-                notes: notes || null,
-            },
+            data: createData,
         });
 
         return NextResponse.json(idea);

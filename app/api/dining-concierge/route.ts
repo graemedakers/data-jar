@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { isCouplePremium } from '@/lib/premium';
+import { reliableGeminiCall } from '@/lib/gemini';
+
 
 export async function POST(request: Request) {
     try {
@@ -131,46 +133,10 @@ export async function POST(request: Request) {
                 }
             ]
         }
-        Do not include markdown formatting. Just raw JSON.
         `;
 
-        const models = ["gemini-2.0-flash-lite-preview-02-05", "gemini-flash-latest", "gemini-2.0-flash"];
-        let lastError = null;
-
-        for (const model of models) {
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.warn(`Model ${model} failed: ${response.status} - ${errorText}`);
-                    lastError = `Model ${model} failed: ${response.status} - ${errorText}`;
-                    continue;
-                }
-
-                const data = await response.json();
-                if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-                    throw new Error("Invalid API response format");
-                }
-
-                const text = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const result = JSON.parse(text);
-
-                return NextResponse.json(result);
-
-            } catch (e) {
-                console.warn(`Error with model ${model}:`, e);
-                lastError = e;
-            }
-        }
-
-        throw new Error(`All models failed. Last error: ${lastError}`);
+        const result = await reliableGeminiCall(prompt);
+        return NextResponse.json(result);
 
     } catch (error: any) {
         console.error('Dining Concierge error:', error);
