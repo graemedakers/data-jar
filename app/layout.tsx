@@ -18,11 +18,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://date-jar.vercel.app'),
   title: {
-    default: "Date Jar | Pick Your Next Date",
+    default: "Date Jar | The Ultimate Date Idea Generator for Couples",
     template: "%s | Date Jar",
   },
   description: "A fun, interactive way for couples to decide on their next date. Create a shared jar of ideas and let fate decide!",
-  keywords: ["date ideas", "couples app", "relationship", "date night", "random date generator", "decision maker", "date planner"],
+  keywords: [
+    "date ideas", "couples app", "relationship", "date night", "random date generator",
+    "decision maker", "date planner", "couple activities", "romantic date ideas", "relationship app"
+  ],
   authors: [{ name: "Date Jar Team" }],
   creator: "Date Jar",
   applicationName: "Date Jar",

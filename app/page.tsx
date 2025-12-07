@@ -360,9 +360,9 @@ export default function Home() {
             © {new Date().getFullYear()} Date Jar. Built for love.
           </p>
           <div className="flex gap-6 text-sm text-slate-500">
-            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <a href="mailto:hello@datejar.app" className="hover:text-white transition-colors">Contact</a>
           </div>
         </div>
       </footer>
