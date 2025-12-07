@@ -1,8 +1,8 @@
 
 const DEFAULT_MODELS = [
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
-    "gemini-pro"
+    "gemini-flash-latest",
+    "gemini-pro-latest",
+    "gemini-2.0-flash-exp"
 ];
 
 interface GenerateOptions {
