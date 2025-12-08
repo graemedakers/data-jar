@@ -30,7 +30,7 @@ export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true
             const now = new Date();
             const diffTime = Math.abs(now.getTime() - created.getTime());
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const remaining = 7 - diffDays;
+            const remaining = 14 - diffDays;
             setDaysRemaining(remaining > 0 ? remaining : 0);
         }
     }, [coupleCreatedAt, isTrialEligible]);
@@ -88,7 +88,7 @@ export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true
                                 </div>
                                 <p className="text-slate-300 text-sm max-w-xl">
                                     Unlock unlimited AI date ideas, the Dining Concierge, Weekend Planner, and more.
-                                    One-time payment for lifetime access.
+                                    Subscription required after trial.
                                 </p>
                             </div>
 
