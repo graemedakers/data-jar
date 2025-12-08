@@ -64,6 +64,32 @@ export async function POST(request: Request) {
             extraInstructions += `The user is interested in: ${userInterests}. Consider this when selecting the vibe or cuisine if applicable.\n`;
         }
 
+        // --- NEW: Fetch recent ideas and favorites to exclude them ---
+        // 1. Fetch recent 'Idea' titles created by this couple (limit 20)
+        const recentIdeas = await prisma.idea.findMany({
+            where: { coupleId: user.coupleId },
+            orderBy: { createdAt: 'desc' },
+            take: 20,
+            select: { description: true } // description holds the title/name
+        });
+
+        // 2. Fetch all 'FavoriteVenue' names for this couple
+        const favorites = await prisma.favoriteVenue.findMany({
+            where: { coupleId: user.coupleId },
+            select: { name: true }
+        });
+
+        // Combine and cleanup
+        const excludeNames = Array.from(new Set([
+            ...recentIdeas.map(i => i.description),
+            ...favorites.map(f => f.name)
+        ])).filter(Boolean);
+
+        if (excludeNames.length > 0) {
+            extraInstructions += `\nEXCLUSION LIST: The user is already aware of the following places. Do NOT match or recommend these exact names again: ${excludeNames.join(', ')}. Find NEW alternatives.\n`;
+        }
+        // -------------------------------------------------------------
+
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         if (!apiKey) {
