@@ -1,9 +1,8 @@
 
 const DEFAULT_MODELS = [
     "gemini-1.5-flash",
-    "gemini-flash-latest",
     "gemini-1.5-pro",
-    "gemini-pro"
+    "gemini-1.0-pro"
 ];
 
 interface GenerateOptions {
@@ -30,11 +29,15 @@ export async function reliableGeminiCall<T>(prompt: string, options: GenerateOpt
 
     for (const model of models) {
         try {
+            // Google Search Tool is only supported on some models, but 1.5-flash and pro support it.
+            // gemini-1.0-pro might not support it well with JSON mode, but we will try.
+
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
+                    tools: [{ google_search: {} }], // Enable Search Grounding
                     generationConfig: {
                         responseMimeType: "application/json"
                     }
@@ -43,21 +46,20 @@ export async function reliableGeminiCall<T>(prompt: string, options: GenerateOpt
 
             if (!response.ok) {
                 const errorText = await response.text();
-                // If 429 (Quota), we might want to wait, but for now we just try the next model
-                // If 404 (Not Found), definitely try next
                 const status = response.status;
                 throw new Error(`Model ${model} failed with status ${status}: ${errorText}`);
             }
 
             const data = await response.json();
 
+            // Check if candidates exist
             if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
                 throw new Error(`Model ${model} returned invalid structure.`);
             }
 
             const text = data.candidates[0].content.parts[0].text;
 
-            // Clean markdown if present (though responseMimeType usually handles this, it's safer to strip)
+            // Clean markdown if present
             const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
 
             return JSON.parse(cleanText) as T;
