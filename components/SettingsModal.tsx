@@ -14,6 +14,7 @@ interface SettingsModalProps {
     currentLocation?: string;
 }
 
+
 export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModalProps) {
     const router = useRouter();
     const [location, setLocation] = useState(currentLocation || "");
@@ -23,6 +24,7 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
     const [isLogModalOpen, setIsLogModalOpen] = useState(false);
     const [isCreator, setIsCreator] = useState(false);
     const [hasPartner, setHasPartner] = useState(false);
+    const [inviteCode, setInviteCode] = useState("");
 
     useEffect(() => {
         if (isOpen) {
@@ -36,6 +38,7 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                         setInterests(data.user.interests || "");
                         setIsCreator(!!data.user.isCreator);
                         setHasPartner(!!data.user.hasPartner);
+                        setInviteCode(data.user.coupleReferenceCode || "");
                     }
                 });
         }
@@ -228,6 +231,28 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                             {isCreator && (
                                 <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
                                     <h3 className="text-sm font-bold text-white mb-2">Manage Partner</h3>
+
+                                    <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm text-slate-300">Invite Code:</span>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(`${window.location.origin}/signup?code=${inviteCode || ""}`);
+                                                        alert("Invite link copied to clipboard!");
+                                                    }}
+                                                    className="font-mono font-bold text-lg text-primary hover:text-white transition-colors flex items-center gap-2"
+                                                >
+                                                    {inviteCode || "Loading..."}
+                                                    <span className="text-xs bg-white/10 px-2 py-1 rounded text-slate-400">Copy</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-slate-400">
+                                            Share this code or link with your partner to sync your jars.
+                                        </p>
+                                    </div>
+
                                     <Button
                                         type="button"
                                         variant="secondary"
@@ -238,9 +263,6 @@ export function SettingsModal({ isOpen, onClose, currentLocation }: SettingsModa
                                         <RefreshCw className="w-4 h-4 mr-2" />
                                         Regenerate Invite Code
                                     </Button>
-                                    <p className="text-xs text-slate-400 ml-1">
-                                        Create a new invite code if you need to share it again or invalidate the old one.
-                                    </p>
                                 </div>
                             )}
 
