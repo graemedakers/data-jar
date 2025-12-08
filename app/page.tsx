@@ -201,7 +201,7 @@ export default function Home() {
               <Sparkles className="w-3 h-3" />
               <span>Reignite the spark</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-400 tracking-tight leading-[1.1]">
+            <h1 className="text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-400 tracking-tight leading-[1.1]">
               The Ultimate <br />
               <span className="text-accent">Date Idea Generator</span> <br />
               For Couples.

@@ -13,6 +13,20 @@ async function decrypt(input: string): Promise<any> {
 }
 
 export async function middleware(request: NextRequest) {
+    // Redirect logged-in users from landing page to dashboard
+    if (request.nextUrl.pathname === '/') {
+        const session = request.cookies.get('session')?.value;
+        if (session) {
+            try {
+                await decrypt(session);
+                return NextResponse.redirect(new URL('/dashboard', request.url));
+            } catch (error) {
+                // Session invalid, let them stay on landing page
+                return NextResponse.next();
+            }
+        }
+    }
+
     // Protect dashboard and feature routes
     if (request.nextUrl.pathname.startsWith('/dashboard') ||
         request.nextUrl.pathname.startsWith('/jar') ||
@@ -37,5 +51,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/jar/:path*', '/memories/:path*'],
+    matcher: ['/', '/dashboard/:path*', '/jar/:path*', '/memories/:path*'],
 }
