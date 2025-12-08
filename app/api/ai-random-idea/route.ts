@@ -220,9 +220,12 @@ export async function POST(request: Request) {
             fallbackIdea.category = category;
             if (category === 'MEAL') {
                 fallbackIdea.description = "Surprise Dinner Spot (AI Offline)";
-                fallbackIdea.details = `Head to your favorite local restaurant for a spontaneous dinner date. (AI could not generate a specific spot at this time).`;
+                fallbackIdea.details = `Head to your favorite local restaurant for a spontaneous dinner date. (AI error: ${error.message})`;
             }
         }
+
+        // Append error to description for visibility during debug
+        fallbackIdea.description += ` [Error: ${error.message.substring(0, 30)}...]`;
 
         return NextResponse.json(fallbackIdea);
     }

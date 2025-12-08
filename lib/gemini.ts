@@ -40,10 +40,9 @@ export async function reliableGeminiCall<T>(prompt: string, options: GenerateOpt
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    tools: [{ google_search: {} }], // Enable Search Grounding
-                    generationConfig: {
-                        responseMimeType: "application/json"
-                    }
+                    tools: [{ google_search: {} }]
+                    // REMOVED: generationConfig with responseMimeType: "application/json" 
+                    // because it often conflicts with Search Grounding on some models.
                 })
             });
 
@@ -55,17 +54,24 @@ export async function reliableGeminiCall<T>(prompt: string, options: GenerateOpt
 
             const data = await response.json();
 
-            // Check if candidates exist
             if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+                // Log the full data to see what went wrong (e.g. Safety filters)
+                console.error(`Invalid structure from ${model}:`, JSON.stringify(data, null, 2));
                 throw new Error(`Model ${model} returned invalid structure.`);
             }
 
-            const text = data.candidates[0].content.parts[0].text;
+            let text = data.candidates[0].content.parts[0].text;
 
-            // Clean markdown if present
-            const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            // Clean markdown blocks if present
+            text = text.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
 
-            return JSON.parse(cleanText) as T;
+            // Attempt to parse
+            try {
+                return JSON.parse(text) as T;
+            } catch (jsonErr) {
+                console.error(`Failed to parse JSON from ${model}. Raw text:`, text);
+                throw new Error(`Model ${model} returned invalid JSON: ${text.substring(0, 50)}...`);
+            }
 
         } catch (error: any) {
             // console.warn(`Gemini attempt failed for ${model}:`, error.message);
