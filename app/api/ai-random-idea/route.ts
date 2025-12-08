@@ -20,14 +20,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check premium status
+        // Fetch user for context (location, interests)
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
             include: { couple: true },
         });
 
-        if (!user || !isCouplePremium(user.couple)) {
-            return NextResponse.json({ error: 'Premium required' }, { status: 403 });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
         const body = await request.json().catch(() => ({}));
