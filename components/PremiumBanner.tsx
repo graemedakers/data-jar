@@ -14,8 +14,6 @@ interface PremiumBannerProps {
 
 export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true }: PremiumBannerProps) {
     const [isVisible, setIsVisible] = useState(true);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [discountCode, setDiscountCode] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [daysRemaining, setDaysRemaining] = useState<number>(0);
 
@@ -43,7 +41,7 @@ export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true
             const res = await fetch('/api/stripe/create-checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ discountCode }),
+                body: JSON.stringify({}),
             });
             const data = await res.json();
 
@@ -92,39 +90,14 @@ export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true
                                 </p>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                                {isExpanded ? (
-                                    <div className="flex flex-col gap-3 w-full sm:w-auto animate-in fade-in slide-in-from-right-4 duration-300">
-                                        <div className="flex gap-2">
-                                            <Input
-                                                placeholder="Discount Code"
-                                                value={discountCode}
-                                                onChange={(e) => setDiscountCode(e.target.value)}
-                                                className="h-10 bg-black/20 border-white/10 text-sm w-full sm:w-40"
-                                            />
-                                            <Button
-                                                onClick={handleUpgrade}
-                                                isLoading={isLoading}
-                                                className="h-10 bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white border-none whitespace-nowrap"
-                                            >
-                                                Pay Now
-                                            </Button>
-                                        </div>
-                                        <button
-                                            onClick={() => setIsExpanded(false)}
-                                            className="text-xs text-slate-500 hover:text-slate-400 self-end sm:self-center"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <Button
-                                        onClick={() => setIsExpanded(true)}
-                                        className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white border-none shadow-lg shadow-yellow-500/20"
-                                    >
-                                        Upgrade to Premium
-                                    </Button>
-                                )}
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    onClick={handleUpgrade}
+                                    isLoading={isLoading}
+                                    className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white border-none shadow-lg shadow-yellow-500/20"
+                                >
+                                    Upgrade to Premium
+                                </Button>
                             </div>
                         </div>
                     </motion.div>
