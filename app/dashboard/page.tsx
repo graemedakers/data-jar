@@ -379,8 +379,8 @@ export default function DashboardPage() {
                             className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 text-yellow-200 border-yellow-400/30 hover:bg-yellow-400/30 rounded-full"
                             onClick={() => setIsPremiumModalOpen(true)}
                         >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Upgrade
+                            <Sparkles className="w-4 h-4 md:mr-2" />
+                            <span className="hidden md:inline">Upgrade</span>
                         </Button>
                     )}
 
@@ -396,11 +396,11 @@ export default function DashboardPage() {
                         <Button
                             variant="secondary"
                             size="sm"
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-full px-4"
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-full px-3 md:px-4"
                             onClick={() => setIsSettingsModalOpen(true)}
                         >
-                            <Settings className="w-4 h-4 mr-2" />
-                            Personalise
+                            <Settings className="w-4 h-4 md:mr-2" />
+                            <span className="hidden md:inline">Personalise</span>
                         </Button>
                         <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={handleLogout}>
                             <LogOut className="w-5 h-5" />
