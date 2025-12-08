@@ -38,11 +38,6 @@ export default function PremiumPage() {
 
     const features = [
         {
-            icon: Sparkles,
-            title: "Unlimited Smart Ideas",
-            description: "Surprise Me! generated specifically for you, as many times as you want."
-        },
-        {
             icon: Utensils,
             title: "Dining Concierge",
             description: "Smart restaurant recommendations that exclude places you've already been."

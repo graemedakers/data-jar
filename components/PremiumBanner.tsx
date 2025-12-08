@@ -62,7 +62,7 @@ export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true
                                     </span>
                                 </div>
                                 <p className="text-slate-300 text-sm max-w-xl">
-                                    Unlock unlimited Smart date ideas, the Dining Concierge, Weekend Planner, and more.
+                                    Unlock the Dining Concierge, Weekend Planner, and more.
                                     Subscription required after trial.
                                 </p>
                             </div>

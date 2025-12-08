@@ -74,7 +74,13 @@ export function PremiumModal({ isOpen, onClose, title, description }: PremiumMod
                                     <div className="p-1 bg-green-500/20 rounded-full">
                                         <Check className="w-4 h-4 text-green-400" />
                                     </div>
-                                    <span className="text-white font-medium">Smart "Surprise Me" Ideas</span>
+                                    <span className="text-white font-medium">Dining Concierge</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="p-1 bg-green-500/20 rounded-full">
+                                        <Check className="w-4 h-4 text-green-400" />
+                                    </div>
+                                    <span className="text-white font-medium">Bar Scout</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="p-1 bg-green-500/20 rounded-full">

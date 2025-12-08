@@ -339,35 +339,22 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                                                 type="button"
                                                 variant="secondary"
                                                 className="flex-1 relative overflow-hidden py-3"
-                                                onClick={() => {
-                                                    if (!isPremium && onUpgrade) {
-                                                        onUpgrade();
-                                                    } else {
-                                                        handleSurpriseMe();
-                                                    }
-                                                }}
+                                                onClick={handleSurpriseMe}
                                                 disabled={isLoading || isGeneratingAI}
                                             >
                                                 {isGeneratingAI ? (
                                                     <Loader2 className="w-5 h-5 animate-spin" />
                                                 ) : (
-                                                    <>
-                                                        {!isPremium && (
-                                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] z-10">
-                                                                <Lock className="w-4 h-4 text-white" />
-                                                            </div>
-                                                        )}
-                                                        <div className="flex flex-col items-center justify-center py-0.5">
-                                                            <div className="flex items-center text-sm font-bold text-white">
-                                                                <Sparkles className="w-4 h-4 mr-1.5 text-yellow-300 fill-yellow-300/20" />
-                                                                <span>Surprise Me</span>
-                                                            </div>
-                                                            <span className="text-[10px] text-slate-200/80 font-medium mt-0.5 text-center leading-tight">
-                                                                Generating <strong>{formData.category === 'MEAL' ? 'Meal' : formData.category === 'EVENT' ? 'Event' : 'Activity'}</strong>.
-                                                                <span className="block opacity-60 text-[9px] font-normal">Change Category above to switch</span>
-                                                            </span>
+                                                    <div className="flex flex-col items-center justify-center py-0.5">
+                                                        <div className="flex items-center text-sm font-bold text-white">
+                                                            <Sparkles className="w-4 h-4 mr-1.5 text-yellow-300 fill-yellow-300/20" />
+                                                            <span>Surprise Me</span>
                                                         </div>
-                                                    </>
+                                                        <span className="text-[10px] text-slate-200/80 font-medium mt-0.5 text-center leading-tight">
+                                                            Generating <strong>{formData.category === 'MEAL' ? 'Meal' : formData.category === 'EVENT' ? 'Event' : 'Activity'}</strong>.
+                                                            <span className="block opacity-60 text-[9px] font-normal">Change Category above to switch</span>
+                                                        </span>
+                                                    </div>
                                                 )}
                                             </Button>
                                         )}

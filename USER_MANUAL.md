@@ -78,7 +78,6 @@ Once the jar picks an idea:
 ## 6. Premium Features
 
 Date Jar Premium unlocks powerful tools to enhance your dating life.
-- **Unlimited Smart Ideas:** Generate endless creative date ideas.
 - **Dining Concierge:** Find the perfect restaurant instantly.
 - **Bar Concierge:** Discover great spots for drinks.
 - **Weekend Planner:** Get a full itinerary for your weekend.
