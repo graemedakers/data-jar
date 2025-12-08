@@ -17,10 +17,20 @@ try {
     const apiKey = match[1].trim();
     console.log(`Using API Key ending in ...${apiKey.slice(-5)}`);
 
-    // Last ditch effort: Experimental models that might have separate quotas
+    // Brute force check of ALL available models for this user
     const models = [
-        "gemini-exp-1206",
-        "gemini-2.0-pro-exp-02-05"
+        "gemini-2.0-flash-lite-001",
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash-lite-preview-02-05",
+        "gemini-2.0-flash-lite-preview",
+        "gemini-flash-lite-latest",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash-lite-preview-09-2025",
+        "gemini-2.0-flash-001",
+        "gemini-2.0-flash",
+        "gemini-flash-latest",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-preview-09-2025"
     ];
 
     const testModelWithSearch = (model) => {
