@@ -358,19 +358,7 @@ export default function DashboardPage() {
                     <p className="text-slate-400 text-sm">Manage your date ideas</p>
                 </div>
                 <div className="flex gap-2 items-center w-full md:w-auto justify-between md:justify-end">
-                    {/* Invite Code Badge */}
-                    <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-colors">
-                        <span className="text-xs text-slate-400 font-medium">Invite Code:</span>
-                        <span className="text-xs font-mono text-white select-all">
-                            {/* We need to fetch this from the user object */}
-                            <InviteCodeDisplay code={inviteCode} />
-                        </span>
-                    </div>
-
-                    {/* Mobile Invite Code Button (Icon only) */}
-                    <div className="md:hidden">
-                        <InviteCodeDisplay mobile code={inviteCode} />
-                    </div>
+                    {/* Invite Code available in Settings */}
 
                     {!isLoadingUser && !isPremium && (
                         <Button
