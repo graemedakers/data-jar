@@ -352,12 +352,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Header */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 md:gap-0">
+            <header className="flex flex-row justify-between items-center mb-16 gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Your Jar</h1>
                     <p className="text-slate-400 text-sm">Manage your date ideas</p>
                 </div>
-                <div className="flex gap-2 items-center w-full md:w-auto justify-between md:justify-end">
+                <div className="flex gap-2 items-center justify-end">
                     {/* Invite Code available in Settings */}
 
                     {!isLoadingUser && !isPremium && (
