@@ -82,10 +82,11 @@ export default function Home() {
       .then(data => {
         if (data.user) {
           setUser(data.user);
+          router.push('/dashboard');
         }
       })
       .catch(err => console.error("Auth check failed:", err));
-  }, []);
+  }, [router]);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -122,7 +123,7 @@ export default function Home() {
           name: 'Is Date Jar free for couples?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes! You can create a jar, add unlimited ideas, and sync with your partner for free. We also offer a premium tier for advanced features like the AI Weekend Planner and Dining Concierge.'
+            text: 'Yes! You can create a jar, add unlimited ideas, and sync with your partner for free. We also offer a premium tier for advanced features like the Smart Weekend Planner and Dining Concierge.'
           }
         },
         {
@@ -146,7 +147,7 @@ export default function Home() {
   };
 
   return (
-    <main ref={containerRef} className="min-h-screen relative overflow-hidden bg-slate-950">
+    <main ref={containerRef} className="min-h-screen relative overflow-hidden bg-slate-950 max-w-[100vw]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -242,7 +243,7 @@ export default function Home() {
             className="relative h-[400px] md:h-[600px] flex items-center justify-center"
           >
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-full blur-[100px] animate-pulse-glow" />
-            <div className="scale-125 md:scale-150 relative z-10">
+            <div className="scale-90 md:scale-150 relative z-10">
               <Jar3D />
             </div>
           </motion.div>
