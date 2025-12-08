@@ -16,58 +16,40 @@ try {
     const apiKey = match[1].trim();
     console.log(`Found API Key: ${apiKey.substring(0, 5)}...`);
 
-    const models = ["gemini-1.5-flash", "gemini-pro", "gemini-1.0-pro"];
-
-    const testModel = (model) => {
+    const listModels = () => {
         return new Promise((resolve, reject) => {
-            const data = JSON.stringify({
-                contents: [{
-                    parts: [{ text: "Say hello" }]
-                }]
-            });
-
             const options = {
                 hostname: 'generativelanguage.googleapis.com',
-                path: `/v1beta/models/${model}:generateContent?key=${apiKey}`,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': data.length
-                }
+                path: `/v1beta/models?key=${apiKey}`,
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             };
 
             const req = https.request(options, (res) => {
                 let body = '';
                 res.on('data', (chunk) => body += chunk);
                 res.on('end', () => {
-                    if (res.statusCode >= 200 && res.statusCode < 300) {
-                        console.log(`✅ Model ${model} SUCCESS`);
-                        resolve(true);
+                    if (res.statusCode === 200) {
+                        try {
+                            const data = JSON.parse(body);
+                            console.log("✅ AVAILABLE MODELS:");
+                            data.models.forEach(m => {
+                                if (m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent")) {
+                                    console.log(` - ${m.name}`);
+                                }
+                            });
+                        } catch (e) { console.error("Parse error", e); }
                     } else {
-                        console.log(`❌ Model ${model} FAILED: ${res.statusCode}`);
-                        console.log(`   Response: ${body}`);
-                        resolve(false);
+                        console.log(`❌ List Models FAILED: ${res.statusCode} - ${body}`);
                     }
+                    resolve();
                 });
             });
-
-            req.on('error', (error) => {
-                console.error(`❌ Model ${model} ERROR:`, error);
-                resolve(false);
-            });
-
-            req.write(data);
             req.end();
         });
     };
 
-    async function runTests() {
-        for (const model of models) {
-            await testModel(model);
-        }
-    }
-
-    runTests();
+    listModels();
 
 } catch (error) {
     console.error("Error reading .env file:", error.message);
