@@ -31,31 +31,32 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: true, message: 'Premium activated successfully!' });
         }
 
-        // 2. Create Stripe Checkout Session
+        // 2. Create Stripe Checkout Session (Subscription Mode)
+        const priceId = process.env.STRIPE_PRICE_ID;
+
+        if (!priceId) {
+            console.error("Missing STRIPE_PRICE_ID in env");
+            return NextResponse.json({ error: 'System configuration error: Price ID missing' }, { status: 500 });
+        }
+
         const checkoutSession = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [
                 {
-                    price_data: {
-                        currency: 'usd',
-                        product_data: {
-                            name: 'Date Jar Premium',
-                            description: 'Unlock unlimited AI date ideas, dining concierge, and more.',
-                        },
-                        unit_amount: 999, // $9.99
-                    },
+                    price: priceId,
                     quantity: 1,
                 },
             ],
-            mode: 'payment',
+            mode: 'subscription', // CHANGED to subscription
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?premium_success=true`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?premium_cancel=true`,
             customer_email: user.email,
             metadata: {
                 coupleId: user.couple.id,
-                type: 'UPGRADE'
+                type: 'SUBSCRIPTION_UPGRADE'
             },
-            allow_promotion_codes: true, // Enable Stripe promotion codes
+            allow_promotion_codes: true,
+            billing_address_collection: 'auto',
         });
 
         return NextResponse.json({ url: checkoutSession.url });

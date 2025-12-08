@@ -11,16 +11,18 @@ If you haven't already, sign up for a [Stripe account](https://stripe.com).
 3.  Copy the **Publishable key** (starts with `pk_test_...` or `pk_live_...`).
 4.  Copy the **Secret key** (starts with `sk_test_...` or `sk_live_...`).
 
-## 3. Create a Product
+## 3. Create Subscription Product
 1.  Go to **Products** in the Stripe Dashboard.
 2.  Click **Add product**.
-3.  **Name**: "Date Jar Access" (or similar).
-4.  **Description**: "One-time fee for lifetime access."
+3.  **Name**: "Date Jar Premium" (or similar).
+4.  **Description**: "Monthly subscription for premium features."
 5.  **Pricing model**: Standard pricing.
-6.  **Price**: $5.00 (or your desired amount).
-7.  **Type**: One-time.
-8.  Save the product.
-9.  Find the **Price API ID** for the price you just created (starts with `price_...`). You can usually find this in the Pricing section of the product page.
+6.  **Price**: $9.99 (or your desired amount).
+7.  **Type**: Recurring.
+8.  **Billing period**: Monthly.
+9.  Save the product.
+10. Find the **Price API ID** for the price you just created (starts with `price_...`). You can usually find this in the Pricing section of the product page.
+11. **(Optional Setup):** If not using code-based trials, you can configure the "Free Trial" days directly in the Stripe Pricing setup. However, the application code handles a default 14-day trial logic internally before enforcing the paywall.
 
 ## 4. Configure Webhooks
 Webhooks allow Stripe to notify your application when a payment is successful.

@@ -25,7 +25,20 @@ export async function POST(req: Request) {
     if (event.type === 'checkout.session.completed') {
         const metadata = session.metadata;
 
-        if (metadata?.type === 'NEW_COUPLE_SIGNUP') {
+        if (metadata?.type === 'SUBSCRIPTION_UPGRADE') {
+            // Handle new subscription checkout
+            if (metadata.coupleId) {
+                await prisma.couple.update({
+                    where: { id: metadata.coupleId },
+                    data: {
+                        isPremium: true, // Legacy flag, keep true for safety
+                        stripeCustomerId: session.customer as string,
+                        stripeSubscriptionId: session.subscription as string,
+                        subscriptionStatus: 'active'
+                    }
+                });
+            }
+        } else if (metadata?.type === 'NEW_COUPLE_SIGNUP') {
             const { name, email, passwordHash, location } = metadata;
 
             if (!name || !email || !passwordHash) {
@@ -52,19 +65,27 @@ export async function POST(req: Request) {
                     hasUsedTrial: true,
                 },
             });
-        } else if (metadata?.coupleId) {
-            // Existing upgrade flow
-            await prisma.couple.update({
-                where: {
-                    id: metadata.coupleId,
-                },
-                data: {
-                    isPremium: true,
-                },
-            });
-        } else {
-            return new NextResponse('Webhook Error: Missing metadata', { status: 400 });
         }
+    } else if (event.type === 'customer.subscription.updated') {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        // Find couple by stripeSubscriptionId and update status
+        await prisma.couple.updateMany({
+            where: { stripeSubscriptionId: subscription.id },
+            data: {
+                subscriptionStatus: subscription.status
+            }
+        });
+    } else if (event.type === 'customer.subscription.deleted') {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        await prisma.couple.updateMany({
+            where: { stripeSubscriptionId: subscription.id },
+            data: {
+                subscriptionStatus: 'canceled',
+                isPremium: false // Revoke legacy flag too if they cancel
+            }
+        });
     }
 
     return new NextResponse(null, { status: 200 });

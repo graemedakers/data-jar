@@ -17,6 +17,13 @@ model Couple {
   createdAt     DateTime @default(now())
   isPremium     Boolean  @default(false)
   isTrialEligible Boolean @default(true)
+  
+  // Subscription Fields
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  subscriptionStatus String? // "active", "trialing", "past_due", "canceled"
+  isLegacyPremium Boolean @default(false) // For grandfathering existing users
+  
   deletedLogs   DeletedLog[]
   favorites     FavoriteVenue[]
 }
