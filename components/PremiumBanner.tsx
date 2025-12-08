@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Sparkles, CheckCircle2, X } from "lucide-react";
@@ -33,33 +34,9 @@ export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true
         }
     }, [coupleCreatedAt, isTrialEligible]);
 
+    const router = useRouter();
+
     if (hasPaid) return null; // Don't show if already paid
-
-    const handleUpgrade = async () => {
-        setIsLoading(true);
-        try {
-            const res = await fetch('/api/stripe/create-checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({}),
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                alert(data.message);
-                window.location.reload(); // Refresh to update state
-            } else if (data.url) {
-                window.location.href = data.url;
-            } else {
-                alert(data.error || "Something went wrong. Please try again.");
-            }
-        } catch (error) {
-            console.error("Upgrade error:", error);
-            alert("An error occurred. Check console for details.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     return (
         <div className="mb-8">
@@ -92,8 +69,7 @@ export function PremiumBanner({ hasPaid, coupleCreatedAt, isTrialEligible = true
 
                             <div className="flex items-center gap-3">
                                 <Button
-                                    onClick={handleUpgrade}
-                                    isLoading={isLoading}
+                                    onClick={() => router.push('/premium')}
                                     className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white border-none shadow-lg shadow-yellow-500/20"
                                 >
                                     Upgrade to Premium
