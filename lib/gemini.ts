@@ -74,7 +74,7 @@ export async function reliableGeminiCall<T>(prompt: string, options: GenerateOpt
             }
 
         } catch (error: any) {
-            // console.warn(`Gemini attempt failed for ${model}:`, error.message);
+            console.warn(`Gemini attempt failed for ${model}:`, error.message); // Log specifically why it failed
             lastError = error;
             // Continue to next model
         }
