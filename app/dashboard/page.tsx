@@ -394,8 +394,14 @@ export default function DashboardPage() {
                                 </span>
                             )}
                         </Button>
-                        <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={() => setIsSettingsModalOpen(true)}>
-                            <Settings className="w-5 h-5" />
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-full px-4"
+                            onClick={() => setIsSettingsModalOpen(true)}
+                        >
+                            <Settings className="w-4 h-4 mr-2" />
+                            Personalise
                         </Button>
                         <Button variant="ghost" size="sm" className="!p-2 rounded-full hover:bg-white/10" onClick={handleLogout}>
                             <LogOut className="w-5 h-5" />
