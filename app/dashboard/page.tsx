@@ -591,41 +591,6 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Setup / Personalize Prompts (Bottom area if needed) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto w-full">
-                    {!isLoadingUser && !userLocation && (
-                        <motion.button
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            onClick={() => setIsSettingsModalOpen(true)}
-                            className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center gap-3 hover:bg-blue-500/20 transition-colors text-left"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
-                                <Settings className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="block text-sm font-bold text-white">Setup Profile</span>
-                                <span className="text-xs text-blue-200/70">Add location for better suggestions</span>
-                            </div>
-                        </motion.button>
-                    )}
-                    {!isLoadingUser && userLocation && !interests && (
-                        <motion.button
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            onClick={() => setIsSettingsModalOpen(true)}
-                            className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center gap-3 hover:bg-purple-500/20 transition-colors text-left"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
-                                <Star className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="block text-sm font-bold text-white">Personalize</span>
-                                <span className="text-xs text-purple-200/70">Add interests for smart ideas</span>
-                            </div>
-                        </motion.button>
-                    )}
-                </div>
-
             </div>
         </main>
     );
