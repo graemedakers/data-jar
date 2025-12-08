@@ -35,7 +35,7 @@ Date Jar allows you and your partner to create a shared collection of date ideas
 
 **Note:** You only need one account per couple. You can share the login, or invite your partner to create their own linked account (see Section 10).
 
-**Free Trial:** New couples get a 7-day free trial of all Premium features!
+**Free Trial:** New couples get a 14-day free trial of all Premium features!
 
 ---
 
@@ -83,7 +83,7 @@ Date Jar Premium unlocks powerful tools to enhance your dating life.
 - **Bar Concierge:** Discover great spots for drinks.
 - **Weekend Planner:** Get a full itinerary for your weekend.
 
-**Upgrade:** Click the "Upgrade" button on the dashboard or use the banner to start your subscription.
+**Upgrade:** Click the "Upgrade" button on the dashboard or use the banner to start your subscription for just AU$2.50/month.
 
 ---
 

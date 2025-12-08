@@ -275,9 +275,10 @@ export default function Home() {
             <FeatureCard
               icon={Calendar}
               title="Weekend Planner"
-              description="Build a complete romantic itinerary. Our smart AI planner creates custom weekend plans based on your location."
+              description="Build a complete romantic itinerary. Our smart planner creates custom weekend plans based on your location."
               delay={0.3}
             />
+
             <FeatureCard
               icon={Utensils}
               title="Dining Concierge"
@@ -345,7 +346,7 @@ export default function Home() {
             />
             <FaqItem
               question="Is Date Jar free for couples?"
-              answer="Yes! You can create a jar, add unlimited ideas, and sync with your partner for free. We also offer a premium tier for advanced features like the AI Weekend Planner and Dining Concierge."
+              answer="Yes! You can create a jar, add unlimited ideas, and sync with your partner for free. We also offer a premium tier for advanced features like the Smart Weekend Planner and Dining Concierge."
             />
             <FaqItem
               question="Can I find restaurants for date night?"
@@ -378,8 +379,8 @@ export default function Home() {
                 </Button>
               </div>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-slate-400">
-                <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> Free 7-day trial of premium features</span>
-                <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-yellow-400" /> Then a small one-off fee</span>
+                <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> Free 14-day trial of premium features</span>
+                <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-yellow-400" /> Then just AU$2.50 / month</span>
               </div>
             </div>
           </div>
@@ -403,6 +404,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </main>
+    </main >
   );
 }

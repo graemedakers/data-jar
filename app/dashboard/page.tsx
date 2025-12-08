@@ -183,7 +183,6 @@ export default function DashboardPage() {
     const [ideaToDelete, setIdeaToDelete] = useState<string | null>(null);
 
     const handleDeleteClick = (id: string) => {
-        console.log("Delete clicked for id:", id);
         setIdeaToDelete(id);
     };
 
@@ -530,7 +529,7 @@ export default function DashboardPage() {
                             </div>
                             <div>
                                 <span className="block text-xl font-bold text-white mb-2">Weekend Planner</span>
-                                <span className="text-sm text-slate-400 leading-relaxed block group-hover:text-purple-200/70 transition-colors">Let AI build a full weekend itinerary automatically.</span>
+                                <span className="text-sm text-slate-400 leading-relaxed block group-hover:text-purple-200/70 transition-colors">Let us build a full weekend itinerary automatically.</span>
                             </div>
                         </motion.div>
 

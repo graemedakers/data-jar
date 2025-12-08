@@ -39,7 +39,7 @@ export default function PremiumPage() {
     const features = [
         {
             icon: Sparkles,
-            title: "Unlimited AI Ideas",
+            title: "Unlimited Smart Ideas",
             description: "Surprise Me! generated specifically for you, as many times as you want."
         },
         {
@@ -89,7 +89,7 @@ export default function PremiumPage() {
                         </h1>
 
                         <p className="text-lg text-slate-300 leading-relaxed">
-                            Unlock the full power of the Date Jar AI. Get personalized, real-time event suggestions and plan perfect weekends effortlessly.
+                            Unlock the full power of the Date Jar. Get personalized, real-time event suggestions and plan perfect weekends effortlessly.
                         </p>
 
                         <div className="pt-4">

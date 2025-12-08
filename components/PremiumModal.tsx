@@ -66,7 +66,7 @@ export function PremiumModal({ isOpen, onClose, title, description }: PremiumMod
 
                             <h2 className="text-3xl font-black text-white mb-2">{title || "Unlock Premium"}</h2>
                             <p className="text-slate-300 mb-8">
-                                {description || "Upgrade to access exclusive features like AI suggestions and Weekend Planner."}
+                                {description || "Upgrade to access exclusive features like Smart Suggestions and Weekend Planner."}
                             </p>
 
                             <div className="space-y-4 w-full mb-8 text-left bg-white/5 p-6 rounded-xl border border-white/10">
@@ -74,7 +74,7 @@ export function PremiumModal({ isOpen, onClose, title, description }: PremiumMod
                                     <div className="p-1 bg-green-500/20 rounded-full">
                                         <Check className="w-4 h-4 text-green-400" />
                                     </div>
-                                    <span className="text-white font-medium">AI "Surprise Me" Ideas</span>
+                                    <span className="text-white font-medium">Smart "Surprise Me" Ideas</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="p-1 bg-green-500/20 rounded-full">
@@ -91,15 +91,15 @@ export function PremiumModal({ isOpen, onClose, title, description }: PremiumMod
                             </div>
 
                             <Button
-                                onClick={handleUpgrade}
+                                onClick={() => router.push('/premium')}
                                 isLoading={isLoading}
                                 className="w-full text-lg h-14 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity shadow-lg shadow-primary/25"
                             >
                                 <Sparkles className="w-5 h-5 mr-2" />
-                                Activate for AU$10
+                                View Plans
                             </Button>
                             <p className="text-xs text-slate-500 mt-4 mb-2">
-                                One-time payment per couple. No monthly fees.
+                                Start for just AU$2.50 / month.
                             </p>
                             <button
                                 onClick={onClose}
