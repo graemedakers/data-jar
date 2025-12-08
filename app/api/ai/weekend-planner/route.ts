@@ -100,7 +100,7 @@ export async function POST(request: Request) {
             "description": "string", // A brief description of the date idea
             "day": "string", // e.g., "Saturday", "Sunday", "Any"
             "cost": "string", // e.g., "Free", "Low", "$", "$$", "$$$"
-            "url": "string" // A URL to buy tickets or get more info (e.g., Ticketmaster, Eventbrite, or a Google Search URL if specific link unavailable)
+            "url": "string" // REQUIRED: Direct link to TICKETING page or Official Event Info. Do not just use a generic search URL if a real link exists.
         }
         
         Do not include markdown formatting. Just the raw JSON.

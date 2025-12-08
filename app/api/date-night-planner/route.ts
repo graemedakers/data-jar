@@ -86,19 +86,26 @@ export async function POST(request: Request) {
             User Preferences (Secondary): ${userInterests}
             
             CRITICAL INSTRUCTIONS:
-            1. LOCALITY: Choose a SINGLE Neighborhood or District and STICK TO IT. All three venues MUST be close enough to walk between (ideal) or a very short tram/bus ride. Do NOT suggest venues scattered across the city. They must form a logical, compact route.
-            2. FLOW: The evening must follow this schedule:
+            1. EVENT FIRST APPROACH: Search for a SPECIFIC, REAL PUBLIC EVENT happening on ${date} (e.g., Concert, Theater, Comedy, Night Market, Festival, Exhibition).
+               - If a great event is found, make it the "Event" slot and build the rest of the night (Dinner/Drinks) nearby to suit it.
+               - IMPORTANT: Ensure you have a valid link for tickets or info for this event.
+               - If no specific event is on, default to a high-quality venue/activity.
+            
+            2. LOCALITY: Choose a SINGLE Neighborhood or District (ideally where the event is) and STICK TO IT. All three venues MUST be walkable or a very short ride apart.
+            
+            3. FLOW: The evening must follow this schedule:
                - Part 1: Pre-dinner drinks at a nice bar or lounge.
                - Part 2: Dinner at a compatible restaurant.
-               - Part 3: An evening event or activity. SEARCH FOR SPECIFIC EVENTS happening on ${date} in this neighborhood (e.g., comedy gig, live music, night market, theater show).
-                 - If no specific event is found, default to a reliable activity (e.g., bowling, arcade, established comedy club).
-                 - **CRITICAL**: This final slot CANNOT be another bar, club, or restaurant. It must be a distinct activity.
-            3. REALITY CHECK: Verify these places exist and are CURRENTLY OPEN for business. Do NOT suggest venues that are "Permanently Closed" or "Temporarily Closed". 
-               - SPECIAL CAUTION: Recent years have seen many closures. BE SKEPTICAL.
-               - User Report: Venues like "The Butterfly Club" in Melbourne have been reported closed. Do not suggest them.
-               - If a venue has ambiguous status, SKIP IT. Pick a safe, established alternative (e.g., major hotel bars, famous landmarks).
-            4. TIMING: Provide an approximate schedule (e.g., 6:00 PM, 7:30 PM, 9:30 PM).
-    
+               - Part 3: The MAIN EVENT or Activity.
+                 - **CRITICAL**: This final slot CANNOT be another bar, club, or restaurant unless it is a specific ticketed event there (e.g. Jazz Club performance). It must be a distinct activity.
+            
+            4. REALITY CHECK: Verify these places exist, are OPEN, and the event is actually happening on ${date}.
+               - SKIP venues marked "Permanently Closed".
+            
+            5. LINKS: You MUST provide a 'booking_link' for every item.
+               - For the EVENT: Direct link to TICKETING or OFFICIAL PAGE.
+               - For Dinner/Drinks: Website or Booking page.
+            
             Output strictly as a JSON object with this structure:
             {
                 "neighborhood": "Name of the locality/area",
@@ -109,7 +116,7 @@ export async function POST(request: Request) {
                         "venue_name": "Name",
                         "description": "Short description of the vibe and why it fits.",
                         "address": "Street address",
-                        "booking_link": "URL for booking or info",
+                        "booking_link": "REQUIRED URL (Tickets/Booking)",
                         "cost_estimate": "Low/Medium/High"
                     }
                     // ... exactly 3 items for the 3 parts

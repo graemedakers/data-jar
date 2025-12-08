@@ -117,31 +117,42 @@ export async function POST(request: Request) {
         - Location: ${location || "Unknown"}
         - Current Weather: ${weatherInfo}
         - ${userInterests}
-        - Consider any major local events, festivals, or seasonal activities happening right now in ${location || "the area"} if known.
+        
+        CRITICAL INSTRUCTION:
+        - FIRST, search for any REAL, SPECIFIC public events, festivals, concerts, markets, or special exhibitions happening NOW or VERY SOON in ${location || "the area"}.
+        - If a compelling real-world event is found, prioritize making this the date idea.
+        - If no specific event is found, fall back to a creative generic activity or specific venue visit.
+        
         ${category ? `- The user specifically wants a date idea in the category: "${category}".` : ''}
         ${category === 'MEAL' ? `- CRITICAL FOR MEAL: Suggest a SPECIFIC, REAL restaurant in or very close to ${location}. Do NOT suggest a generic cuisine type. You MUST provide the specific restaurant name as the 'description'.` : ''}
+        ${category === 'EVENT' ? `- CRITICAL FOR EVENT: You MUST provide a specific, real-world event name as the 'description'.` : ''}
         
         CONSTRAINTS:
         - The idea MUST be suitable for the current weather conditions and location.
-        - Verify to the best of your knowledge that the venue/restaurant is currently OPEN and operating (not permanently closed).
+        - Verify to the best of your knowledge that the venue/restaurant/event is currently OPEN/ACTIVE.
         - It can be an indoor activity (staying at home) or an outdoor activity (going out).
         - Do NOT involve cardboard in any way.
         - Do NOT involve cocktails or alcohol-focused activities.
         - Avoid activities that require significant prior preparation or planning (spontaneous ideas preferred).
         - If the user has listed interests, try to incorporate them if possible, but don't be limited by them.
         ${category ? `- The idea MUST fit the category: ${category}` : ''}
-        ${category === 'MEAL' ? `- For 'url', you MUST provide the specific restaurant's website or Google Maps link.` : ''}
+        
+        URL REQUIREMENTS:
+        - You MUST provide a valid URL in the 'url' field.
+        - If the idea is an EVENT: Provide the direct link to the official event page or TICKETING page.
+        - If the idea is a VENUE/RESTAURANT: Provide the official website or Google Maps link.
+        - If the idea is generic (e.g. "Walk in park"): Provide a link to a "Best Parks in [City]" guide or similar.
         
         Return the response as a valid JSON object with the following fields:
-        - description: string (a short, catchy title for the date)
-        - details: string (specific tips, what to wear, where to go, or instructions. Relate this to the weather/location if applicable.)
+        - description: string (The specific Event Name, Restaurant Name, or Activity Title)
+        - details: string (specific tips, what to wear, where to go, or instructions. Mention the event date/time if applicable.)
         - indoor: boolean (true for indoor, false for outdoor)
         - duration: string (one of: "0.25", "0.5", "1.0", "2.0", "4.0", "8.0")
         - activityLevel: string (one of: "LOW", "MEDIUM", "HIGH")
         - cost: string (one of: "FREE", "$", "$$", "$$$")
         - timeOfDay: string (one of: "ANY", "DAY", "EVENING")
         - category: string (must be one of: "ACTIVITY", "MEAL", "EVENT")
-        - url: string (optional, URL to the specific venue or event website if applicable)
+        - url: string (REQUIRED. Link to tickets, info, or website)
 
         Example:
         {
