@@ -13,7 +13,7 @@ Welcome to **Date Jar**, the application designed to spice up your relationship 
 8. [Weekend Planner](#weekend-planner)
 9. [Date Night Planner](#date-night-planner)
 10. [Managing History](#managing-history)
-11. [Settings & Inviting Your Partner](#settings--inviting-your-partner)
+11. [Settings & Configuration](#settings--configuration)
 
 ---
 
@@ -152,6 +152,10 @@ To see a record of deleted items:
 
 ## 11. Settings & Configuration
 - **View Deletion History:** View a log of who deleted which date ideas and when. Useful for tracking accidental deletions.
+
+### Managing Your Partner
+- **Invite Partner:** To link accounts with your partner, open the **Settings** menu (Gear icon) and check the **"Manage Partner"** section. You will find your unique invite code and a copyable link there.
+- **Regenerate Code:** If you need a new code, you can regenerate it from the same settings menu.
 
 ### Danger Zone (Creator Only)
 These actions are irreversible.

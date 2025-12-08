@@ -235,8 +235,8 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                             <div>
                                 <h4 className="font-bold text-white text-sm">Partner Management</h4>
                                 <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm">
-                                    <li><strong>Invite Partner:</strong> Use the code on the dashboard to invite your significant other.</li>
-                                    <li><strong>Regenerate Code:</strong> (Creator only) If you need a new invite link or want to invalidate an old one, use this option.</li>
+                                    <li><strong>Invite Partner:</strong> Go to Settings and look under the "Manage Partner" section to find your unique invitation link and code. Share this with your partner to link accounts.</li>
+                                    <li><strong>Regenerate Code:</strong> (Creator only) If you need a new invite link or want to invalidate an old one, use this option in Settings.</li>
                                 </ul>
                             </div>
 
