@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
         const body = await request.json().catch(() => ({}));
         category = body.category;
-        const { activityLevel, cost, timeOfDay } = body;
+        const { activityLevel, cost, timeOfDay, location: inputLocation } = body;
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
@@ -38,8 +38,10 @@ export async function POST(request: Request) {
         const userHomeTown = user.homeTown;
 
         // Determine which location to use
-        const locations = [coupleLocation, userHomeTown].filter(Boolean);
-        const location = locations.length > 0 ? locations[Math.floor(Math.random() * locations.length)] : "Unknown";
+        const fallbackLocations = [coupleLocation, userHomeTown].filter(Boolean);
+        const randomFallback = fallbackLocations.length > 0 ? fallbackLocations[Math.floor(Math.random() * fallbackLocations.length)] : "Unknown";
+
+        const location = inputLocation || randomFallback;
 
         const userInterests = user.interests ? `User Interests: ${user.interests}` : "";
         let weatherInfo = "Unknown";

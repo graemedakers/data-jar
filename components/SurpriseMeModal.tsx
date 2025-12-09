@@ -3,23 +3,34 @@
 
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Loader2, Activity, DollarSign, Utensils, Calendar } from "lucide-react";
-import { useState } from "react";
+import { X, Sparkles, Loader2, Activity, DollarSign, Utensils, Calendar, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface SurpriseMeModalProps {
     isOpen: boolean;
     onClose: () => void;
     onIdeaAdded: () => void;
+    initialLocation?: string;
 }
 
-export function SurpriseMeModal({ isOpen, onClose, onIdeaAdded }: SurpriseMeModalProps) {
+export function SurpriseMeModal({ isOpen, onClose, onIdeaAdded, initialLocation }: SurpriseMeModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
+        location: "",
         activityLevel: "MEDIUM",
         cost: "$",
         timeOfDay: "ANY",
         category: "ACTIVITY",
     });
+
+    useEffect(() => {
+        if (isOpen) {
+            setFormData(prev => ({
+                ...prev,
+                location: initialLocation || prev.location || ""
+            }));
+        }
+    }, [isOpen, initialLocation]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -80,6 +91,21 @@ export function SurpriseMeModal({ isOpen, onClose, onIdeaAdded }: SurpriseMeModa
                         <div className="max-h-[85vh] overflow-y-auto overflow-x-hidden px-4 pb-4">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300 ml-1">Location</label>
+                                    <div className="relative">
+                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            value={formData.location}
+                                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                            placeholder="e.g. New York, NY"
+                                            className="glass-input pl-10 w-full"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-300 ml-1">Category</label>
                                     <div className="flex bg-black/20 rounded-xl p-1 border border-white/10">
                                         <button
@@ -105,8 +131,6 @@ export function SurpriseMeModal({ isOpen, onClose, onIdeaAdded }: SurpriseMeModa
                                         </button>
                                     </div>
                                 </div>
-
-
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
