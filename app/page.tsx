@@ -162,7 +162,7 @@ export default function Home() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 border-b border-white/5 bg-slate-950/50 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-gradient-to-br from-primary to-accent rounded-lg">
               <Heart className="w-4 h-4 text-white fill-white" />
@@ -189,7 +189,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6">
+      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-4 md:px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -201,7 +201,7 @@ export default function Home() {
               <Sparkles className="w-3 h-3" />
               <span>Reignite the spark</span>
             </div>
-            <h1 className="text-3xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-400 tracking-tight leading-[1.1]">
+            <h1 className="text-3xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-400 tracking-tight leading-[1.1] break-words">
               The Ultimate <br />
               <span className="text-accent">Date Idea Generator</span> <br />
               For Couples.
