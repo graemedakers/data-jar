@@ -147,7 +147,7 @@ export default function Home() {
   };
 
   return (
-    <main ref={containerRef} className="min-h-screen relative overflow-hidden bg-slate-950 max-w-[100vw]">
+    <main ref={containerRef} className="min-h-screen relative overflow-hidden bg-slate-950 w-full">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -195,7 +195,7 @@ export default function Home() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-8 text-center md:text-left"
+            className="space-y-8 text-center md:text-left w-full"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-accent">
               <Sparkles className="w-3 h-3" />
@@ -206,7 +206,7 @@ export default function Home() {
               <span className="text-accent">Date Idea Generator</span> <br />
               For Couples.
             </h1>
-            <p className="text-lg text-slate-400 max-w-xl mx-auto md:mx-0 leading-relaxed">
+            <p className="text-lg text-slate-400 max-w-xl mx-auto md:mx-0 leading-relaxed break-words">
               Stop scrolling and start dating. Our <strong>shared app for couples</strong> helps you curate, manage, and discover <strong>romantic date ideas</strong>.
               Let fate decide your next adventure or use our <strong>smart date planner</strong> for the perfect weekend.
             </p>

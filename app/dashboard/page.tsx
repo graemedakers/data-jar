@@ -315,7 +315,7 @@ export default function DashboardPage() {
             <DateNightPlannerModal
                 isOpen={isDateNightOpen}
                 onClose={() => setIsDateNightOpen(false)}
-                userLocation={combinedLocation || undefined}
+                userLocation={userLocation || undefined}
                 onIdeaAdded={fetchIdeas}
             />
 
