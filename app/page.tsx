@@ -176,10 +176,10 @@ export default function Home() {
               </Button>
             ) : (
               <>
-                <Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">
+                <Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Sign In
                 </Link>
-                <Button onClick={() => router.push('/signup')} size="sm" className="bg-white text-slate-900 hover:bg-slate-200 border-none">
+                <Button onClick={() => router.push('/signup')} size="sm" className="bg-white text-slate-900 hover:bg-slate-200 border-none hidden sm:flex">
                   Get Started
                 </Button>
               </>

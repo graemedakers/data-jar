@@ -16,7 +16,7 @@ export function Jar3D() {
     }
 
     return (
-        <div className="relative w-full max-w-[320px] aspect-square mx-auto perspective-1000">
+        <div className="relative w-64 h-64 md:w-80 md:h-80 mx-auto perspective-1000">
             {/* Glow underneath */}
             <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-64 h-16 bg-primary/20 blur-3xl rounded-full" />
 
