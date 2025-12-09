@@ -201,12 +201,12 @@ export default function Home() {
               <Sparkles className="w-3 h-3" />
               <span>Reignite the spark</span>
             </div>
-            <h1 className="text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-400 tracking-tight leading-[1.1]">
+            <h1 className="text-3xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-slate-400 tracking-tight leading-[1.1]">
               The Ultimate <br />
               <span className="text-accent">Date Idea Generator</span> <br />
               For Couples.
             </h1>
-            <p className="text-lg text-slate-400 max-w-xl mx-auto md:mx-0 leading-relaxed break-words">
+            <p className="text-base md:text-lg text-slate-400 max-w-xl mx-auto md:mx-0 leading-relaxed break-words">
               Stop scrolling and start dating. Our <strong>shared app for couples</strong> helps you curate, manage, and discover <strong>romantic date ideas</strong>.
               Let fate decide your next adventure or use our <strong>smart date planner</strong> for the perfect weekend.
             </p>

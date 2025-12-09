@@ -61,12 +61,14 @@
   }
 }
 
+html,
 body {
   background: radial-gradient(circle at top center, #1e293b, #0f172a);
   color: var(--foreground);
   font-family: var(--font-geist-sans), sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%;
 }
 
 /* Glassmorphism Utilities */
