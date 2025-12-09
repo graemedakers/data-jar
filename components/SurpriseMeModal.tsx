@@ -77,7 +77,7 @@ export function SurpriseMeModal({ isOpen, onClose, onIdeaAdded }: SurpriseMeModa
                             Set your preferences and we'll generate a secret date idea. It will remain hidden in your jar until you spin it!
                         </p>
 
-                        <div className="max-h-[85vh] overflow-y-auto px-1 pb-2">
+                        <div className="max-h-[85vh] overflow-y-auto overflow-x-hidden px-4 pb-4">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-300 ml-1">Category</label>
