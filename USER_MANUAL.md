@@ -56,22 +56,28 @@ Once logged in, you will see your **Dashboard**.
 You can add ideas manually or let our assistant suggest them.
 
 ### Manual Entry
-Ready for a date? Click the **"Spin Jar"** button to get a random suggestion.
+1. Click the **"Add Idea"** button (Plus icon) on the dashboard.
+2. Fill in the details:
+   - **Description:** A short title (e.g., "Mini Golf").
+   - **Details:** Optional extra info.
+   - **Category:** Activity, Meal, or Event.
+   - **Duration:** Estimated time.
+   - **Cost:** Estimated budget.
+   - **Energy:** Activity level.
+   - **Time:** Day or Evening.
+   - **Setting:** Indoor or Outdoor.
+3. Click **"Add to Jar"**.
 
-### Filters
-You can narrow down the selection to fit your current mood:
-- **Category:** Activity, Meal, or Event.
-- **Duration:** Set a maximum time limit (e.g., "Under 2 hours").
-- **Cost:** Set a budget cap (e.g., "Free", "$", "$$", "$$$").
-- **Energy:** Choose how active you want to be (Low, Medium, High).
-- **Time:** Filter for Day or Evening activities.
-- **Setting:** Indoor or Outdoor.
-
-### The Reveal & Locations
-Once the jar picks an idea:
-1.  **Accept Date:** Click to mark it as "Selected". This moves it from the Jar to your History.
-2.  **Find Specific Places:** If the idea is generic (e.g., "Go Bowling"), click the **"Find Specific Places & Tickets"** button. Our assistant will scout your location for the best venues, complete with ratings and links.
-3.  **Find Food Nearby:** If you're going on an activity date, use the **"Find food nearby"** button to instantly launch the Dining Concierge, pre-filled with the activity's location.
+### Surprise Me
+Stuck on what to do? The assistant can generate custom date ideas tailored to your location and interests.
+1. Click the **"Surprise Me"** button (Sparkles icon) on the dashboard.
+2. Set your preferences:
+   - **Category:** Activity, Meal, or Event.
+   - **Cost:** Your budget.
+   - **Energy:** Desired activity level.
+   - **Time of Day:** Day or Evening.
+3. Click **"Create Secret Surprise Idea"**.
+4. The idea is quietly added to your jar as a "Hidden Surprise". Its details will remain secret from *both* of you until it is selected by spinning the jar!
 
 ---
 

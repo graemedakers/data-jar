@@ -151,11 +151,10 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                             <h4 className="font-bold text-secondary">Surprise Me</h4>
                             <p className="text-slate-300">Stuck on what to do? The assistant can generate custom date ideas tailored to your location and interests.</p>
                             <ol className="list-decimal list-inside space-y-1 text-slate-300 text-sm mt-2">
-                                <li>Click <strong>"Add Idea"</strong> from the dashboard.</li>
-                                <li>Click the <strong><Sparkles className="inline w-3 h-3 text-yellow-400" /> Surprise Me</strong> button.</li>
-                                <li>Select a category (Activity, Meal, or Event).</li>
+                                <li>Click the <strong><Sparkles className="inline w-3 h-3 text-yellow-400" /> Surprise Me</strong> button on the dashboard.</li>
+                                <li>Select your preferences (Category, Cost, Energy, Time).</li>
                                 <li>The planner will use your <strong>Interests</strong> (from Settings) to generate a unique plan.</li>
-                                <li>Review the idea and click "Add" to drop it in your jar.</li>
+                                <li>The idea will be added to your jar as a <strong>Hidden Surprise</strong>. Its details are secret from everyone until you spin it!</li>
                             </ol>
                         </div>
                     </div>
