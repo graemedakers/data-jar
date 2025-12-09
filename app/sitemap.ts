@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/privacy',
         '/terms',
         '/forgot-password',
+        '/science',
     ];
 
     return routes.map((route) => ({

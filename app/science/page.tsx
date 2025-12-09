@@ -1,7 +1,19 @@
+
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Brain, Heart, Sparkles, Zap, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "The Science of Connection | Why Date Jar Works",
+    description: "Discover the psychology behind Date Jar. Learn how novelty, shared experiences, and reduced decision fatigue lead to stronger, happier relationships.",
+    openGraph: {
+        title: "The Science of Connection | Why Date Jar Works",
+        description: "Discover the psychology behind Date Jar. Learn how novelty, shared experiences, and reduced decision fatigue lead to stronger, happier relationships.",
+        url: "https://date-jar.vercel.app/science",
+    }
+};
 
 export default function SciencePage() {
     return (
