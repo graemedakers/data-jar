@@ -167,6 +167,8 @@ export function SurpriseMeModal({ isOpen, onClose, onIdeaAdded }: SurpriseMeModa
                                         type="submit"
                                         className="w-full h-12 text-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 border-none relative overflow-hidden group"
                                         disabled={isLoading}
+                                        whileHover={{ scale: 1 }}
+                                        whileTap={{ scale: 0.98 }}
                                     >
                                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                                         {isLoading ? (
