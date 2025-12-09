@@ -260,7 +260,7 @@ export default function DashboardPage() {
                 isOpen={isSurpriseModalOpen}
                 onClose={() => setIsSurpriseModalOpen(false)}
                 onIdeaAdded={fetchIdeas}
-                initialLocation={combinedLocation}
+                initialLocation={userLocation || ""}
             />
 
             <SpinFiltersModal
