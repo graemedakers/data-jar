@@ -67,32 +67,48 @@ export async function GET(request: Request) {
         // but we want to hide their details (description).
 
         // Let's re-fetch to get ALL unselected ideas for the couple, but we'll mask the ones not created by me.
-        const allIdeas = await prisma.idea.findMany({
-            where: {
-                coupleId: session.user.coupleId,
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-            include: {
-                createdBy: {
-                    select: { name: true, id: true },
-                },
-            },
-        });
+        // Use raw query to ensure we get 'isSurprise' even if Prisma Client is stale
+        const allIdeas: any[] = await prisma.$queryRaw`
+            SELECT i.*, 
+                   json_build_object('id', u.id, 'name', u.name) as "createdBy"
+            FROM "Idea" i
+            LEFT JOIN "User" u ON i."createdById" = u.id
+            WHERE i."coupleId" = ${session.user.coupleId}
+            ORDER BY i."createdAt" DESC
+        `;
 
         const maskedIdeas = allIdeas.map(idea => {
-            // If it's my idea OR it has been selected, show everything
-            if (idea.createdById === session.user.id || idea.selectedAt) {
+            const isMyIdea = idea.createdById === session.user.id;
+            const isSelected = !!idea.selectedAt;
+            const isSurprise = (idea as any).isSurprise; // Typecast because generic Prisma client might not be fully regened in IDE context
+
+            // If it has been selected, show everything.
+            if (isSelected) {
                 return idea;
             }
 
-            // Otherwise (it's partner's unselected idea), hide the description
+            // If it is a "Surprise Idea" created via the specific feature, hide from everyone until selected.
+            if (isSurprise) {
+                return {
+                    ...idea,
+                    description: "Surprise Idea",
+                    details: "This idea will be revealed when you spin the jar!",
+                    isMasked: true,
+                    // Keep metadata visible? User said "hide it", but usually filters need metadata.
+                    // The jar view uses these to show icons. Keep them.
+                };
+            }
+
+            // If it's my idea (and not a special surprise), show it.
+            if (isMyIdea) {
+                return idea;
+            }
+
+            // Otherwise (it's partner's unselected normal idea), hide the description
             return {
                 ...idea,
-                description: "??? (Surprise)",
+                description: "??? (Partner's Idea)",
                 isMasked: true,
-                indoor: idea.indoor, // Keep these visible for filtering context
             };
         });
 

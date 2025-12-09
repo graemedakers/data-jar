@@ -18,7 +18,7 @@ interface AddIdeaModalProps {
 
 export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrade }: AddIdeaModalProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+
     const [formData, setFormData] = useState({
         description: "",
         details: "",
@@ -62,44 +62,7 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
 
     const itinerary = getItinerary(formData.details);
 
-    const handleSurpriseMe = async () => {
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/ai-random-idea', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    category: formData.category,
-                    duration: formData.duration,
-                    // We can optionally send other fields if we want the AI to respect them too,
-                    // but the user specifically asked for category.
-                    // Let's send them as "preferences" if they are not default?
-                    // For now, just category is the main request.
-                })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setFormData({
-                    description: data.description,
-                    details: (data.details || "") + (data.url ? `\n\nMore Info: ${data.url}` : ""), // Populate details from AI
-                    indoor: data.indoor,
-                    duration: String(data.duration),
-                    activityLevel: data.activityLevel,
-                    cost: data.cost,
-                    timeOfDay: data.timeOfDay,
-                    category: data.category || formData.category || "ACTIVITY",
-                });
-            } else {
-                const errorData = await res.json();
-                alert(`Failed to generate idea: ${errorData.details || "Unknown error"}`);
-            }
-        } catch (error) {
-            console.error("Idea Generation Error:", error);
-            alert("Error generating idea. Check console for details.");
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -333,35 +296,11 @@ export function AddIdeaModal({ isOpen, onClose, initialData, isPremium, onUpgrad
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                                        {!(initialData?.id) && (
-                                            <Button
-                                                type="button"
-                                                variant="secondary"
-                                                className="flex-1 relative overflow-hidden py-3"
-                                                onClick={handleSurpriseMe}
-                                                disabled={isLoading || isGeneratingAI}
-                                            >
-                                                {isGeneratingAI ? (
-                                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                                ) : (
-                                                    <div className="flex flex-col items-center justify-center py-0.5">
-                                                        <div className="flex items-center text-sm font-bold text-white">
-                                                            <Sparkles className="w-4 h-4 mr-1.5 text-yellow-300 fill-yellow-300/20" />
-                                                            <span>Surprise Me</span>
-                                                        </div>
-                                                        <span className="text-[10px] text-slate-200/80 font-medium mt-0.5 text-center leading-tight">
-                                                            Generating <strong>{formData.category === 'MEAL' ? 'Meal' : formData.category === 'EVENT' ? 'Event' : 'Activity'}</strong>.
-                                                            <span className="block opacity-60 text-[9px] font-normal">Change Category above to switch</span>
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </Button>
-                                        )}
+                                    <div className="flex gap-3 pt-2">
                                         <button
                                             type="submit"
-                                            className={`${initialData?.id ? "w-full" : "flex-[2]"} inline-flex items-center justify-center transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none glass-button px-8 py-3 text-base`}
-                                            disabled={isLoading || isGeneratingAI}
+                                            className="w-full inline-flex items-center justify-center transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none glass-button px-8 py-3 text-base"
+                                            disabled={isLoading}
                                         >
                                             {isLoading ? (
                                                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

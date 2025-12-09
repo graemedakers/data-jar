@@ -21,6 +21,7 @@ import { PremiumBanner } from "@/components/PremiumBanner";
 import { DateNightPlannerModal } from "@/components/DateNightPlannerModal";
 import { Moon, Heart } from "lucide-react";
 import { FavoritesModal } from "@/components/FavoritesModal";
+import { SurpriseMeModal } from "@/components/SurpriseMeModal";
 
 function InviteCodeDisplay({ mobile, code }: { mobile?: boolean; code: string | null }) {
     const [copied, setCopied] = useState(false);
@@ -76,6 +77,7 @@ export default function DashboardPage() {
     const [isBarModalOpen, setIsBarModalOpen] = useState(false);
     const [isDateNightOpen, setIsDateNightOpen] = useState(false);
     const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+    const [isSurpriseModalOpen, setIsSurpriseModalOpen] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
     const router = useRouter();
 
@@ -254,6 +256,12 @@ export default function DashboardPage() {
                 }}
             />
 
+            <SurpriseMeModal
+                isOpen={isSurpriseModalOpen}
+                onClose={() => setIsSurpriseModalOpen(false)}
+                onIdeaAdded={fetchIdeas}
+            />
+
             <SpinFiltersModal
                 isOpen={isFilterModalOpen}
                 onClose={() => setIsFilterModalOpen(false)}
@@ -425,6 +433,22 @@ export default function DashboardPage() {
                             <div className="text-left relative z-10">
                                 <span className="block text-lg font-bold text-white group-hover:text-violet-200 transition-colors">Add Idea</span>
                                 <span className="text-sm text-violet-200/60 group-hover:text-violet-200/80 transition-colors leading-tight">Fill your jar</span>
+                            </div>
+                        </motion.button>
+
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setIsSurpriseModalOpen(true)}
+                            className="w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 cursor-pointer transition-all bg-gradient-to-br from-yellow-500/20 to-orange-600/40 border border-yellow-500/30 hover:border-yellow-500/50 shadow-lg shadow-yellow-900/10 group"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="w-12 h-12 shrink-0 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-200 group-hover:scale-110 transition-transform relative z-10 border border-yellow-500/30">
+                                <Sparkles className="w-6 h-6" />
+                            </div>
+                            <div className="text-left relative z-10">
+                                <span className="block text-lg font-bold text-white group-hover:text-yellow-200 transition-colors">Surprise Me</span>
+                                <span className="text-sm text-yellow-200/60 group-hover:text-yellow-200/80 transition-colors leading-tight">Add a secret idea</span>
                             </div>
                         </motion.button>
 

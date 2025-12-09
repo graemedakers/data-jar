@@ -91,6 +91,8 @@ model Idea {
   googleRating   Float?
   openingHours   String?
   
+  isSurprise     Boolean  @default(false)
+
   ratings        Rating[]
 }
 
