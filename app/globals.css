@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
+
 :root {
   /* Professional, Vibrant Theme Palette (Light Mode Default) */
   --background: #f8fafc;
