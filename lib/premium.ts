@@ -1,5 +1,16 @@
 import { Jar, User } from "@prisma/client";
 
+/**
+ * Premium Status Determination (Simplified)
+ * 
+ * Premium features are unlocked if EITHER:
+ * 1. User has isLifetimePro = true (user-level premium)
+ * 2. User has active subscription (subscriptionStatus = 'active', 'trialing', or 'past_due')
+ * 3. Jar has isPremium = true (jar-level premium, for manual overrides)
+ * 
+ * The effective premium status is: userIsPro OR jarIsPremium
+ */
+
 export function isUserPro(user: User | null | undefined): boolean {
     if (!user) return false;
 
@@ -18,18 +29,9 @@ export function isUserPro(user: User | null | undefined): boolean {
 export function isCouplePremium(jar: Jar | null | undefined): boolean {
     if (!jar) return false;
 
-    // 1. Legacy Grandfathering
-    if ((jar as any).isLegacyPremium) return true;
-
-    // 2. Manual Override / Legacy One-Time Payment
-    if (jar.isPremium) return true;
-
-    // 3. User-based Premium Check (for associated users)
-    // Ideally, we check the user who owns the jar, but we don't have that context here easily 
-    // without fetching relations. 
-    // For now, rely on legacy fields OR the caller should use isUserPro().
-
-    return false;
+    // Check if the jar itself has premium status
+    // This covers manual overrides and legacy one-time payments
+    return jar.isPremium === true;
 }
 
 export function getLimits(user: User | null | undefined) {
