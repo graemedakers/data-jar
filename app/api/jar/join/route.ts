@@ -1,0 +1,122 @@
+import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+export async function POST(request: Request) {
+    const session = await getSession();
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const { code } = await request.json();
+
+        if (!code) {
+            return NextResponse.json({ error: "Code is required" }, { status: 400 });
+        }
+
+        // Find Jar
+        const jar = await prisma.jar.findUnique({
+            where: { referenceCode: code.toUpperCase() },
+            include: { members: true }
+        });
+
+        if (!jar) {
+            return NextResponse.json({ error: "Invalid jar code" }, { status: 404 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        const { getLimits } = await import('@/lib/premium');
+        const limits = getLimits(user);
+
+        // Check jar count limit
+        const currentJarCount = await prisma.jarMember.count({
+            where: { userId: user.id }
+        });
+
+        if (currentJarCount >= limits.maxJars) {
+            return NextResponse.json({
+                error: `Limit reached: You can only have ${limits.maxJars} jar(s) on the Free plan. Please upgrade to Pro for more.`
+            }, { status: 403 });
+        }
+
+        // Check if already a member
+        const existingMembership = await prisma.jarMember.findUnique({
+            where: {
+                userId_jarId: {
+                    jarId: jar.id,
+                    userId: session.user.id
+                }
+            }
+        });
+
+        if (existingMembership) {
+            // Already a member, just switch
+            await prisma.user.update({
+                where: { id: session.user.id },
+                data: { activeJarId: jar.id }
+            });
+            return NextResponse.json({ success: true, message: "Already a member, switched to jar." });
+        }
+
+        // Constraint Checks
+        if (jar.type === 'ROMANTIC') {
+            // 1. One Romantic Jar per User
+            const userRomanticMembership = await prisma.jarMember.findFirst({
+                where: {
+                    userId: session.user.id,
+                    jar: { type: 'ROMANTIC' }
+                }
+            });
+
+            if (userRomanticMembership) {
+                return NextResponse.json({
+                    error: "You are already in a Romantic Jar. You can only be in one couple jar at a time."
+                }, { status: 400 });
+            }
+
+            // 2. Max 2 members for Romantic Jar
+            if (jar.members.length >= 2) {
+                return NextResponse.json({
+                    error: "This jar is full (max 2 partners for Romantic jars)."
+                }, { status: 400 });
+            }
+        } else if (jar.type === 'SOCIAL') {
+            // 3. Max members for Social Jar
+            if (jar.members.length >= limits.maxMembersPerJar) {
+                return NextResponse.json({
+                    error: `This jar is full (max ${limits.maxMembersPerJar} members for Social jars). Upgrade to Pro for more.`
+                }, { status: 403 });
+            }
+        }
+
+        // Join
+        await prisma.$transaction(async (tx) => {
+            await tx.jarMember.create({
+                data: {
+                    jarId: jar.id,
+                    userId: session.user.id,
+                    role: 'MEMBER'
+                }
+            });
+
+            await tx.user.update({
+                where: { id: session.user.id },
+                data: { activeJarId: jar.id }
+            });
+        });
+
+        return NextResponse.json({ success: true });
+
+    } catch (error) {
+        console.error("Join Jar Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}

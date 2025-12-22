@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+:root {
+  /* Professional, Vibrant Theme Palette (Light Mode Default) */
+  --background: #f8fafc;
+  /* Slate 50 - Cleaner, more neutral base */
+  --foreground: #0f172a;
+  /* Slate 900 - Higher contrast text */
+
+  --primary: #db2777;
+  /* Pink 600 - Vibrant Primary */
+  --primary-foreground: #ffffff;
+
+  --secondary: #7c3aed;
+  /* Violet 600 - Slightly richer purple */
+  --secondary-foreground: #ffffff;
+
+  --accent: #0891b2;
+  /* Cyan 600 - Richer Cyan for better visibility on light bg */
+  --accent-foreground: #ffffff;
+
+  /* Enhanced Glass Variables for Light Mode */
+  --glass-border: rgba(203, 213, 225, 0.6);
+  /* Slate 300 equivalent - distinct definition */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  /* Higher opacity for cleaner look */
+  --glass-highlight: rgba(255, 255, 255, 0.95);
+  /* Bright highlight on hover */
+  --glass-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+  /* Soft, professional slate shadow */
+}
+
+.dark {
+  /* Dark Mode Overrides */
+  --background: #020617;
+  /* Slate 950 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
+
+  --primary: #f472b6;
+  /* Pink 400 - Lighter for dark mode */
+  --secondary: #a78bfa;
+  /* Violet 400 */
+  --accent: #22d3ee;
+  /* Cyan 400 */
+
+  /* Glass Variables for Dark Mode */
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  /* Slate 900 base for glass */
+  --glass-highlight: rgba(30, 41, 59, 0.6);
+  /* Lighter slate highlight */
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 20px rgba(219, 39, 119, 0.5);
+    }
+
+    50% {
+      opacity: 0.8;
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+    }
+  }
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  @apply rounded-2xl p-6 transition-all duration-300;
+}
+
+.glass-card:hover {
+  background-color: var(--glass-highlight);
+  border-color: var(--primary);
+}
+
+.glass-button {
+  @apply relative overflow-hidden rounded-full px-8 py-3 font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.glass-button:hover {
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
+}
+
+.glass-input {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  color: var(--foreground);
+
+  @apply w-full rounded-xl px-4 py-3 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20;
+
+  &::placeholder {
+    color: #94a3b8;
+    /* slate-400 */
+  }
+}
+
+/* Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.2);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.4);
+}

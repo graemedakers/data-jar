@@ -1,0 +1,170 @@
+import { getSession } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
+import { NextResponse } from 'next/server';
+import { awardXp } from '@/lib/gamification';
+import { checkAndUnlockAchievements } from '@/lib/achievements';
+
+export async function POST(request: Request) {
+    const session = await getSession();
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const currentJarId = user.activeJarId || user.coupleId;
+
+    if (!currentJarId) {
+        return NextResponse.json({ error: 'No active jar' }, { status: 400 });
+    }
+
+    const { getLimits } = await import('@/lib/premium');
+    const limits = getLimits(user);
+
+    if (!limits.unlimitedIdeas) {
+        const count = await prisma.idea.count({ where: { jarId: currentJarId } });
+        if (count >= 25) {
+            return NextResponse.json({
+                error: "Limit reached: Free jars are limited to 25 ideas. Upgrade to Pro for unlimited ideas!"
+            }, { status: 403 });
+        }
+    }
+
+    try {
+        const body = await request.json();
+        const { description, indoor, duration, activityLevel, cost, timeOfDay, details, category, selectedAt, notes, address, website, googleRating, openingHours, rating, photoUrls, selectedDate } = body;
+
+        if (!description) {
+            return NextResponse.json({ error: 'Description is required' }, { status: 400 });
+        }
+
+        const createData: Prisma.IdeaUncheckedCreateInput = {
+            description,
+            details: details || null,
+            indoor: Boolean(indoor),
+            duration: typeof duration === 'string' ? parseFloat(duration) : Number(duration),
+            activityLevel,
+            cost,
+            timeOfDay: timeOfDay || 'ANY',
+            category: category || 'ACTIVITY',
+            selectedAt: selectedAt ? new Date(selectedAt) : null,
+            selectedDate: selectedDate ? new Date(selectedDate) : (selectedAt ? new Date(selectedAt) : null), // Use selectedDate if provided, else selectedAt
+            jarId: currentJarId,
+            createdById: session.user.id,
+            notes: notes || null,
+            address: address || null,
+            website: website || null,
+            googleRating: googleRating ? parseFloat(String(googleRating)) : null,
+            openingHours: openingHours || null,
+            rating: rating ? parseInt(String(rating)) : null,
+            photoUrls: photoUrls || [],
+        };
+
+        const idea = await prisma.idea.create({
+            data: createData,
+        });
+
+        // Gamification: Award XP for adding an idea
+        await awardXp(currentJarId, 15);
+        await checkAndUnlockAchievements(currentJarId);
+
+        return NextResponse.json(idea);
+    } catch (error) {
+        console.error('Error creating idea:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+export async function GET(request: Request) {
+    const session = await getSession();
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Fetch fresh user to get up-to-date activeJarId
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id }
+    });
+
+    if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const currentJarId = user.activeJarId || user.coupleId;
+
+    if (!currentJarId) {
+        return NextResponse.json([]); // No jar, no ideas
+    }
+
+    try {
+        // Fetch all ideas for the couple (jar)
+        // Note: The physical column in the DB is "coupleId" (mapped to "jarId" in Prisma schema)
+        // so we must use "coupleId" in the raw query.
+
+        // Wait, actually we WANT to include partner's unselected ideas so we can count them,
+        // but we want to hide their details (description).
+
+        // Let's re-fetch to get ALL unselected ideas for the couple, but we'll mask the ones not created by me.
+        // Use raw query to ensure we get 'isSurprise' even if Prisma Client is stale
+        // Fetch all ideas for the couple (jar) and include jar type
+        const allIdeas: any[] = await prisma.$queryRaw`
+            SELECT i.*, 
+                   json_build_object('id', u.id, 'name', u.name) as "createdBy",
+                   c.type as "jarType"
+            FROM "Idea" i
+            LEFT JOIN "User" u ON i."createdById" = u.id
+            LEFT JOIN "Couple" c ON i."coupleId" = c.id
+            WHERE i."coupleId" = ${currentJarId} 
+            ORDER BY i."createdAt" DESC
+        `;
+
+        const maskedIdeas = allIdeas.map(idea => {
+            const isMyIdea = idea.createdById === session.user.id;
+            const isSelected = !!idea.selectedAt;
+            const isSurprise = (idea as any).isSurprise;
+            const isGroupJar = (idea as any).jarType === 'SOCIAL';
+
+            // If it has been selected, show everything.
+            if (isSelected) {
+                return idea;
+            }
+
+            // In Group Jars, everyone sees everything (except maybe explicit Surprise ideas if we enable them later, but currently Surprise features are hidden for Groups).
+            // User requested "all members see all ideas".
+            if (isGroupJar && !isSurprise) {
+                return idea;
+            }
+
+            // If it is a "Surprise Idea" created via the specific feature, hide from everyone until selected.
+            if (isSurprise) {
+                return {
+                    ...idea,
+                    description: "Surprise Idea",
+                    details: "This idea will be revealed when you spin the jar!",
+                    isMasked: true,
+                };
+            }
+
+            // If it's my idea (and not a special surprise), show it.
+            if (isMyIdea) {
+                return idea;
+            }
+
+            // Otherwise (it's partner's unselected normal idea), hide the description
+            return {
+                ...idea,
+                description: "??? (Partner's Idea)",
+                isMasked: true,
+            };
+        });
+
+        return NextResponse.json(maskedIdeas);
+    } catch (error) {
+        console.error('Error fetching ideas:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}

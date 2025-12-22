@@ -1,0 +1,61 @@
+name: Build iOS App
+
+on:
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Update CocoaPods Repo
+        run: |
+          cd ios/App
+          pod install --repo-update
+
+      - name: Check Xcode Scheme
+        run: |
+          cd ios/App
+          xcodebuild -list
+
+      - name: Build iOS App (Archive)
+        run: |
+          cd ios/App
+          mkdir -p build
+          xcodebuild -workspace App.xcworkspace -scheme App -sdk iphoneos -configuration Release archive -archivePath $PWD/build/App.xcarchive clean archive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+
+      - name: Export .app (Unsigned)
+        run: |
+          cd ios/App
+          # Drill into the archive to find the .app bundle
+          cd build/App.xcarchive/Products/Applications/
+          # Zip it up so it's a single file artifact
+          zip -r App.zip App.app
+          # Move it to a known location for upload
+          mkdir -p ../../../build/ipa-export
+          mv App.zip ../../../build/ipa-export/App.zip
+
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app-unsigned
+          path: ios/App/build/ipa-export/App.zip
+          
+      # Note: This produces an UNSIGNED App Bundle. You cannot install this directly on a phone
+      # without a developer account or using a tool like AltStore.
+      # To get a real signed IPA, you need to add secrets (CERTIFICATE, PROFILE) to GitHub.

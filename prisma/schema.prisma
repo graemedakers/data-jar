@@ -1,0 +1,202 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Squad Mode Enums
+enum JarType {
+  ROMANTIC
+  SOCIAL
+}
+
+enum MemberRole {
+  ADMIN
+  MEMBER
+}
+
+model Jar {
+  id            String   @id @default(uuid())
+  referenceCode String   @unique
+  name          String   @default("Our Jar")
+  type          JarType  @default(ROMANTIC)
+  
+  members       JarMember[]
+  ideas         Idea[]
+  
+  // Legacy access for migration
+  legacyUsers   User[]
+
+  location      String?  // e.g. "New York, NY" or "London, UK"
+  createdAt     DateTime @default(now())
+  isPremium     Boolean  @default(false)
+  isTrialEligible Boolean @default(true)
+  
+  // Subscription Fields
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  subscriptionStatus String? // "active", "trialing", "past_due", "canceled"
+  isLegacyPremium Boolean @default(false) // For grandfathering existing users
+  
+  // Gamification
+  xp          Int      @default(0)
+  level       Int      @default(1)
+
+  deletedLogs   DeletedLog[]
+  favorites     FavoriteVenue[]
+  achievements  UnlockedAchievement[]
+
+  @@map("Couple") // Keep table name for now to simplify migration (optional, but good practice)
+}
+
+model UnlockedAchievement {
+  id            String   @id @default(uuid())
+  jarId         String   @map("coupleId")
+  jar           Jar      @relation(fields: [jarId], references: [id])
+  achievementId String   // Constant ID from code
+  unlockedAt    DateTime @default(now())
+
+  @@unique([jarId, achievementId])
+}
+
+model DeletedLog {
+  id          String   @id @default(uuid())
+  jarId       String   @map("coupleId")
+  jar         Jar      @relation(fields: [jarId], references: [id])
+  description String
+  deletedBy   String   // Name of the user who deleted it
+  deletedAt   DateTime @default(now())
+}
+
+model JarMember {
+  id        String     @id @default(uuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  jarId     String
+  jar       Jar        @relation(fields: [jarId], references: [id])
+  role      MemberRole @default(MEMBER)
+  joinedAt  DateTime   @default(now())
+
+  @@unique([userId, jarId])
+}
+
+model User {
+  id                     String   @id @default(uuid())
+  email                  String   @unique
+  name                   String
+  passwordHash           String
+  mustChangePassword     Boolean  @default(true)
+  
+  // Squad Mode Relations
+  memberships            JarMember[]
+  activeJarId            String?  // The jar they are currently viewing
+  
+  // Legacy Relation (for migration)
+  coupleId               String?
+  couple                 Jar?      @relation(fields: [coupleId], references: [id])
+
+  createdIdeas           Idea[]   @relation("CreatedBy")
+  ratings                Rating[]
+  createdAt              DateTime @default(now())
+  homeTown               String?
+  interests              String?  // Comma separated list of interests
+  hasUsedTrial           Boolean  @default(false)
+  emailVerified          DateTime?
+  verificationToken      String?
+  passwordResetToken     String?
+  passwordResetTokenExp  DateTime?
+  favorites              FavoriteVenue[]
+  appReviews             AppReview[]
+
+  // Subscription Fields (User-based)
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  subscriptionStatus     String?   // "active", "trialing", "canceled", "past_due"
+  isLifetimePro          Boolean   @default(false)
+  subscriptionEndsAt     DateTime?
+}
+
+model Idea {
+  id             String   @id @default(uuid())
+  description    String
+  indoor         Boolean // true = indoor, false = outdoor
+  duration       Float // 0.25, 0.5, 0.75, 1.0
+  activityLevel  String // LOW, MEDIUM, HIGH
+  cost           String // FREE, $, $$, $$$
+  timeOfDay      String   @default("ANY") // DAY, EVENING, ANY
+  category       String   @default("ACTIVITY") // ACTIVITY, MEAL, EVENT
+  
+  jarId          String   @map("coupleId")
+  jar            Jar      @relation(fields: [jarId], references: [id])
+  
+  createdById    String
+  createdBy      User     @relation("CreatedBy", fields: [createdById], references: [id])
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  selectedAt     DateTime? // If null, it's still in the jar
+  selectedDate   DateTime? // The actual date they went on (optional)
+  rating         Int?      // 1-5 stars (Legacy/Average)
+  notes          String?   // "Best pizza ever!"
+  details        String?   // "Wear comfortable shoes", "Bring a swimsuit"
+  
+  // Rich Data Fields
+  address        String?
+  website        String?
+  googleRating   Float?
+  openingHours   String?
+  photoUrls      String[]
+  
+  isSurprise     Boolean  @default(false)
+
+  ratings        Rating[]
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  ideaId    String
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  value     Int      // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ideaId, userId])
+}
+
+model FavoriteVenue {
+  id          String   @id @default(uuid())
+  jarId       String   @map("coupleId")
+  jar         Jar      @relation(fields: [jarId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  name        String
+  address     String?
+  description String?
+  websiteUrl  String?
+  googleRating Float?
+  type        String   @default("VENUE") // "RESTAURANT", "BAR", "VENUE"
+  isShared    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+
+  @@index([jarId])
+}
+
+model AppReview {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int
+  comment   String
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

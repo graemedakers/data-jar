@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Date Jar</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav id="navbar" class="hidden">
+            <div class="logo">The Date Jar</div>
+            <div class="nav-links">
+                <a href="#" onclick="router.navigate('dashboard')">Dashboard</a>
+                <a href="#" onclick="router.navigate('jar')">The Jar</a>
+                <a href="#" onclick="router.navigate('history')">History</a>
+                <a href="#" onclick="auth.logout()">Logout</a>
+            </div>
+        </nav>
+
+        <!-- Pages -->
+        <main id="main-content">
+            <!-- Login Page -->
+            <section id="page-login" class="page active">
+                <div class="auth-container">
+                    <h1>Welcome to The Date Jar</h1>
+                    <p class="subtitle">Curate your moments. Pick your destiny.</p>
+                    
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="ui.switchAuthTab('login')">Login</button>
+                        <button class="tab-btn" onclick="ui.switchAuthTab('register')">New Couple Setup</button>
+                    </div>
+
+                    <form id="login-form" onsubmit="auth.handleLogin(event)">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" required placeholder="you@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn primary">Enter</button>
+                    </form>
+
+                    <form id="register-form" class="hidden" onsubmit="auth.handleRegister(event)">
+                        <div class="form-group">
+                            <label>Reference Code (Jar Name)</label>
+                            <input type="text" name="refCode" required placeholder="e.g. SmithJar2024">
+                        </div>
+                        <div class="form-group">
+                            <label>Shared Password</label>
+                            <input type="password" name="sharedPassword" required placeholder="Create a shared password">
+                        </div>
+                        
+                        <div class="couple-inputs">
+                            <div class="user-input">
+                                <h3>Partner 1</h3>
+                                <input type="text" name="name1" required placeholder="Name">
+                                <input type="email" name="email1" required placeholder="Email">
+                            </div>
+                            <div class="user-input">
+                                <h3>Partner 2</h3>
+                                <input type="text" name="name2" required placeholder="Name">
+                                <input type="email" name="email2" required placeholder="Email">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn primary">Create Jar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Change Password Page -->
+            <section id="page-change-password" class="page">
+                <div class="auth-container">
+                    <h2>Update Password</h2>
+                    <p>For security, please set your personal password.</p>
+                    <form onsubmit="auth.handleChangePassword(event)">
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" name="newPassword" required>
+                        </div>
+                        <button type="submit" class="btn primary">Update</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Dashboard -->
+            <section id="page-dashboard" class="page">
+                <header class="page-header">
+                    <h2>My Ideas</h2>
+                    <button class="btn primary" onclick="ui.showModal('add-idea-modal')">+ New Idea</button>
+                </header>
+                
+                <div id="my-ideas-list" class="ideas-grid">
+                    <!-- Ideas injected here -->
+                </div>
+            </section>
+
+            <!-- The Jar (Selection) -->
+            <section id="page-jar" class="page">
+                <div class="jar-container">
+                    <div class="controls">
+                        <h3>Filters</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" id="filter-indoor"> Indoor Only</label>
+                            <label><input type="checkbox" id="filter-outdoor"> Outdoor Only</label>
+                        </div>
+                        <div class="filter-group">
+                            <label>Max Duration</label>
+                            <select id="filter-duration">
+                                <option value="1">Any</option>
+                                <option value="0.25">Short (Wait a bit)</option>
+                                <option value="0.5">Half Day</option>
+                                <option value="1">Full Day</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Max Cost</label>
+                            <select id="filter-cost">
+                                <option value="$$$">Any</option>
+                                <option value="FREE">Free</option>
+                                <option value="$">$</option>
+                                <option value="$$">$$</option>
+                            </select>
+                        </div>
+                        <button class="btn accent large" onclick="jar.shakeAndPick()">Pick a Date!</button>
+                    </div>
+
+                    <div class="jar-stage">
+                        <div id="glass-jar" class="jar">
+                            <div class="lid"></div>
+                            <div class="glass">
+                                <div class="reflection"></div>
+                                <div id="papers-container">
+                                    <!-- Papers injected here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Overlay -->
+                <div id="result-overlay" class="hidden">
+                    <div class="paper-reveal">
+                        <div class="paper-content">
+                            <h2 id="result-title">Picnic in the Park</h2>
+                            <div class="tags" id="result-tags">
+                                <span class="tag">Outdoor</span>
+                                <span class="tag">Low Cost</span>
+                            </div>
+                            <div class="details">
+                                <p><strong>Duration:</strong> <span id="result-duration">0.5 days</span></p>
+                                <p><strong>Activity:</strong> <span id="result-activity">Low</span></p>
+                                <p><strong>Cost:</strong> <span id="result-cost">$</span></p>
+                            </div>
+                            <div class="ai-suggestions">
+                                <h3>AI Suggestions</h3>
+                                <ul id="result-ai">
+                                    <li>Don't forget a blanket!</li>
+                                    <li>Check the weather forecast.</li>
+                                </ul>
+                            </div>
+                            <button class="btn primary" onclick="router.navigate('history')">Awesome!</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History -->
+            <section id="page-history" class="page">
+                <h2>History</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="ui.sortHistory('date')">Date Selected ↕</th>
+                                <th onclick="ui.sortHistory('idea')">Idea ↕</th>
+                                <th onclick="ui.sortHistory('creator')">Created By ↕</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-list">
+                            <!-- History items -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="danger-zone">
+                    <h3>Danger Zone</h3>
+                    <button class="btn danger" onclick="auth.requestDeleteAccount()">Delete Account</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modals -->
+        <div id="add-idea-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close" onclick="ui.hideModal('add-idea-modal')">&times;</span>
+                <h2>Add New Idea</h2>
+                <form onsubmit="ideas.add(event)">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" required placeholder="What's the plan?"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select name="type">
+                                <option value="indoor">Indoor</option>
+                                <option value="outdoor">Outdoor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (Days)</label>
+                            <select name="duration">
+                                <option value="0.25">0.25</option>
+                                <option value="0.5">0.5</option>
+                                <option value="0.75">0.75</option>
+                                <option value="1">1.0</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Activity Level</label>
+                            <select name="activity">
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HIGH">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cost</label>
+                            <select name="cost">
+                                <option value="FREE">Free</option>
+                                <option value="$">$</option>
+                                <option value="$$">$$</option>
+                                <option value="$$$">$$$</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn primary">Save Idea</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
