@@ -72,6 +72,10 @@ export async function GET() {
                         hasPartner: false,
                         isPremium: userIsPro, // User can have premium even without a jar
                         hasPaid: userIsPro,
+                        location: null, // No jar means no location
+                        coupleReferenceCode: null,
+                        isTrialEligible: true,
+                        coupleCreatedAt: user.createdAt,
                     }
                 });
             }
