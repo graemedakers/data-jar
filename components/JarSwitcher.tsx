@@ -83,10 +83,23 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
 
     // ... rest of handlers ...
     const handleLeaveJar = async (jarId: string) => {
-        if (!confirm("Are you sure you want to leave this Jar? You will lose access to its ideas.")) return;
-
         setIsLoading(true);
+
         try {
+            // Check member count before showing confirmation
+            const memberCountRes = await fetch(`/api/jar/${jarId}/member-count`);
+            const { count } = await memberCountRes.json();
+
+            const isLastMember = count <= 1;
+            const confirmMessage = isLastMember
+                ? "Are you sure you want to leave this jar? You are the last member, so the jar and ALL its ideas and memories will be permanently deleted."
+                : "Are you sure you want to leave this jar? You will lose access to its ideas.";
+
+            if (!confirm(confirmMessage)) {
+                setIsLoading(false);
+                return;
+            }
+
             const res = await fetch('/api/jar/leave', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -101,7 +114,7 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
                 alert(data.error || "Failed to leave jar");
             }
         } catch (error) {
-            console.error("Failed to leave jar", error);
+            console.error("Failed to leave jar:", error);
         } finally {
             setIsLoading(false);
         }
