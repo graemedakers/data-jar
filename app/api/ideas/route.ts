@@ -87,7 +87,14 @@ export async function GET(request: Request) {
 
     // Fetch fresh user to get up-to-date activeJarId
     const user = await prisma.user.findUnique({
-        where: { id: session.user.id }
+        where: { id: session.user.id },
+        include: {
+            memberships: {
+                include: {
+                    jar: true
+                }
+            }
+        }
     });
 
     if (!user) {
@@ -98,6 +105,12 @@ export async function GET(request: Request) {
 
     if (!currentJarId) {
         return NextResponse.json([]); // No jar, no ideas
+    }
+
+    // Verify user is a member of this jar and jar is not deleted
+    const membership = user.memberships.find(m => m.jarId === currentJarId);
+    if (!membership || membership.jar.deleted) {
+        return NextResponse.json([]); // Not a member or jar is deleted - no access
     }
 
     try {
