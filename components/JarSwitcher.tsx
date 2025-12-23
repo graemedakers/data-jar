@@ -15,24 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
 
-interface Jar {
-    id: string;
-    name: string | null;
-    type: "ROMANTIC" | "SOCIAL";
-}
-
-interface Membership {
-    jarId: string;
-    role: "ADMIN" | "MEMBER";
-    jar: Jar;
-}
-
-interface User {
-    id: string;
-    activeJarId: string | null;
-    memberships: Membership[];
-    isPremium?: boolean;
-}
+import { User } from "@/lib/types";
 
 interface JarSwitcherProps {
     user: User;
@@ -49,13 +32,13 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
     const router = useRouter();
 
     // Handle case where user has no memberships
-    const memberships = user.memberships || [];
+    const memberships = (user.memberships || []).filter(m => !!m.jar);
     const activeMembership = memberships.find(m => m.jarId === user.activeJarId) || memberships[0];
     const activeJar = activeMembership?.jar;
     const otherMemberships = memberships.filter(m => m.jarId !== activeJar?.id);
 
     // Calc hasRomanticJar
-    const hasRomanticJar = memberships.some(m => m.jar.type === 'ROMANTIC');
+    const hasRomanticJar = memberships.some(m => m.jar?.type === 'ROMANTIC');
 
     const handleSwitchJar = async (jarId: string) => {
         if (jarId === activeJar?.id) return;
@@ -226,15 +209,15 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
                                     <div className="flex items-center gap-3">
                                         <div className={cn(
                                             "w-8 h-8 rounded-full flex items-center justify-center border border-transparent",
-                                            membership.jar.type === 'ROMANTIC'
+                                            membership.jar!.type === 'ROMANTIC'
                                                 ? "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                                                 : "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                                         )}>
-                                            {membership.jar.type === 'ROMANTIC' ? <Heart className="w-4 h-4" /> : <Users className="w-4 h-4" />}
+                                            {membership.jar!.type === 'ROMANTIC' ? <Heart className="w-4 h-4" /> : <Users className="w-4 h-4" />}
                                         </div>
                                         <div>
                                             <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                                {membership.jar.name || "Untitled Jar"}
+                                                {membership.jar!.name || "Untitled Jar"}
                                             </div>
                                             <div className="text-xs text-slate-500">
                                                 {membership.role === 'ADMIN' ? 'Admin' : 'Member'}

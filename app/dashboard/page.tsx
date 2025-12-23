@@ -37,14 +37,7 @@ import { JarVisualization } from "@/components/dashboard/JarVisualization";
 import { JarActions } from "@/components/dashboard/JarActions";
 import { MobileSpinButton } from "@/components/dashboard/MobileSpinButton";
 import { ToolsGrid } from "@/components/dashboard/ToolsGrid";
-
-interface UserData {
-    id: string;
-    activeJarId: string | null;
-    memberships: any[];
-    jarType?: 'ROMANTIC' | 'SOCIAL';
-    [key: string]: any;
-}
+import { User, Idea } from "@/lib/types";
 
 function InviteCodeDisplay({ mobile, code }: { mobile?: boolean; code: string | null }) {
     const [copied, setCopied] = useState(false);
@@ -109,7 +102,7 @@ export default function DashboardPage() {
     const [diningSearchLocation, setDiningSearchLocation] = useState<string | null>(null);
 
     const [favoritesCount, setFavoritesCount] = useState(0);
-    const [userData, setUserData] = useState<UserData | null>(null);
+    const [userData, setUserData] = useState<User | null>(null);
 
     // New state for Premium Banner
     const [hasPaid, setHasPaid] = useState(false);
