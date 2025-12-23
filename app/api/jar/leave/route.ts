@@ -30,14 +30,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "You are not a member of this jar" }, { status: 404 });
         }
 
-        // Prevent leaving if last admin (unless deleting jar logic exists, which we won't do here yet)
-        // Or if it's a Romantic Jar and they are the "owner" (Admin)?
-        // For simple logic: Just allow leaving.
-        // BUT, if they are the ONLY member, the jar becomes abandoned. Ideally we delete it?
-        // Let's check member count.
+        // Check member count of this jar
         const memberCount = await prisma.jarMember.count({
             where: { jarId }
         });
+
+        // Check if this is the user's only jar - prevent leaving if so
+        const userJarCount = await prisma.jarMember.count({
+            where: { userId: session.user.id }
+        });
+
+        if (userJarCount <= 1) {
+            return NextResponse.json({
+                error: "You cannot leave your only jar. Please join or create another jar first."
+            }, { status: 400 });
+        }
 
         await prisma.$transaction(async (tx) => {
             // Delete membership
@@ -50,11 +57,31 @@ export async function POST(request: Request) {
                 }
             });
 
-            // If last member, delete the Jar too?
+            // If last member, delete the Jar and all related data
             if (memberCount <= 1) {
-                // Delete everything related to Jar
-                // This might be heavy, but let's do basic cleanup
-                // Ideas, Dates, etc should cascade if schema is set up, but let's just delete Jar
+                // Delete all related records first (in correct order to avoid FK violations)
+
+                // Delete ideas (which will cascade delete ratings if configured)
+                await tx.idea.deleteMany({
+                    where: { jarId }
+                });
+
+                // Delete achievements
+                await tx.unlockedAchievement.deleteMany({
+                    where: { jarId }
+                });
+
+                // Delete favorites
+                await tx.favoriteVenue.deleteMany({
+                    where: { jarId }
+                });
+
+                // Delete deleted logs
+                await tx.deletedLog.deleteMany({
+                    where: { jarId }
+                });
+
+                // Finally delete the Jar
                 await tx.jar.delete({
                     where: { id: jarId }
                 });
@@ -64,8 +91,6 @@ export async function POST(request: Request) {
                 if (membership.jar.type === 'ROMANTIC') {
                     // Generate new 6-char code
                     const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                    // We don't strictly check for uniqueness here for simplicity in this rare case, 
-                    // but collision is unlikely. In a perfect world, we'd loop check.
 
                     await tx.jar.update({
                         where: { id: jarId },
@@ -74,16 +99,12 @@ export async function POST(request: Request) {
                 }
             }
 
-            // Update user activeJarId if they were looking at this one
-            // We can just set it to null or find another one.
-            // But since the user is already updated via membership deletion, activeJarId might still point to it?
-            // User schema activeJarId is a string, not FK constrained usually, or it IS FK?
-            // If FK, setting null is important.
+            // Update user activeJarId to null since they're leaving
             await tx.user.update({
                 where: { id: session.user.id },
                 data: { activeJarId: null }
             });
-            // We rely on "me" endpoint so switch to a valid one next load
+            // The /api/auth/me endpoint will switch to another jar if available on next load
         });
 
         return NextResponse.json({ success: true });
