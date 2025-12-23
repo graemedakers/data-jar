@@ -109,8 +109,8 @@ export async function GET(request: Request) {
 
     // Verify user is a member of this jar and jar is not deleted
     const membership = user.memberships.find(m => m.jarId === currentJarId);
-    if (!membership || membership.jar.deleted) {
-        return NextResponse.json([]); // Not a member or jar is deleted - no access
+    if (!membership) {
+        return NextResponse.json([]); // Not a member - no access
     }
 
     try {
