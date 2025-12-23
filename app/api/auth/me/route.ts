@@ -47,19 +47,11 @@ export async function GET() {
         // 1. FILTER DELETED JARS SAFEGUARD (Handles null/undefined gracefully)
         // This ensures existing users with null 'deleted' fields (from early migration) are treated as active
         if (user.memberships) {
-            console.log(`[Auth/Me] User ${user.id} raw memberships:`, user.memberships.map(m => ({
-                jarId: m.jarId,
-                hasJar: !!m.jar,
-                jarName: m.jar?.name,
-                deleted: (m.jar as any)?.deleted
-            })));
-
             user.memberships = user.memberships.filter(m => {
                 // Keep if jar exists AND (deleted is false OR deleted is null/undefined)
                 const jar = m.jar as any;
                 return jar && (jar.deleted === false || jar.deleted === null || jar.deleted === undefined);
             });
-            console.log(`[Auth/Me] Filtered memberships count: ${user.memberships.length}`);
         }
 
         // 2. DETERMINE ACTIVE JAR
@@ -121,9 +113,26 @@ export async function GET() {
         const jarIsPremium = isCouplePremium(activeJar);
         const effectivePremium = jarIsPremium || userIsPro;
 
+        // CRITICAL FIX: Ensure activeJar is represented in memberships for frontend consistency
+        // If the user has an active jar (e.g. legacy couple) but it's not in memberships list (migration gap), add it.
+        const membershipExists = user.memberships.some(m => m.jarId === activeJar?.id);
+        const effectiveMemberships = [...user.memberships];
+
+        if (!membershipExists && activeJar) {
+            effectiveMemberships.unshift({
+                id: 'legacy-membership',
+                userId: user.id,
+                jarId: activeJar.id,
+                role: isCreator ? 'ADMIN' : 'MEMBER',
+                joinedAt: activeJar.createdAt,
+                jar: activeJar as any // Cast to any to fit types
+            } as any);
+        }
+
         return NextResponse.json({
             user: {
                 ...user,
+                memberships: effectiveMemberships,
                 // Map Jar fields to legacy Couple fields for frontend compatibility
                 coupleReferenceCode: activeJar.referenceCode,
                 location: user.homeTown,
