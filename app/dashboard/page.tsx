@@ -32,6 +32,11 @@ import { ReviewAppModal } from "@/components/ReviewAppModal";
 import { HelpModal } from "@/components/HelpModal";
 import { HelpCircle } from "lucide-react";
 import { JarSwitcher } from "@/components/JarSwitcher";
+import { JarControls } from "@/components/dashboard/JarControls";
+import { JarVisualization } from "@/components/dashboard/JarVisualization";
+import { JarActions } from "@/components/dashboard/JarActions";
+import { MobileSpinButton } from "@/components/dashboard/MobileSpinButton";
+import { ToolsGrid } from "@/components/dashboard/ToolsGrid";
 
 interface UserData {
     id: string;
@@ -643,256 +648,51 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-12 max-w-6xl mx-auto">
 
                 {/* Mobile: Spin Button at Top - Compact Banner Style */}
-                <div className="xl:hidden">
-                    <motion.button
-                        whileHover={availableIdeasCount > 0 ? { scale: 1.02 } : {}}
-                        whileTap={availableIdeasCount > 0 ? { scale: 0.95 } : {}}
-                        onClick={() => availableIdeasCount > 0 && setIsFilterModalOpen(true)}
-                        className={`w-full relative overflow-hidden rounded-xl p-4 flex items-center justify-between transition-all cursor-pointer border shadow-lg group ${availableIdeasCount > 0
-                            ? 'bg-gradient-to-r from-pink-600/20 to-pink-900/40 border-pink-500/30 hover:border-pink-500/50 shadow-pink-900/10'
-                            : 'bg-slate-800/20 border-slate-700 opacity-50 grayscale cursor-not-allowed'}`}
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-pink-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                        <div className="flex items-center gap-3 relative z-10">
-                            <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center border transition-transform group-hover:scale-110 ${availableIdeasCount > 0 ? 'bg-pink-500/20 text-pink-200 border-pink-500/30' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>
-                                <Sparkles className={`w-4 h-4 ${isSpinning ? 'animate-spin' : ''}`} />
-                            </div>
-                            <div className="text-left">
-                                <span className={`block text-base font-bold transition-colors flex items-center gap-2 ${availableIdeasCount > 0 ? 'text-pink-900 dark:text-white group-hover:text-pink-700 dark:group-hover:text-pink-200' : 'text-slate-400'}`}>
-                                    {isSpinning ? 'Spinning...' : 'Spin the Jar'}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Right Side Info */}
-                        <div className="relative z-10 flex items-center gap-2">
-                            {!isSpinning && availableIdeasCount > 0 && (
-                                <span className="bg-pink-500/30 text-pink-200 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide">
-                                    +5 XP
-                                </span>
-                            )}
-                            <Sparkles className="w-4 h-4 text-pink-500/50" />
-                        </div>
-                    </motion.button>
-                </div>
+                <MobileSpinButton
+                    availableIdeasCount={availableIdeasCount}
+                    isSpinning={isSpinning}
+                    onSpin={() => setIsFilterModalOpen(true)}
+                />
 
                 {/* Upper Section: Jar Control Center */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-center relative">
 
                     {/* Left Column: Input & Management */}
-                    <div className="space-y-6 order-2 xl:order-1">
-                        <motion.button
-                            whileHover={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 1.02 } : {}}
-                            whileTap={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 0.95 } : {}}
-                            onClick={userData && userData.memberships && userData.memberships.length > 0 ? handleAddIdeaClick : undefined}
-                            disabled={!userData || !userData.memberships || userData.memberships.length === 0}
-                            className={`w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 transition-all bg-gradient-to-br from-violet-600/20 to-violet-900/40 border border-violet-500/30 shadow-lg shadow-violet-900/10 group ${!userData || !userData.memberships || userData.memberships.length === 0
-                                ? 'opacity-50 cursor-not-allowed'
-                                : 'cursor-pointer hover:border-violet-500/50'
-                                }`}
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="w-12 h-12 shrink-0 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-200 group-hover:scale-110 transition-transform relative z-10 border border-violet-500/30">
-                                <Plus className="w-6 h-6" />
-                            </div>
-                            <div className="text-left relative z-10">
-                                <span className="block text-lg font-bold text-violet-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-200 transition-colors flex items-center gap-2">
-                                    Add Idea
-                                    <span className="bg-violet-500/30 text-violet-700 dark:text-violet-200 text-[10px] px-1.5 py-0.5 rounded-full font-bold">+15 XP</span>
-                                </span>
-                                <span className="text-sm text-violet-700 dark:text-violet-200/60 group-hover:text-violet-900 dark:group-hover:text-violet-200/80 transition-colors leading-tight">Fill your jar</span>
-                            </div>
-                        </motion.button>
-
-                        {userData?.jarType !== 'SOCIAL' && (
-                            <motion.button
-                                whileHover={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 1.02 } : {}}
-                                whileTap={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 0.95 } : {}}
-                                onClick={userData && userData.memberships && userData.memberships.length > 0 ? () => setIsSurpriseModalOpen(true) : undefined}
-                                disabled={!userData || !userData.memberships || userData.memberships.length === 0}
-                                className={`w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 transition-all bg-gradient-to-br from-yellow-500/20 to-orange-600/40 border border-yellow-500/30 shadow-lg shadow-yellow-900/10 group ${!userData || !userData.memberships || userData.memberships.length === 0
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : 'cursor-pointer hover:border-yellow-500/50'
-                                    }`}
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <div className="w-12 h-12 shrink-0 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-200 group-hover:scale-110 transition-transform relative z-10 border border-yellow-500/30">
-                                    <Sparkles className="w-6 h-6" />
-                                </div>
-                                <div className="text-left relative z-10">
-                                    <span className="block text-lg font-bold text-yellow-900 dark:text-white group-hover:text-yellow-700 dark:group-hover:text-yellow-200 transition-colors flex items-center gap-2">
-                                        Surprise Me
-                                        <span className="bg-yellow-500/30 text-yellow-700 dark:text-yellow-200 text-[10px] px-1.5 py-0.5 rounded-full font-bold">+15 XP</span>
-                                    </span>
-                                    <span className="text-sm text-yellow-700 dark:text-yellow-200/60 group-hover:text-yellow-900 dark:group-hover:text-yellow-200/80 transition-colors leading-tight">Add a secret idea</span>
-                                </div>
-                            </motion.button>
-                        )}
-
-                        <motion.div
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => router.push('/jar')}
-                            className="glass-card p-6 hidden md:flex items-center gap-4 cursor-pointer group hover:bg-white/10"
-                        >
-                            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:bg-blue-500/30 transition-colors shrink-0">
-                                <Layers className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Open Jar</h3>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">View {ideas.filter(i => !i.selectedAt).length} ideas</p>
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
-                        </motion.div>
-
-                    </div>
+                    <JarControls
+                        userData={userData}
+                        ideasCount={ideas.filter(i => !i.selectedAt).length}
+                        onAddIdea={handleAddIdeaClick}
+                        onSurpriseMe={() => setIsSurpriseModalOpen(true)}
+                        onOpenJar={() => router.push('/jar')}
+                    />
 
                     {/* Center Column: The Visualization */}
-                    <div className="order-1 xl:order-2 flex flex-col items-center justify-center relative">
-                        <div className="relative w-full aspect-square max-w-[400px] flex items-center justify-center">
-                            {/* Decorative Glow */}
-                            <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-50 pointer-events-none" />
-
-                            <div className="relative z-10 scale-100 transform transition-transform hover:scale-105 duration-700">
-                                <Jar3D />
-                            </div>
-                        </div>
-                        <div className="mt-8 relative z-10 text-center">
-                            {isLoadingIdeas && ideas.length === 0 ? (
-                                <p className="text-3xl font-bold text-slate-400 animate-pulse">...</p>
-                            ) : (
-                                <p className="text-3xl font-bold text-slate-900 dark:text-white">{availableIdeasCount}</p>
-                            )}
-                            <p className="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium">
-                                {isLoadingIdeas && ideas.length === 0 ? 'Loading Ideas...' : 'Ideas Waiting'}
-                            </p>
-                        </div>
-                    </div>
+                    <JarVisualization
+                        availableIdeasCount={availableIdeasCount}
+                        isLoadingIdeas={isLoadingIdeas}
+                        ideasLength={ideas.length}
+                    />
 
                     {/* Right Column: Action & History */}
-                    <div className="space-y-6 order-3 xl:order-3">
-                        {/* Desktop Spin Button (Hidden on Mobile) */}
-                        <div className="hidden xl:block">
-                            <motion.button
-                                whileHover={availableIdeasCount > 0 ? { scale: 1.02 } : {}}
-                                whileTap={availableIdeasCount > 0 ? { scale: 0.95 } : {}}
-                                onClick={() => availableIdeasCount > 0 && setIsFilterModalOpen(true)}
-                                className={`w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 transition-all cursor-pointer border shadow-lg group ${availableIdeasCount > 0
-                                    ? 'bg-gradient-to-br from-pink-600/20 to-pink-900/40 border-pink-500/30 hover:border-pink-500/50 shadow-pink-900/10'
-                                    : 'bg-slate-800/20 border-slate-700 opacity-50 grayscale cursor-not-allowed'}`}
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-pink-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <div className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center relative z-10 border transition-transform group-hover:scale-110 ${availableIdeasCount > 0 ? 'bg-pink-500/20 text-pink-200 border-pink-500/30' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>
-                                    <Sparkles className={`w-6 h-6 ${isSpinning ? 'animate-spin' : ''}`} />
-                                </div>
-                                <div className="text-left relative z-10">
-                                    <span className={`block text-lg font-bold transition-colors flex items-center gap-2 ${availableIdeasCount > 0 ? 'text-pink-900 dark:text-white group-hover:text-pink-700 dark:group-hover:text-pink-200' : 'text-slate-400'}`}>
-                                        {isSpinning ? 'Spinning...' : 'Spin the Jar'}
-                                        {!isSpinning && availableIdeasCount > 0 && <span className="bg-pink-500/30 text-pink-700 dark:text-pink-200 text-[10px] px-1.5 py-0.5 rounded-full font-bold">+5 XP</span>}
-                                    </span>
-                                    <span className={`text-sm transition-colors leading-tight ${availableIdeasCount > 0 ? 'text-pink-700 dark:text-pink-200/60 group-hover:text-pink-900 dark:group-hover:text-pink-200/80' : 'text-slate-500'}`}>Let fate decide</span>
-                                </div>
-                            </motion.button>
-                        </div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => router.push('/memories')}
-                            className="glass-card p-6 hidden md:flex items-center gap-4 cursor-pointer group hover:bg-white/10"
-                        >
-                            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/30 transition-colors shrink-0">
-                                <History className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Memories</h3>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">{ideas.filter(i => i.selectedAt).length} dates done</p>
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
-                        </motion.div>
-                    </div>
+                    <JarActions
+                        availableIdeasCount={availableIdeasCount}
+                        isSpinning={isSpinning}
+                        onSpin={() => setIsFilterModalOpen(true)}
+                        onOpenMemories={() => router.push('/memories')}
+                        memoriesCount={ideas.filter(i => i.selectedAt).length}
+                    />
                 </div>
 
                 {/* Lower Section: Smart Tools Grid */}
-                <div className="hidden md:block">
-                    <h3 className="text-center text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Concierge & Tools</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                        <motion.div
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="bg-white dark:bg-slate-900/40 backdrop-blur-md border border-purple-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-500/40 transition-all shadow-lg shadow-black/5 dark:shadow-black/20"
-                            onClick={() => isPremium ? setIsPlannerOpen(true) : setIsPremiumModalOpen(true)}
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="w-12 h-12 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-300 ring-1 ring-purple-500/30">
-                                    <Calendar className="w-6 h-6" />
-                                </div>
-                                {!isPremium && <Lock className="w-5 h-5 text-slate-400" />}
-                            </div>
-                            <div>
-                                <span className="block text-xl font-bold text-slate-900 dark:text-white mb-2">Weekend Planner</span>
-                                <span className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed block group-hover:text-purple-700 dark:group-hover:text-purple-200/70 transition-colors">Discover great ideas of what to do in your area this weekend</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="bg-white dark:bg-slate-900/40 backdrop-blur-md border border-orange-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-500/40 transition-all shadow-lg shadow-black/5 dark:shadow-black/20"
-                            onClick={() => isPremium ? setIsDiningModalOpen(true) : setIsPremiumModalOpen(true)}
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="w-12 h-12 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center text-orange-600 dark:text-orange-300 ring-1 ring-orange-500/30">
-                                    <Utensils className="w-6 h-6" />
-                                </div>
-                                {!isPremium && <Lock className="w-5 h-5 text-slate-400" />}
-                            </div>
-                            <div>
-                                <span className="block text-xl font-bold text-slate-900 dark:text-white mb-2">Dining Concierge</span>
-                                <span className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed block group-hover:text-orange-700 dark:group-hover:text-orange-200/70 transition-colors">Find the perfect dining spot for breakfast, lunch or dinner</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="bg-white dark:bg-slate-900/40 backdrop-blur-md border border-pink-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:border-pink-500/40 transition-all shadow-lg shadow-black/5 dark:shadow-black/20"
-                            onClick={() => isPremium ? setIsBarModalOpen(true) : setIsPremiumModalOpen(true)}
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="w-12 h-12 rounded-xl bg-pink-500/10 dark:bg-pink-500/20 flex items-center justify-center text-pink-600 dark:text-pink-300 ring-1 ring-pink-500/30">
-                                    <Wine className="w-6 h-6" />
-                                </div>
-                                {!isPremium && <Lock className="w-5 h-5 text-slate-400" />}
-                            </div>
-                            <div>
-                                <span className="block text-xl font-bold text-slate-900 dark:text-white mb-2">Bar Scout</span>
-                                <span className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed block group-hover:text-pink-700 dark:group-hover:text-pink-200/70 transition-colors">Discover top-rated bars and lounges nearby.</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="bg-white dark:bg-slate-900/40 backdrop-blur-md border border-rose-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-500/40 transition-all shadow-lg shadow-black/5 dark:shadow-black/20"
-                            onClick={() => isPremium ? setIsDateNightOpen(true) : setIsPremiumModalOpen(true)}
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="w-12 h-12 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-300 ring-1 ring-rose-500/30">
-                                    <Moon className="w-6 h-6" />
-                                </div>
-                                {!isPremium && <Lock className="w-5 h-5 text-slate-400" />}
-                            </div>
-                            <div>
-                                <span className="block text-xl font-bold text-slate-900 dark:text-white mb-2">
-                                    {userData?.jarType === 'SOCIAL' ? 'Big Night Planner' : 'Date Night Planner'}
-                                </span>
-                                <span className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed block group-hover:text-rose-700 dark:group-hover:text-rose-200/70 transition-colors">Plan a complete evening: Drinks, Dinner & Event.</span>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
+                <ToolsGrid
+                    isPremium={isPremium}
+                    isSocial={userData?.jarType === 'SOCIAL'}
+                    onOpenWeekendPlanner={() => setIsPlannerOpen(true)}
+                    onOpenDining={() => setIsDiningModalOpen(true)}
+                    onOpenBar={() => setIsBarModalOpen(true)}
+                    onOpenDateNight={() => setIsDateNightOpen(true)}
+                    onUpgrade={() => setIsPremiumModalOpen(true)}
+                />
 
                 {/* Setup / Personalize Prompts (Bottom area if needed) */}
 
