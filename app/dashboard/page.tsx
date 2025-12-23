@@ -181,21 +181,22 @@ export default function DashboardPage() {
                 const newLevel = data.user.level;
                 setLevel(newLevel);
 
-                const storedLevelStr = localStorage.getItem('datejar_user_level');
+                // Use a jar-specific key to avoid false level-ups when switching jars
+                const levelKey = `datejar_level_${data.user.activeJarId || 'common'}`;
+
+                const storedLevelStr = localStorage.getItem(levelKey);
                 if (storedLevelStr) {
                     const storedLevel = parseInt(storedLevelStr, 10);
                     if (newLevel > storedLevel) {
                         setShowLevelUp(true);
-                        // Don't update localStorage here - wait for modal close
-                    } else if (newLevel === storedLevel) {
-                        // Level hasn't changed, no action needed
-                    } else {
-                        // Level went down somehow, sync it
-                        localStorage.setItem('datejar_user_level', newLevel.toString());
+                        // Don't update localStorage here - wait for modal close, but we track the key to update
+                    } else if (newLevel < storedLevel) {
+                        // Level went down (different jar or reset), sync it silently
+                        localStorage.setItem(levelKey, newLevel.toString());
                     }
                 } else {
-                    // First time, just store it without showing modal
-                    localStorage.setItem('datejar_user_level', newLevel.toString());
+                    // First time for this jar, store it
+                    localStorage.setItem(levelKey, newLevel.toString());
                 }
             }
             // End of logic
@@ -259,7 +260,8 @@ export default function DashboardPage() {
 
     const handleCloseLevelUp = () => {
         setShowLevelUp(false);
-        localStorage.setItem('datejar_user_level', level.toString());
+        const levelKey = `datejar_level_${userData?.activeJarId || 'common'}`;
+        localStorage.setItem(levelKey, level.toString());
     };
 
     const handleLogout = async () => {
