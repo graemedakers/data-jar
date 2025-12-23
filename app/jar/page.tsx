@@ -41,10 +41,20 @@ export default function JarPage() {
                 const data = await res.json();
                 if (data?.user) {
                     setIsPremium(!!data.user.isPremium);
+
+                    // If user has no active jar or no memberships, redirect to dashboard
+                    if (!data.user.activeJarId || !data.user.memberships || data.user.memberships.length === 0) {
+                        router.push('/dashboard');
+                        return;
+                    }
                 }
+            } else {
+                // Unauthorized - redirect to dashboard
+                router.push('/dashboard');
             }
         } catch (error) {
             console.error("Error fetching user:", error);
+            router.push('/dashboard');
         }
     };
 
