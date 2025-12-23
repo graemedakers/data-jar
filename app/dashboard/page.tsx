@@ -601,25 +601,7 @@ export default function DashboardPage() {
             }
 
             {/* Debug Panel for User Diagnosis (ALWAYS SHOW) */}
-            <div className="mb-8 p-4 bg-slate-800 text-cyan-400 border border-cyan-500 rounded-lg font-mono text-xs overflow-auto">
-                <h3 className="font-bold text-white mb-2">DEBUG DIAGNOSTICS (Global)</h3>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <p><strong>Loading:</strong> {String(isLoadingUser)}</p>
-                        <p><strong>User Data:</strong> {userData ? 'Present' : 'NULL'}</p>
-                        <p><strong>User ID:</strong> {userData?.id || 'N/A'}</p>
-                        <p><strong>ActiveJarId:</strong> {userData?.activeJarId || 'NULL'}</p>
-                        <p><strong>Couple ID:</strong> {(userData as any)?.coupleId || 'NULL'}</p>
-                        <p><strong>Is Creator:</strong> {String(userData?.isCreator)}</p>
-                        <p><strong>Has Partner:</strong> {String(userData?.hasPartner)}</p>
-                        <p><strong>Memberships Count:</strong> {userData?.memberships?.length || 0}</p>
-                    </div>
-                    <div>
-                        <p><strong>Raw Memberships:</strong></p>
-                        <pre>{JSON.stringify(userData?.memberships, null, 2)}</pre>
-                    </div>
-                </div>
-            </div>
+            <DebugSessionPanel userData={userData} isLoadingUser={isLoadingUser} />
 
             {/* Premium Banner */}
             {
@@ -917,5 +899,39 @@ export default function DashboardPage() {
                 </div>
             </div>
         </main >
+    );
+}
+
+function DebugSessionPanel({ userData, isLoadingUser }: { userData: any, isLoadingUser: boolean }) {
+    const [sessionDebug, setSessionDebug] = useState<any>(null);
+
+    useEffect(() => {
+        fetch('/api/debug/session')
+            .then(res => res.json())
+            .then(data => setSessionDebug(data))
+            .catch(err => setSessionDebug({ error: String(err) }));
+    }, []);
+
+    return (
+        <div className="mb-8 p-4 bg-slate-800 text-cyan-400 border border-cyan-500 rounded-lg font-mono text-xs overflow-auto">
+            <h3 className="font-bold text-white mb-2">DEBUG DIAGNOSTICS (Global)</h3>
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <p className="font-bold text-yellow-400 mb-1">--- SERVER SESSION ---</p>
+                    <p><strong>Checking Check:</strong> {sessionDebug ? 'Complete' : 'Loading...'}</p>
+                    <p><strong>Hash Session:</strong> {String(sessionDebug?.hasSession)}</p>
+                    <p><strong>Data Email:</strong> {sessionDebug?.userEmail || 'NULL'}</p>
+                    <p className="mt-2 font-bold text-yellow-400 mb-1">--- CLIENT STATE ---</p>
+                    <p><strong>Loading:</strong> {String(isLoadingUser)}</p>
+                    <p><strong>User Data:</strong> {userData ? 'Present' : 'NULL'}</p>
+                    <p><strong>User ID:</strong> {userData?.id || 'N/A'}</p>
+                    <p><strong>ActiveJarId:</strong> {userData?.activeJarId || 'NULL'}</p>
+                </div>
+                <div>
+                    <p><strong>Raw Memberships:</strong></p>
+                    <pre>{JSON.stringify(userData?.memberships, null, 2)}</pre>
+                </div>
+            </div>
+        </div>
     );
 }
