@@ -904,6 +904,7 @@ export default function DashboardPage() {
 
 function DebugSessionPanel({ userData, isLoadingUser }: { userData: any, isLoadingUser: boolean }) {
     const [sessionDebug, setSessionDebug] = useState<any>(null);
+    const [dbDump, setDbDump] = useState<any>(null);
 
     useEffect(() => {
         fetch('/api/debug/session')
@@ -911,6 +912,14 @@ function DebugSessionPanel({ userData, isLoadingUser }: { userData: any, isLoadi
             .then(data => setSessionDebug(data))
             .catch(err => setSessionDebug({ error: String(err) }));
     }, []);
+
+    const fetchDbDump = () => {
+        setDbDump({ loading: true });
+        fetch('/api/debug/db-dump?key=secret123')
+            .then(res => res.json())
+            .then(data => setDbDump(data))
+            .catch(err => setDbDump({ error: String(err) }));
+    };
 
     return (
         <div className="mb-8 p-4 bg-slate-800 text-cyan-400 border border-cyan-500 rounded-lg font-mono text-xs overflow-auto">
@@ -926,12 +935,28 @@ function DebugSessionPanel({ userData, isLoadingUser }: { userData: any, isLoadi
                     <p><strong>User Data:</strong> {userData ? 'Present' : 'NULL'}</p>
                     <p><strong>User ID:</strong> {userData?.id || 'N/A'}</p>
                     <p><strong>ActiveJarId:</strong> {userData?.activeJarId || 'NULL'}</p>
+                    <button
+                        onClick={fetchDbDump}
+                        className="mt-4 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                        INSPECT DB
+                    </button>
                 </div>
                 <div>
                     <p><strong>Raw Memberships:</strong></p>
-                    <pre>{JSON.stringify(userData?.memberships, null, 2)}</pre>
+                    <pre className="mb-4">{JSON.stringify(userData?.memberships, null, 2)}</pre>
+
+                    {dbDump && (
+                        <>
+                            <p className="font-bold text-red-400 mb-1">--- DB INSPECTOR ---</p>
+                            <pre className="max-h-64 overflow-auto bg-black p-2 rounded border border-red-500/30">
+                                {JSON.stringify(dbDump, null, 2)}
+                            </pre>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
+

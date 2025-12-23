@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 
         const jars = await prisma.jar.findMany({
             take: 5,
-            select: { id: true, name: true, deleted: true }
+            select: { id: true, name: true }
         });
 
         const countUsers = await prisma.user.count();
