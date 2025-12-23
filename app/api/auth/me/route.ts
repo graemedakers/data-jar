@@ -17,7 +17,7 @@ export async function GET() {
     console.log(`[Auth/Me] Looking up user by email: ${session.user.email}`);
 
     try {
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
             where: { email: session.user.email },
             include: {
                 // Fetch ALL memberships including deleted ones (we filter in code)
@@ -44,6 +44,41 @@ export async function GET() {
                 }
             },
         });
+
+        // Fallback: Case-insensitive lookup if strict lookup failed
+        if (!user) {
+            console.log(`[Auth/Me] Strict lookup failed. Trying case-insensitive for: ${session.user.email}`);
+            user = await prisma.user.findFirst({
+                where: {
+                    email: {
+                        equals: session.user.email,
+                        mode: 'insensitive'
+                    }
+                },
+                include: {
+                    memberships: {
+                        include: {
+                            jar: {
+                                include: {
+                                    members: {
+                                        include: { user: { select: { id: true, name: true } } }
+                                    },
+                                    achievements: true
+                                }
+                            }
+                        }
+                    },
+                    couple: {
+                        include: {
+                            members: {
+                                include: { user: { select: { id: true } } }
+                            },
+                            achievements: true
+                        }
+                    }
+                }
+            });
+        }
 
         if (!user) {
             console.log(`[Auth/Me] User not found in DB for email: ${session.user.email}`);
