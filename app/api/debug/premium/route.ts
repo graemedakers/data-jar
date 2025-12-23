@@ -57,13 +57,13 @@ export async function GET() {
                 // Jar info
                 hasActiveJar: !!activeJar,
                 activeJarId: activeJar?.id || null,
-                jarIsPremium: activeJar?.isPremium || null,
+                jarIsPremiumField: activeJar?.isPremium || null,
                 jarIsLegacyPremium: (activeJar as any)?.isLegacyPremium || null,
                 jarSubscriptionStatus: activeJar?.subscriptionStatus || null,
 
                 // Calculated values
                 userIsPro,
-                jarIsPremium,
+                jarIsPremiumCalculated: jarIsPremium,
                 effectivePremium,
 
                 // What the frontend receives
