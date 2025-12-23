@@ -47,11 +47,14 @@ export async function GET() {
         // 1. FILTER DELETED JARS SAFEGUARD (Handles null/undefined gracefully)
         // This ensures existing users with null 'deleted' fields (from early migration) are treated as active
         if (user.memberships) {
+            // TEMPORARILY DISABLED FILTER to debug production user issue
+            /*
             user.memberships = user.memberships.filter(m => {
                 // Keep if jar exists AND (deleted is false OR deleted is null/undefined)
                 const jar = m.jar as any;
                 return jar && (jar.deleted === false || jar.deleted === null || jar.deleted === undefined);
             });
+            */
         }
 
         // 2. DETERMINE ACTIVE JAR
