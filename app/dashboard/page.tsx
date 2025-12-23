@@ -600,26 +600,26 @@ export default function DashboardPage() {
                 )
             }
 
-            {/* Debug Panel for User Diagnosis (ALL USERS for verification) */}
-            {userData && (
-                <div className="mb-8 p-4 bg-slate-800 text-cyan-400 border border-cyan-500 rounded-lg font-mono text-xs overflow-auto">
-                    <h3 className="font-bold text-white mb-2">DEBUG DIAGNOSTICS (Global)</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p><strong>User ID:</strong> {userData.id}</p>
-                            <p><strong>ActiveJarId:</strong> {userData.activeJarId || 'NULL'}</p>
-                            <p><strong>Couple ID:</strong> {(userData as any).coupleId || 'NULL'}</p>
-                            <p><strong>Is Creator:</strong> {String(userData.isCreator)}</p>
-                            <p><strong>Has Partner:</strong> {String(userData.hasPartner)}</p>
-                            <p><strong>Memberships Count:</strong> {userData.memberships?.length || 0}</p>
-                        </div>
-                        <div>
-                            <p><strong>Raw Memberships:</strong></p>
-                            <pre>{JSON.stringify(userData.memberships, null, 2)}</pre>
-                        </div>
+            {/* Debug Panel for User Diagnosis (ALWAYS SHOW) */}
+            <div className="mb-8 p-4 bg-slate-800 text-cyan-400 border border-cyan-500 rounded-lg font-mono text-xs overflow-auto">
+                <h3 className="font-bold text-white mb-2">DEBUG DIAGNOSTICS (Global)</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <p><strong>Loading:</strong> {String(isLoadingUser)}</p>
+                        <p><strong>User Data:</strong> {userData ? 'Present' : 'NULL'}</p>
+                        <p><strong>User ID:</strong> {userData?.id || 'N/A'}</p>
+                        <p><strong>ActiveJarId:</strong> {userData?.activeJarId || 'NULL'}</p>
+                        <p><strong>Couple ID:</strong> {(userData as any)?.coupleId || 'NULL'}</p>
+                        <p><strong>Is Creator:</strong> {String(userData?.isCreator)}</p>
+                        <p><strong>Has Partner:</strong> {String(userData?.hasPartner)}</p>
+                        <p><strong>Memberships Count:</strong> {userData?.memberships?.length || 0}</p>
+                    </div>
+                    <div>
+                        <p><strong>Raw Memberships:</strong></p>
+                        <pre>{JSON.stringify(userData?.memberships, null, 2)}</pre>
                     </div>
                 </div>
-            )}
+            </div>
 
             {/* Premium Banner */}
             {
