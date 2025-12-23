@@ -97,6 +97,7 @@ export default function DashboardPage() {
     const [isSurpriseModalOpen, setIsSurpriseModalOpen] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isLoadingIdeas, setIsLoadingIdeas] = useState(true);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
     const router = useRouter();
 
@@ -115,6 +116,7 @@ export default function DashboardPage() {
     const [showLevelUp, setShowLevelUp] = useState(false);
 
     const fetchIdeas = async () => {
+        setIsLoadingIdeas(true);
         try {
             const res = await fetch(getApiUrl('/api/ideas'), { credentials: 'include' });
             if (res.ok) {
@@ -123,6 +125,8 @@ export default function DashboardPage() {
             }
         } catch (error) {
             console.error('Failed to fetch ideas', error);
+        } finally {
+            setIsLoadingIdeas(false);
         }
     };
 
@@ -755,8 +759,14 @@ export default function DashboardPage() {
                             </div>
                         </div>
                         <div className="mt-8 relative z-10 text-center">
-                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{availableIdeasCount}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium">Ideas Waiting</p>
+                            {isLoadingIdeas && ideas.length === 0 ? (
+                                <p className="text-3xl font-bold text-slate-400 animate-pulse">...</p>
+                            ) : (
+                                <p className="text-3xl font-bold text-slate-900 dark:text-white">{availableIdeasCount}</p>
+                            )}
+                            <p className="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium">
+                                {isLoadingIdeas && ideas.length === 0 ? 'Loading Ideas...' : 'Ideas Waiting'}
+                            </p>
                         </div>
                     </div>
 
