@@ -602,7 +602,7 @@ export default function DashboardPage() {
             )}
 
             {/* Premium Banner */}
-            {!isLoadingUser && (
+            {!isLoadingUser && !isPremium && userData && userData.memberships && userData.memberships.length > 0 && (
                 <div className="mb-4">
                     <PremiumBanner hasPaid={hasPaid} coupleCreatedAt={coupleCreatedAt} isTrialEligible={isTrialEligible} />
                 </div>
