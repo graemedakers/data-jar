@@ -137,7 +137,12 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
                     {variant === 'title' ? (
                         <button className="flex items-center gap-1 group outline-none text-left min-w-0 max-w-full">
                             <h1 className="text-lg md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1 min-w-0">
-                                {activeJar ? (
+                                {!user.id ? (
+                                    <>
+                                        <span className="text-slate-400 dark:text-slate-500">Loading jars...</span>
+                                        <ChevronDown className="w-5 h-5 md:w-6 md:h-6 text-slate-400 animate-pulse flex-shrink-0" />
+                                    </>
+                                ) : activeJar ? (
                                     <>
                                         <span className="truncate min-w-0">
                                             {activeJar.name || "My Jar"}

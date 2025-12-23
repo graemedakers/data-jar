@@ -508,16 +508,12 @@ export default function DashboardPage() {
             <header className="flex flex-col gap-2 mb-6 md:mb-16">
                 <div className="flex flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                        {userData ? (
-                            <JarSwitcher
-                                user={userData}
-                                variant="title"
-                                className="min-w-0"
-                                onSwitch={handleContentUpdate}
-                            />
-                        ) : (
-                            <h1 className="text-xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Dashboard</h1>
-                        )}
+                        <JarSwitcher
+                            user={userData || { id: '', email: '', name: '', memberships: [], activeJarId: null }}
+                            variant="title"
+                            className="min-w-0"
+                            onSwitch={handleContentUpdate}
+                        />
                     </div>
 
                     <div className="flex gap-2 items-center justify-end">
