@@ -263,6 +263,15 @@ export default function DashboardPage() {
         router.refresh();
     };
 
+    const checkLocationAndOpen = (openTool: () => void) => {
+        if (!userLocation) {
+            alert("Please set your location in Settings first, so we can provide personalized recommendations!");
+            setIsSettingsModalOpen(true);
+            return;
+        }
+        openTool();
+    };
+
     const handleSpinJar = async (filters: { maxDuration?: number; maxCost?: string; maxActivityLevel?: string; timeOfDay?: string; category?: string } = {}) => {
         if (ideas.length === 0) {
             alert("Add some ideas first!");
