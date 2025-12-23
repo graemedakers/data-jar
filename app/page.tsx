@@ -134,7 +134,7 @@ export default function Home() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Decision Jar',
+    name: 'Date Jar',
     applicationCategory: 'LifestyleApplication',
     operatingSystem: 'Web',
     offers: {
@@ -210,7 +210,7 @@ export default function Home() {
             <div className="p-1.5 bg-gradient-to-br from-primary to-accent rounded-lg">
               <Heart className="w-4 h-4 text-white fill-white" />
             </div>
-            <span className="font-bold text-lg text-slate-800 dark:text-white tracking-tight">Decision Jar</span>
+            <span className="font-bold text-lg text-slate-800 dark:text-white tracking-tight">Date Jar</span>
           </div>
           <div className="flex items-center gap-4">
             {user ? (
@@ -305,7 +305,7 @@ export default function Home() {
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-3xl md:text-5xl font-bold text-slate-800 dark:text-white">Everything You Need for <br /><span className="text-primary dark:text-accent">Better Decisions</span></h2>
             <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              We've packed Decision Jar with features designed to take the stress out of planning and put the fun back into spending time together.
+              We've packed Date Jar with features designed to take the stress out of planning and put the fun back into spending time together.
             </p>
           </div>
 
@@ -356,7 +356,7 @@ export default function Home() {
         <section className="py-24 px-6 relative">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-4">Users Love Decision Jar</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-4">Users Love Date Jar</h2>
               <p className="text-slate-600 dark:text-slate-400">See what users are saying.</p>
             </div>
 
@@ -379,7 +379,7 @@ export default function Home() {
                     <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center">
                       <User className="w-4 h-4 text-slate-400" />
                     </div>
-                    <span className="text-sm font-medium text-slate-800 dark:text-white">{review.user?.name || "Decision Jar User"}</span>
+                    <span className="text-sm font-medium text-slate-800 dark:text-white">{review.user?.name || "Date Jar User"}</span>
                   </div>
                 </motion.div>
               ))}
@@ -467,7 +467,7 @@ export default function Home() {
                 RECOMMENDED
               </div>
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Decision Jar Pro</h3>
+                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Date Jar Pro</h3>
                 <p className="text-slate-600 dark:text-slate-400">For the ultimate social life</p>
               </div>
               <div className="mb-8 space-y-2">
@@ -522,7 +522,7 @@ export default function Home() {
               answer="Simply add your own ideas or use our pre-filled categories. When you're ready, filter by budget, time, or energy level, and 'Spin the Jar' to get a random suggestion that fits your mood perfectly."
             />
             <FaqItem
-              question="Is Decision Jar free?"
+              question="Is Date Jar free?"
               answer="Yes! You can create unlimited jars (one for your partner, one for the group!), add unlimited ideas, and sync with everyone for free. We also offer a premium tier for advanced features."
             />
             <FaqItem
@@ -569,10 +569,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-            <span className="font-bold text-slate-600 dark:text-slate-400">Decision Jar</span>
+            <span className="font-bold text-slate-600 dark:text-slate-400">Date Jar</span>
           </div>
           <p className="text-slate-500 dark:text-slate-600 text-sm">
-            © {new Date().getFullYear()} Decision Jar. Built for fun.
+            © {new Date().getFullYear()} Date Jar. Built for fun.
           </p>
           <div className="flex gap-6 text-sm text-slate-500 dark:text-slate-500">
             <Link href="/privacy" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy</Link>
