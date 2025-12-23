@@ -3,13 +3,35 @@
 import { Home, Layers, Compass, History } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export function BottomNav() {
     const pathname = usePathname();
+    const [hasActiveJar, setHasActiveJar] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const checkUser = async () => {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data?.user?.activeJarId) {
+                        setHasActiveJar(true);
+                    }
+                }
+            } catch (e) {
+                // ignore
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        checkUser();
+    }, []);
 
     const tabs = [
         { name: "Jar", href: "/dashboard", icon: Home },
-        { name: "List", href: "/jar", icon: Layers },
+        { name: "List", href: "/jar", icon: Layers, hidden: !hasActiveJar }, // Hide List if no jar
         { name: "Explore", href: "/explore", icon: Compass },
         { name: "Memories", href: "/memories", icon: History },
     ];
@@ -21,6 +43,7 @@ export function BottomNav() {
         <div className="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-lg border-t border-white/10 z-50 md:hidden safe-area-pb">
             <div className="flex items-center justify-around p-3">
                 {tabs.map((tab) => {
+                    if (tab.hidden) return null;
                     const isActive = pathname === tab.href;
                     return (
                         <Link
