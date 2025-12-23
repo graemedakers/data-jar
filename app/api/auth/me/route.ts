@@ -14,62 +14,59 @@ export async function GET() {
         const sessionId = session.user.id?.toString().trim();
         const email = session.user.email?.trim().toLowerCase();
 
-        // 1. Fetch Basic User + Memberships (No deep nesting yet)
+        // 1. Fetch Basic User ONLY (No includes to prevent crash)
         let user: any = null;
+        if (sessionId) {
+            user = await prisma.user.findUnique({ where: { id: sessionId } });
+        }
+        if (!user && email) {
+            user = await prisma.user.findUnique({ where: { email } });
+        }
 
-        // Define the safe include for memberships (shallow)
-        const membershipInclude = {
-            memberships: {
-                include: {
-                    jar: {
+        if (!user) return NextResponse.json({ user: null });
+
+        // 2. Safely Reconstruct Memberships
+        // We cannot use 'include: memberships' because if a jar is missing, Prisma crashes.
+        let safeMemberships: any[] = [];
+
+        try {
+            // Fetch raw members first (just IDs)
+            const rawMemberships = await prisma.jarMember.findMany({
+                where: { userId: user.id }
+            });
+
+            // Fetch Jars manually for each membership
+            const membershipPromises = rawMemberships.map(async (m) => {
+                try {
+                    const jar = await prisma.jar.findUnique({
+                        where: { id: m.jarId },
                         include: {
-                            // Fetch members lighter
                             members: {
                                 include: { user: { select: { id: true, name: true } } }
                             },
                             achievements: true
                         }
+                    });
+
+                    if (jar) {
+                        return { ...m, jar };
                     }
+                    return null; // Jar is missing (corrupted data)
+                } catch (e) {
+                    return null; // Error fetching specific jar
                 }
-            }
-        };
+            });
 
-        if (sessionId) {
-            user = await prisma.user.findUnique({ where: { id: sessionId }, include: membershipInclude });
-        }
-        if (!user && email) {
-            user = await prisma.user.findUnique({ where: { email }, include: membershipInclude });
-        }
+            const results = await Promise.all(membershipPromises);
+            safeMemberships = results.filter(Boolean); // Remove nulls
 
-        if (!user) return NextResponse.json({ user: null });
-
-        // 2. Fetch Legacy Couple Relation (Separately to avoid big query explosion)
-        if (user.coupleId) {
-            try {
-                const coupleJar = await prisma.jar.findUnique({
-                    where: { id: user.coupleId },
-                    include: {
-                        members: { include: { user: { select: { id: true } } } },
-                        achievements: true
-                    }
-                });
-                if (coupleJar) {
-                    user.couple = coupleJar;
-                }
-            } catch (e) {
-                console.warn("Failed to fetch legacy couple jar", e);
-            }
+        } catch (e) {
+            console.warn("Failed to fetch memberships manually", e);
         }
 
-        // 3. Logic: Determine Active Jar
-        // ... (Restore previous logic) ...
+        user.memberships = safeMemberships;
 
-        // 1. FILTER DELETED JARS SAFEGUARD (Handles null/undefined gracefully)
-        if (user.memberships) {
-            // TEMPORARILY DISABLED FILTER to debug production user issue
-        }
-
-        // 2. DETERMINE ACTIVE JAR
+        // 3. Determine Active Jar (Logic Restored)
         let activeJar = null;
         let isCreator = false;
         let hasPartner = false;
@@ -80,19 +77,35 @@ export async function GET() {
             activeJar = membership?.jar || null;
         }
 
-        // Priority 2: Fallback to first available active membership if selection is invalid/deleted
+        // Priority 2: Fallback to first available active membership
         if (!activeJar && user.memberships.length > 0) {
             activeJar = user.memberships[0].jar;
         }
 
         // Priority 3: Legacy Couple fallback
-        if (!activeJar && user.couple) {
-            activeJar = user.couple;
+        // Fetch legacy couple safely if not found yet
+        if (!activeJar && user.coupleId) {
+            try {
+                const coupleJar = await prisma.jar.findUnique({
+                    where: { id: user.coupleId },
+                    include: {
+                        members: { include: { user: { select: { id: true } } } },
+                        achievements: true
+                    }
+                });
+                if (coupleJar) {
+                    // Inject as legacy jar logic if needed
+                    activeJar = coupleJar;
+                }
+            } catch (e) {
+                console.warn("Legacy couple fetch failed", e);
+            }
         }
 
-        // Priority 4: Orphaned ActiveJarId Recovery
+        // Priority 4: Orphaned ActiveJarId Recovery (Safe Fetch)
         if (!activeJar && user.activeJarId) {
             try {
+                // Check if this specific jar even exists
                 const orphanedJar = await prisma.jar.findUnique({
                     where: { id: user.activeJarId },
                     include: {
@@ -108,27 +121,26 @@ export async function GET() {
                 });
 
                 if (orphanedJar) {
+                    // Verify membership or legacy status
                     const isMember = orphanedJar.members.some(m => m.userId === user.id);
                     const isLegacy = orphanedJar.legacyUsers.length > 0;
-
                     if (isMember || isLegacy) {
-                        console.log(`[Auth/Me] Recovered orphaned jar ${orphanedJar.id} for user ${user.id}`);
                         activeJar = orphanedJar;
                     }
                 }
             } catch (e) {
-                console.warn("Failed to fetch orphaned jar", e);
+                // Ignore if orphaned jar is truly gone
             }
         }
 
-        // Calculate user status
+        // 4. Construct Final Response
         const userIsPro = isUserPro(user);
 
-        // CASE: User has NO active jars
         if (!activeJar) {
             return NextResponse.json({
                 user: {
                     ...user,
+                    memberships: safeMemberships,
                     isCreator: false,
                     hasPartner: false,
                     isPremium: userIsPro,
@@ -137,7 +149,6 @@ export async function GET() {
                     coupleReferenceCode: null,
                     isTrialEligible: true,
                     coupleCreatedAt: user.createdAt,
-                    // Active Jar fields null
                     activeJarId: null,
                     jarName: null,
                     jarType: null,
@@ -146,20 +157,15 @@ export async function GET() {
             });
         }
 
-        // CASE: User HAS active jar
-        const members = activeJar.members || (activeJar as any).users || []; // Handle legacy vs new structure
-
-        // Check if creator (Admin role)
+        const members = activeJar.members || (activeJar as any).users || [];
         const userDifference = user.memberships.find((m: any) => m.jarId === activeJar?.id);
         isCreator = userDifference?.role === 'ADMIN';
-
         hasPartner = members.length > 1;
 
-        // Calculate Premium
         const jarIsPremium = isCouplePremium(activeJar);
         const effectivePremium = jarIsPremium || userIsPro;
 
-        // CRITICAL FIX: Ensure activeJar is represented in memberships for frontend consistency
+        // Ensure activeJar is in memberships for frontend consistency
         const membershipExists = user.memberships.some((m: any) => m.jarId === activeJar?.id);
         const effectiveMemberships = [...user.memberships];
 
@@ -170,7 +176,7 @@ export async function GET() {
                 jarId: activeJar.id,
                 role: isCreator ? 'ADMIN' : 'MEMBER',
                 joinedAt: activeJar.createdAt,
-                jar: activeJar as any // Cast to any to fit types
+                jar: activeJar as any
             } as any);
         }
 
@@ -178,7 +184,6 @@ export async function GET() {
             user: {
                 ...user,
                 memberships: effectiveMemberships,
-                // Map Jar fields to legacy Couple fields for frontend compatibility
                 coupleReferenceCode: activeJar.referenceCode,
                 location: user.homeTown,
                 isPremium: effectivePremium,
@@ -188,8 +193,6 @@ export async function GET() {
                 xp: activeJar.xp || 0,
                 level: activeJar.level || 1,
                 unlockedAchievements: activeJar.achievements?.map((a: any) => a.achievementId) || [],
-
-                // Helper flags
                 activeJarId: activeJar.id,
                 jarName: activeJar.name,
                 jarType: activeJar.type,
@@ -199,7 +202,8 @@ export async function GET() {
         });
 
     } catch (e) {
-        console.error("Auth/Me Error:", e);
+        // Global catch for unexpected errors
+        console.error("Auth/Me Global Error:", e);
         return NextResponse.json({ error: String(e) }, { status: 500 });
     }
 }
