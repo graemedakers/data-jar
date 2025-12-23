@@ -19,17 +19,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://date-jar.com'),
   title: {
-    default: "Decision Jar | The Ultimate Decision Maker",
-    template: "%s | Decision Jar",
+    default: "Date Jar | The Ultimate Ideas Generator",
+    template: "%s | Date Jar",
   },
-  description: "Stop asking \"what should we do?\" Spin the jar for ideas, sync with friends, and decide together. Try Decision Jar for free today!",
+  description: "Stop asking \"what should we do?\" Spin the jar for ideas, sync with friends, and decide together. Try Date Jar for free today!",
   keywords: [
     "date ideas", "couples app", "relationship", "date night", "random date generator",
     "decision maker", "date planner", "couple activities", "romantic date ideas", "relationship app"
   ],
-  authors: [{ name: "Decision Jar Team" }],
-  creator: "Decision Jar",
-  applicationName: "Decision Jar",
+  authors: [{ name: "Date Jar Team" }],
+  creator: "Date Jar",
+  applicationName: "Date Jar",
   alternates: {
     canonical: '/',
   },
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://date-jar.com",
-    title: "Decision Jar | Make Decisions Together",
-    description: "Stop asking 'What do you want to do?'. Let the Decision Jar decide.",
-    siteName: "Decision Jar",
+    title: "Date Jar | The Ultimate Ideas Generator",
+    description: "Stop asking 'What do you want to do?'. Let the Date Jar decide.",
+    siteName: "Date Jar",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Decision Jar | Make Decisions Together",
+    title: "Date Jar | The Ultimate Ideas Generator",
     description: "A fun way for couples and friends to decide what to do.",
   },
   icons: {
