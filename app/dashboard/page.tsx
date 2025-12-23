@@ -600,9 +600,6 @@ export default function DashboardPage() {
                 )
             }
 
-            {/* Debug Panel for User Diagnosis (ALWAYS SHOW) */}
-            <DebugSessionPanel userData={userData} isLoadingUser={isLoadingUser} />
-
             {/* Premium Banner */}
             {
                 !isLoadingUser && !isPremium && userData && userData.memberships && userData.memberships.length > 0 && (
@@ -901,67 +898,3 @@ export default function DashboardPage() {
         </main >
     );
 }
-
-function DebugSessionPanel({ userData, isLoadingUser }: { userData: any, isLoadingUser: boolean }) {
-    const [sessionDebug, setSessionDebug] = useState<any>(null);
-    const [dbDump, setDbDump] = useState<any>(null);
-
-    useEffect(() => {
-        fetch('/api/debug/session')
-            .then(res => res.json())
-            .then(data => setSessionDebug(data))
-            .catch(err => setSessionDebug({ error: String(err) }));
-    }, []);
-
-    const fetchDbDump = () => {
-        setDbDump({ loading: true });
-        // Use current user details if known, otherwise generic
-        const uid = userData?.id || 'edf84cfe-f4e4-43b2-b1b2-38dd41405131';
-        const jid = userData?.activeJarId || 'fa371aee-73d9-4a98-b71e-c52864b8c2d4';
-
-        fetch(`/api/debug/db-dump?key=secret123&userId=${uid}&jarId=${jid}`)
-            .then(res => res.json())
-            .then(data => setDbDump(data))
-            .catch(err => setDbDump({ error: String(err) }));
-    };
-
-    return (
-        <div className="mb-8 p-4 bg-slate-800 text-cyan-400 border border-cyan-500 rounded-lg font-mono text-xs overflow-auto">
-            <h3 className="font-bold text-white mb-2">DEBUG DIAGNOSTICS (Global)</h3>
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <p className="font-bold text-yellow-400 mb-1">--- SERVER SESSION ---</p>
-                    <p><strong>Checking Check:</strong> {sessionDebug ? 'Complete' : 'Loading...'}</p>
-                    <p><strong>Hash Session:</strong> {String(sessionDebug?.hasSession)}</p>
-                    <p><strong>Data Email:</strong> {sessionDebug?.userEmail || 'NULL'}</p>
-                    <p><strong>Session ID:</strong> {sessionDebug?.userId || 'NULL'}</p>
-                    <p className="mt-2 font-bold text-yellow-400 mb-1">--- CLIENT STATE ---</p>
-                    <p><strong>Loading:</strong> {String(isLoadingUser)}</p>
-                    <p><strong>User Data:</strong> {userData ? 'Present' : 'NULL'}</p>
-                    <p><strong>User ID:</strong> {userData?.id || 'N/A'}</p>
-                    <p><strong>ActiveJarId:</strong> {userData?.activeJarId || 'NULL'}</p>
-                    <button
-                        onClick={fetchDbDump}
-                        className="mt-4 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                    >
-                        INSPECT DB
-                    </button>
-                </div>
-                <div>
-                    <p><strong>Raw Memberships:</strong></p>
-                    <pre className="mb-4">{JSON.stringify(userData?.memberships, null, 2)}</pre>
-
-                    {dbDump && (
-                        <>
-                            <p className="font-bold text-red-400 mb-1">--- DB INSPECTOR ---</p>
-                            <pre className="max-h-64 overflow-auto bg-black p-2 rounded border border-red-500/30">
-                                {JSON.stringify(dbDump, null, 2)}
-                            </pre>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
