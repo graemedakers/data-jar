@@ -40,9 +40,9 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
             case "intro":
                 return (
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold text-slate-800 dark:text-white">Welcome to Decision Jar</h3>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-white">Welcome to Date Jar</h3>
                         <p className="text-slate-600 dark:text-slate-300">
-                            Decision Jar is designed to spice up your relationship or friend group hangouts by taking the indecision out of your next date or activity!
+                            Date Jar is designed to spice up your relationship or friend group hangouts by taking the indecision out of your next date or activity!
                             Create shared collections of ideas (Jars) for your partner or group and let the jar decide for you.
                         </p>
                     </div>
@@ -125,6 +125,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                         <h3 className="text-xl font-bold text-slate-800 dark:text-white">Date Night Planner <span className="text-xs bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-0.5 rounded-full ml-2">NEW</span></h3>
                         <p className="text-slate-600 dark:text-slate-300">
                             Want a complete evening plan without the hassle? The Date Night Planner curates a cohesive itinerary for you.
+                            <br /><span className="text-xs text-slate-500 italic mt-1 block">(Note: For Group Jars, this is called "Big Night Planner")</span>
                         </p>
                         <div className="space-y-2">
                             <h4 className="font-bold text-slate-800 dark:text-white text-sm border-b border-slate-200 dark:border-white/10 pb-1">How it Works</h4>
@@ -271,7 +272,7 @@ export function HelpModal({ isOpen, onClose, initialSection }: HelpModalProps) {
                 return (
                     <div className="space-y-4">
                         <h3 className="text-xl font-bold text-slate-800 dark:text-white">Settings & Configuration</h3>
-                        <p className="text-slate-600 dark:text-slate-300">Customize your Decision Jar experience.</p>
+                        <p className="text-slate-600 dark:text-slate-300">Customize your Date Jar experience.</p>
 
                         <div className="space-y-3">
                             <div>

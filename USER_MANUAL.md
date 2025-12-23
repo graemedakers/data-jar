@@ -199,6 +199,7 @@ Need a plan for the whole weekend?
 ---
 
 ## 10. Date Night Planner
+*(Also known as "Big Night Planner" for groups)*
 
 Want a complete evening plan?
 1.  Click **"Plan Date Night"**.

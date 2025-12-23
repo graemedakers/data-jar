@@ -163,7 +163,7 @@ export default function Home() {
         },
         {
           '@type': 'Question',
-          name: 'Is Decision Jar free for couples?',
+          name: 'Is Date Jar free for couples?',
           acceptedAnswer: {
             '@type': 'Answer',
             text: 'Yes! You can create a jar, add unlimited ideas, and sync with your partner or group for free. We also offer a premium tier for advanced features like the Smart Weekend Planner and Dining Concierge.'
@@ -182,7 +182,7 @@ export default function Home() {
           name: 'Does it sync between two phones?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. Decision Jar is designed for couples and groups. Once you invite your partner or friends using your unique code, your jars are instantly linked. Any idea added or removed on one phone appears on the others immediately.'
+            text: 'Yes. Date Jar is designed for couples and groups. Once you invite your partner or friends using your unique code, your jars are instantly linked. Any idea added or removed on one phone appears on the others immediately.'
           }
         }
       ]
