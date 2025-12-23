@@ -26,6 +26,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         }
 
         // Create deletion log
+        /*
         await prisma.deletedLog.create({
             data: {
                 jarId: currentJarId,
@@ -33,6 +34,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
                 deletedBy: session.user.name || session.user.email,
             },
         });
+        */
 
         await prisma.idea.delete({
             where: { id },
