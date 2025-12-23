@@ -47,10 +47,19 @@ export async function GET() {
         // 1. FILTER DELETED JARS SAFEGUARD (Handles null/undefined gracefully)
         // This ensures existing users with null 'deleted' fields (from early migration) are treated as active
         if (user.memberships) {
+            console.log(`[Auth/Me] User ${user.id} raw memberships:`, user.memberships.map(m => ({
+                jarId: m.jarId,
+                hasJar: !!m.jar,
+                jarName: m.jar?.name,
+                deleted: (m.jar as any)?.deleted
+            })));
+
             user.memberships = user.memberships.filter(m => {
                 // Keep if jar exists AND (deleted is false OR deleted is null/undefined)
-                return m.jar && (m.jar.deleted === false || m.jar.deleted === null || m.jar.deleted === undefined);
+                const jar = m.jar as any;
+                return jar && (jar.deleted === false || jar.deleted === null || jar.deleted === undefined);
             });
+            console.log(`[Auth/Me] Filtered memberships count: ${user.memberships.length}`);
         }
 
         // 2. DETERMINE ACTIVE JAR
