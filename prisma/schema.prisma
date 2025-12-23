@@ -36,9 +36,9 @@ model Jar {
   isPremium     Boolean  @default(false)
   isTrialEligible Boolean @default(true)
   
-  // Soft delete for memory preservation
-  deleted       Boolean  @default(false)
-  deletedAt     DateTime?
+  // Soft delete for memory preservation (Temporarily disabled due to migration mismatch)
+  // deleted       Boolean  @default(false)
+  // deletedAt     DateTime?
   
   // Subscription Fields
   stripeCustomerId String?
@@ -50,7 +50,7 @@ model Jar {
   xp          Int      @default(0)
   level       Int      @default(1)
 
-  deletedLogs   DeletedLog[]
+  // deletedLogs   DeletedLog[]
   favorites     FavoriteVenue[]
   achievements  UnlockedAchievement[]
 
@@ -67,14 +67,14 @@ model UnlockedAchievement {
   @@unique([jarId, achievementId])
 }
 
-model DeletedLog {
-  id          String   @id @default(uuid())
-  jarId       String   @map("coupleId")
-  jar         Jar      @relation(fields: [jarId], references: [id])
-  description String
-  deletedBy   String   // Name of the user who deleted it
-  deletedAt   DateTime @default(now())
-}
+// model DeletedLog {
+//   id          String   @id @default(uuid())
+//   jarId       String   @map("coupleId")
+//   jar         Jar      @relation(fields: [jarId], references: [id])
+//   description String
+//   deletedBy   String   // Name of the user who deleted it
+//   deletedAt   DateTime @default(now())
+// }
 
 model JarMember {
   id        String     @id @default(uuid())

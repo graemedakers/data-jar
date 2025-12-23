@@ -61,6 +61,7 @@ export async function POST(request: Request) {
             if (memberCount <= 1) {
                 // Soft delete: Mark jar as deleted instead of actually deleting it
                 // This preserves all ideas (including memories) for historical access
+                /*
                 await tx.jar.update({
                     where: { id: jarId },
                     data: {
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
                         deletedAt: new Date()
                     }
                 });
+                */
             } else {
                 // If Jar remains, and it is Romantic, regenerate code for security
                 // This prevents the ex-partner from rejoining with an old link/code
