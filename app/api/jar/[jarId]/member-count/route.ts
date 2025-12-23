@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
     request: Request,
-    { params }: { params: { jarId: string } }
+    { params }: { params: Promise<{ jarId: string }> }
 ) {
     const session = await getSession();
     if (!session?.user?.email) {
@@ -12,7 +12,7 @@ export async function GET(
     }
 
     try {
-        const { jarId } = params;
+        const { jarId } = await params; // Await params in Next.js 15
 
         if (!jarId) {
             return NextResponse.json({ error: "Jar ID is required" }, { status: 400 });
