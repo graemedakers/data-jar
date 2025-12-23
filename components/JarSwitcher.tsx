@@ -48,12 +48,14 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    const activeMembership = user.memberships.find(m => m.jarId === user.activeJarId) || user.memberships[0];
+    // Handle case where user has no memberships
+    const memberships = user.memberships || [];
+    const activeMembership = memberships.find(m => m.jarId === user.activeJarId) || memberships[0];
     const activeJar = activeMembership?.jar;
-    const otherMemberships = user.memberships.filter(m => m.jarId !== activeJar?.id);
+    const otherMemberships = memberships.filter(m => m.jarId !== activeJar?.id);
 
     // Calc hasRomanticJar
-    const hasRomanticJar = user.memberships.some(m => m.jar.type === 'ROMANTIC');
+    const hasRomanticJar = memberships.some(m => m.jar.type === 'ROMANTIC');
 
     const handleSwitchJar = async (jarId: string) => {
         if (jarId === activeJar?.id) return;
@@ -266,7 +268,7 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
                 onClose={() => setIsCreateModalOpen(false)}
                 hasRomanticJar={hasRomanticJar}
                 isPro={!!user.isPremium}
-                currentJarCount={user.memberships.length}
+                currentJarCount={memberships.length}
             />
 
             <JoinJarModal
