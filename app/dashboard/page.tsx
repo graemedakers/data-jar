@@ -508,12 +508,18 @@ export default function DashboardPage() {
             <header className="flex flex-col gap-2 mb-6 md:mb-16">
                 <div className="flex flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <JarSwitcher
-                            user={userData || { id: '', email: '', name: '', memberships: [], activeJarId: null }}
-                            variant="title"
-                            className="min-w-0"
-                            onSwitch={handleContentUpdate}
-                        />
+                        {userData ? (
+                            <JarSwitcher
+                                user={userData}
+                                variant="title"
+                                className="min-w-0"
+                                onSwitch={handleContentUpdate}
+                            />
+                        ) : (
+                            <h1 className="text-lg md:text-3xl font-bold text-slate-400 dark:text-slate-500 tracking-tight flex items-center gap-2">
+                                <span className="animate-pulse">Loading jars...</span>
+                            </h1>
+                        )}
                     </div>
 
                     <div className="flex gap-2 items-center justify-end">
