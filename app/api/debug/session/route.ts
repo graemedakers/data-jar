@@ -9,6 +9,7 @@ export async function GET() {
     return NextResponse.json({
         hasSession: !!session,
         userEmail: session?.user?.email || null,
+        userId: session?.user?.id || null,
         expires: session?.expires || null
     });
 }

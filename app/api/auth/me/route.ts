@@ -1,3 +1,4 @@
+
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
@@ -14,90 +15,77 @@ export async function GET() {
         return NextResponse.json({ user: null });
     }
 
-    console.log(`[Auth/Me] Looking up user by email: ${session.user.email}`);
+    const lookupEmail = session.user.email.trim(); // Keep original case first for strict match, but trim whitespace
+    const userSessionId = session.user.id;
+
+    console.log(`[Auth/Me] Looking up user by email: '${lookupEmail}' or ID: ${userSessionId}`);
 
     try {
-        let user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-            include: {
-                // Fetch ALL memberships including deleted ones (we filter in code)
-                memberships: {
-                    include: {
-                        jar: {
-                            include: {
-                                members: {
-                                    include: { user: { select: { id: true, name: true } } }
-                                },
-                                achievements: true
-                            }
-                        }
-                    }
-                },
-                // Legacy fallback support for migration
-                couple: {
-                    include: {
-                        members: {
-                            include: { user: { select: { id: true } } }
-                        },
-                        achievements: true
-                    }
-                }
-            },
-        });
+        let user = null;
 
-        // Fallback: Case-insensitive lookup if strict lookup failed
-        if (!user) {
-            console.log(`[Auth/Me] Strict lookup failed. Trying case-insensitive for: ${session.user.email}`);
-            user = await prisma.user.findFirst({
-                where: {
-                    email: {
-                        equals: session.user.email,
-                        mode: 'insensitive'
-                    }
-                },
+        const commonInclude = {
+            memberships: {
                 include: {
-                    memberships: {
-                        include: {
-                            jar: {
-                                include: {
-                                    members: {
-                                        include: { user: { select: { id: true, name: true } } }
-                                    },
-                                    achievements: true
-                                }
-                            }
-                        }
-                    },
-                    couple: {
+                    jar: {
                         include: {
                             members: {
-                                include: { user: { select: { id: true } } }
+                                include: { user: { select: { id: true, name: true } } }
                             },
                             achievements: true
                         }
                     }
                 }
+            },
+            couple: {
+                include: {
+                    members: {
+                        include: { user: { select: { id: true } } }
+                    },
+                    achievements: true
+                }
+            }
+        };
+
+        // Priority 1: Lookup by ID if available (Most reliable)
+        if (userSessionId) {
+            user = await prisma.user.findUnique({
+                where: { id: userSessionId },
+                include: commonInclude
+            });
+        }
+
+        // Priority 2: Strict Lookup by Email (if no ID or ID lookup failed)
+        if (!user) {
+            user = await prisma.user.findUnique({
+                where: { email: lookupEmail },
+                include: commonInclude
+            });
+        }
+
+        // Priority 3: Case-insensitive fallback
+        if (!user) {
+            console.log(`[Auth/Me] Strict lookup failed. Trying case-insensitive for: ${lookupEmail}`);
+            user = await prisma.user.findFirst({
+                where: {
+                    email: {
+                        equals: lookupEmail,
+                        mode: 'insensitive'
+                    }
+                },
+                include: commonInclude
             });
         }
 
         if (!user) {
-            console.log(`[Auth/Me] User not found in DB for email: ${session.user.email}`);
+            console.log(`[Auth/Me] User not found in DB for email: ${lookupEmail}`);
             return NextResponse.json({ user: null });
         }
 
         console.log(`[Auth/Me] User found: ${user.id}`);
 
         // 1. FILTER DELETED JARS SAFEGUARD (Handles null/undefined gracefully)
-        // This ensures existing users with null 'deleted' fields (from early migration) are treated as active
         if (user.memberships) {
             // TEMPORARILY DISABLED FILTER to debug production user issue
-            /*
-           user.memberships = user.memberships.filter(m => {
-               // Keep if jar exists AND (deleted is false OR deleted is null/undefined)
-               const jar = m.jar as any;
-               return jar && (jar.deleted === false || jar.deleted === null || jar.deleted === undefined);
-           });
-           */
         }
 
         // 2. DETERMINE ACTIVE JAR

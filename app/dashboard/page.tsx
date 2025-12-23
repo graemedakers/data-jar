@@ -930,6 +930,7 @@ function DebugSessionPanel({ userData, isLoadingUser }: { userData: any, isLoadi
                     <p><strong>Checking Check:</strong> {sessionDebug ? 'Complete' : 'Loading...'}</p>
                     <p><strong>Hash Session:</strong> {String(sessionDebug?.hasSession)}</p>
                     <p><strong>Data Email:</strong> {sessionDebug?.userEmail || 'NULL'}</p>
+                    <p><strong>Session ID:</strong> {sessionDebug?.userId || 'NULL'}</p>
                     <p className="mt-2 font-bold text-yellow-400 mb-1">--- CLIENT STATE ---</p>
                     <p><strong>Loading:</strong> {String(isLoadingUser)}</p>
                     <p><strong>User Data:</strong> {userData ? 'Present' : 'NULL'}</p>
