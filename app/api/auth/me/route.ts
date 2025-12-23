@@ -78,6 +78,43 @@ export async function GET() {
             activeJar = user.couple;
         }
 
+        // Priority 4: Orphaned ActiveJarId Recovery
+        // If the user has an activeJarId but it wasn't found in memberships/couple (e.g. migration desync),
+        // try to fetch it directly and verify access.
+        if (!activeJar && user.activeJarId) {
+            try {
+                const orphanedJar = await prisma.jar.findUnique({
+                    where: { id: user.activeJarId },
+                    include: {
+                        members: {
+                            include: { user: { select: { id: true, name: true } } }
+                        },
+                        achievements: true,
+                        // Check if user is in legacyUsers list
+                        legacyUsers: {
+                            where: { id: user.id },
+                            select: { id: true }
+                        }
+                    }
+                });
+
+                if (orphanedJar) {
+                    // Check access rights
+                    // 1. Is in members list? (Should have been caught by memberships include, but double check)
+                    const isMember = orphanedJar.members.some(m => m.userId === user.id);
+                    // 2. Is in legacyUsers?
+                    const isLegacy = orphanedJar.legacyUsers.length > 0;
+
+                    if (isMember || isLegacy) {
+                        console.log(`[Auth/Me] Recovered orphaned jar ${orphanedJar.id} for user ${user.id}`);
+                        activeJar = orphanedJar;
+                    }
+                }
+            } catch (e) {
+                console.warn("Failed to fetch orphaned jar", e);
+            }
+        }
+
         // Calculate user status
         const userIsPro = isUserPro(user);
 
