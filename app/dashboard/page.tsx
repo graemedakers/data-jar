@@ -872,25 +872,25 @@ export default function DashboardPage() {
                             </div>
                         </motion.div>
 
-                        {userData?.jarType !== 'SOCIAL' && (
-                            <motion.div
-                                whileHover={{ scale: 1.02, y: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="bg-white dark:bg-slate-900/40 backdrop-blur-md border border-rose-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-500/40 transition-all shadow-lg shadow-black/5 dark:shadow-black/20"
-                                onClick={() => isPremium ? setIsDateNightOpen(true) : setIsPremiumModalOpen(true)}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="w-12 h-12 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-300 ring-1 ring-rose-500/30">
-                                        <Moon className="w-6 h-6" />
-                                    </div>
-                                    {!isPremium && <Lock className="w-5 h-5 text-slate-400" />}
+                        <motion.div
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-white dark:bg-slate-900/40 backdrop-blur-md border border-rose-500/20 rounded-2xl p-6 flex flex-col gap-4 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-500/40 transition-all shadow-lg shadow-black/5 dark:shadow-black/20"
+                            onClick={() => isPremium ? setIsDateNightOpen(true) : setIsPremiumModalOpen(true)}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="w-12 h-12 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-300 ring-1 ring-rose-500/30">
+                                    <Moon className="w-6 h-6" />
                                 </div>
-                                <div>
-                                    <span className="block text-xl font-bold text-slate-900 dark:text-white mb-2">Date Night Planner</span>
-                                    <span className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed block group-hover:text-rose-700 dark:group-hover:text-rose-200/70 transition-colors">Plan a complete evening: Drinks, Dinner & Event.</span>
-                                </div>
-                            </motion.div>
-                        )}
+                                {!isPremium && <Lock className="w-5 h-5 text-slate-400" />}
+                            </div>
+                            <div>
+                                <span className="block text-xl font-bold text-slate-900 dark:text-white mb-2">
+                                    {userData?.jarType === 'SOCIAL' ? 'Big Night Planner' : 'Date Night Planner'}
+                                </span>
+                                <span className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed block group-hover:text-rose-700 dark:group-hover:text-rose-200/70 transition-colors">Plan a complete evening: Drinks, Dinner & Event.</span>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
 
