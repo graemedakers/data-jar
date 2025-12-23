@@ -7,9 +7,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     const session = await getSession();
+    console.log("[Auth/Me] Session check:", session ? "Session Found" : "No Session");
+
     if (!session?.user?.email) {
+        console.log("[Auth/Me] No email in session");
         return NextResponse.json({ user: null });
     }
+
+    console.log(`[Auth/Me] Looking up user by email: ${session.user.email}`);
 
     try {
         const user = await prisma.user.findUnique({
@@ -41,20 +46,23 @@ export async function GET() {
         });
 
         if (!user) {
+            console.log(`[Auth/Me] User not found in DB for email: ${session.user.email}`);
             return NextResponse.json({ user: null });
         }
+
+        console.log(`[Auth/Me] User found: ${user.id}`);
 
         // 1. FILTER DELETED JARS SAFEGUARD (Handles null/undefined gracefully)
         // This ensures existing users with null 'deleted' fields (from early migration) are treated as active
         if (user.memberships) {
             // TEMPORARILY DISABLED FILTER to debug production user issue
             /*
-            user.memberships = user.memberships.filter(m => {
-                // Keep if jar exists AND (deleted is false OR deleted is null/undefined)
-                const jar = m.jar as any;
-                return jar && (jar.deleted === false || jar.deleted === null || jar.deleted === undefined);
-            });
-            */
+           user.memberships = user.memberships.filter(m => {
+               // Keep if jar exists AND (deleted is false OR deleted is null/undefined)
+               const jar = m.jar as any;
+               return jar && (jar.deleted === false || jar.deleted === null || jar.deleted === undefined);
+           });
+           */
         }
 
         // 2. DETERMINE ACTIVE JAR
@@ -79,8 +87,6 @@ export async function GET() {
         }
 
         // Priority 4: Orphaned ActiveJarId Recovery
-        // If the user has an activeJarId but it wasn't found in memberships/couple (e.g. migration desync),
-        // try to fetch it directly and verify access.
         if (!activeJar && user.activeJarId) {
             try {
                 const orphanedJar = await prisma.jar.findUnique({
@@ -99,10 +105,7 @@ export async function GET() {
                 });
 
                 if (orphanedJar) {
-                    // Check access rights
-                    // 1. Is in members list? (Should have been caught by memberships include, but double check)
                     const isMember = orphanedJar.members.some(m => m.userId === user.id);
-                    // 2. Is in legacyUsers?
                     const isLegacy = orphanedJar.legacyUsers.length > 0;
 
                     if (isMember || isLegacy) {
@@ -154,7 +157,6 @@ export async function GET() {
         const effectivePremium = jarIsPremium || userIsPro;
 
         // CRITICAL FIX: Ensure activeJar is represented in memberships for frontend consistency
-        // If the user has an active jar (e.g. legacy couple) but it's not in memberships list (migration gap), add it.
         const membershipExists = user.memberships.some(m => m.jarId === activeJar?.id);
         const effectiveMemberships = [...user.memberships];
 
