@@ -915,7 +915,11 @@ function DebugSessionPanel({ userData, isLoadingUser }: { userData: any, isLoadi
 
     const fetchDbDump = () => {
         setDbDump({ loading: true });
-        fetch('/api/debug/db-dump?key=secret123')
+        // Use current user details if known, otherwise generic
+        const uid = userData?.id || 'edf84cfe-f4e4-43b2-b1b2-38dd41405131';
+        const jid = userData?.activeJarId || 'fa371aee-73d9-4a98-b71e-c52864b8c2d4';
+
+        fetch(`/api/debug/db-dump?key=secret123&userId=${uid}&jarId=${jid}`)
             .then(res => res.json())
             .then(data => setDbDump(data))
             .catch(err => setDbDump({ error: String(err) }));

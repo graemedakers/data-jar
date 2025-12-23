@@ -12,16 +12,38 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    try {
-        const users = await prisma.user.findMany({
-            take: 10,
-            select: { id: true, email: true, name: true, activeJarId: true }
-        });
+    const targetUserId = searchParams.get('userId');
+    const targetJarId = searchParams.get('jarId');
 
-        const jars = await prisma.jar.findMany({
-            take: 5,
-            select: { id: true, name: true }
-        });
+    let users, jars, members;
+
+    try {
+        if (targetUserId) {
+            users = await prisma.user.findMany({
+                where: { id: targetUserId },
+                include: { memberships: true, couple: true }
+            });
+            members = await prisma.jarMember.findMany({
+                where: { userId: targetUserId }
+            });
+        } else {
+            users = await prisma.user.findMany({
+                take: 10,
+                select: { id: true, email: true, name: true, activeJarId: true }
+            });
+        }
+
+        if (targetJarId) {
+            jars = await prisma.jar.findMany({
+                where: { id: targetJarId },
+                include: { members: true, legacyUsers: { select: { id: true } } }
+            });
+        } else {
+            jars = await prisma.jar.findMany({
+                take: 5,
+                select: { id: true, name: true }
+            });
+        }
 
         const countUsers = await prisma.user.count();
 
