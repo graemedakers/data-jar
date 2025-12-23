@@ -131,8 +131,8 @@ export function JarSwitcher({ user, className, variant = 'default', onSwitch }: 
                                     </>
                                 ) : (
                                     <>
-                                        Dashboard
-                                        <span className="text-base font-normal text-slate-500">(No Jar)</span>
+                                        <span className="truncate">Dashboard</span>
+                                        <span className="text-sm md:text-base font-normal text-slate-500 whitespace-nowrap">(No Jar)</span>
                                     </>
                                 )}
                             </h1>
