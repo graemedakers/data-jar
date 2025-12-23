@@ -600,10 +600,10 @@ export default function DashboardPage() {
                 )
             }
 
-            {/* Debug Panel for User Diagnosis */}
-            {userData?.id === 'edf84cfe-f4e4-43b2-b1b2-38dd41405131' && (
+            {/* Debug Panel for User Diagnosis (ALL USERS for verification) */}
+            {userData && (
                 <div className="mb-8 p-4 bg-slate-800 text-cyan-400 border border-cyan-500 rounded-lg font-mono text-xs overflow-auto">
-                    <h3 className="font-bold text-white mb-2">DEBUG DIAGNOSTICS</h3>
+                    <h3 className="font-bold text-white mb-2">DEBUG DIAGNOSTICS (Global)</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <p><strong>User ID:</strong> {userData.id}</p>
