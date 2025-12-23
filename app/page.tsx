@@ -251,7 +251,7 @@ export default function Home() {
             </div>
             <h1 className="text-3xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 dark:from-white dark:via-white dark:to-slate-400 tracking-tight leading-[1.1] break-words">
               The Ultimate <br />
-              <span className="text-primary dark:text-accent">Decision Maker</span> <br />
+              <span className="text-primary dark:text-accent">Ideas Generator</span> <br />
               For Couples & Groups.
             </h1>
             <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto md:mx-0 leading-relaxed break-words">
