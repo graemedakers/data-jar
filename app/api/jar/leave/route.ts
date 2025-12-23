@@ -57,33 +57,16 @@ export async function POST(request: Request) {
                 }
             });
 
-            // If last member, delete the Jar and all related data
+            // If last member, soft delete the jar (preserves memories)
             if (memberCount <= 1) {
-                // Delete all related records first (in correct order to avoid FK violations)
-
-                // Delete ideas (which will cascade delete ratings if configured)
-                await tx.idea.deleteMany({
-                    where: { jarId }
-                });
-
-                // Delete achievements
-                await tx.unlockedAchievement.deleteMany({
-                    where: { jarId }
-                });
-
-                // Delete favorites
-                await tx.favoriteVenue.deleteMany({
-                    where: { jarId }
-                });
-
-                // Delete deleted logs
-                await tx.deletedLog.deleteMany({
-                    where: { jarId }
-                });
-
-                // Finally delete the Jar
-                await tx.jar.delete({
-                    where: { id: jarId }
+                // Soft delete: Mark jar as deleted instead of actually deleting it
+                // This preserves all ideas (including memories) for historical access
+                await tx.jar.update({
+                    where: { id: jarId },
+                    data: {
+                        deleted: true,
+                        deletedAt: new Date()
+                    }
                 });
             } else {
                 // If Jar remains, and it is Romantic, regenerate code for security

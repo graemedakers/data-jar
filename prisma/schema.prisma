@@ -36,6 +36,10 @@ model Jar {
   isPremium     Boolean  @default(false)
   isTrialEligible Boolean @default(true)
   
+  // Soft delete for memory preservation
+  deleted       Boolean  @default(false)
+  deletedAt     DateTime?
+  
   // Subscription Fields
   stripeCustomerId String?
   stripeSubscriptionId String?

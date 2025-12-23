@@ -26,6 +26,11 @@ export async function GET() {
                                 achievements: true
                             }
                         }
+                    },
+                    where: {
+                        jar: {
+                            deleted: false // Only fetch non-deleted jars
+                        }
                     }
                 },
                 // Legacy fallback support
