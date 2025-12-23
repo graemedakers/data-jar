@@ -674,10 +674,14 @@ export default function DashboardPage() {
                     {/* Left Column: Input & Management */}
                     <div className="space-y-6 order-2 xl:order-1">
                         <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handleAddIdeaClick}
-                            className="w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 cursor-pointer transition-all bg-gradient-to-br from-violet-600/20 to-violet-900/40 border border-violet-500/30 hover:border-violet-500/50 shadow-lg shadow-violet-900/10 group"
+                            whileHover={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 1.02 } : {}}
+                            whileTap={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 0.95 } : {}}
+                            onClick={userData && userData.memberships && userData.memberships.length > 0 ? handleAddIdeaClick : undefined}
+                            disabled={!userData || !userData.memberships || userData.memberships.length === 0}
+                            className={`w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 transition-all bg-gradient-to-br from-violet-600/20 to-violet-900/40 border border-violet-500/30 shadow-lg shadow-violet-900/10 group ${!userData || !userData.memberships || userData.memberships.length === 0
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'cursor-pointer hover:border-violet-500/50'
+                                }`}
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="w-12 h-12 shrink-0 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-200 group-hover:scale-110 transition-transform relative z-10 border border-violet-500/30">
@@ -694,10 +698,14 @@ export default function DashboardPage() {
 
                         {userData?.jarType !== 'SOCIAL' && (
                             <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setIsSurpriseModalOpen(true)}
-                                className="w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 cursor-pointer transition-all bg-gradient-to-br from-yellow-500/20 to-orange-600/40 border border-yellow-500/30 hover:border-yellow-500/50 shadow-lg shadow-yellow-900/10 group"
+                                whileHover={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 1.02 } : {}}
+                                whileTap={userData && userData.memberships && userData.memberships.length > 0 ? { scale: 0.95 } : {}}
+                                onClick={userData && userData.memberships && userData.memberships.length > 0 ? () => setIsSurpriseModalOpen(true) : undefined}
+                                disabled={!userData || !userData.memberships || userData.memberships.length === 0}
+                                className={`w-full relative overflow-hidden rounded-2xl p-6 flex flex-row items-center justify-start gap-4 transition-all bg-gradient-to-br from-yellow-500/20 to-orange-600/40 border border-yellow-500/30 shadow-lg shadow-yellow-900/10 group ${!userData || !userData.memberships || userData.memberships.length === 0
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'cursor-pointer hover:border-yellow-500/50'
+                                    }`}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <div className="w-12 h-12 shrink-0 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-200 group-hover:scale-110 transition-transform relative z-10 border border-yellow-500/30">
@@ -884,6 +892,6 @@ export default function DashboardPage() {
                     </button>
                 </div>
             </div>
-        </main>
+        </main >
     );
 }
