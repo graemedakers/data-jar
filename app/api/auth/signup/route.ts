@@ -36,7 +36,7 @@ export async function POST(request: Request) {
                     referenceCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
                     location: location || 'Unknown',
                     isPremium: false,
-                    name: `${name}'s Decision Jar`, // Default name
+                    name: `${name}'s Date Jar`, // Default name
                     type: "ROMANTIC"
                 },
             });
@@ -47,6 +47,7 @@ export async function POST(request: Request) {
                     email,
                     name,
                     passwordHash,
+                    homeTown: location || 'Unknown',
                     activeJarId: jar.id,
                     coupleId: jar.id, // Legacy support
                     hasUsedTrial: false, // Default false until they subscribe/start trial
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
                     email,
                     name,
                     passwordHash,
+                    homeTown: location || 'Unknown',
                     activeJarId: jar.id,
                     coupleId: jar.id, // Legacy support
                     verificationToken,

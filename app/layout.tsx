@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://date-jar.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://datejar.com'),
   title: {
     default: "Date Jar | The Ultimate Ideas Generator",
     template: "%s | Date Jar",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://date-jar.com",
+    url: "https://datejar.com",
     title: "Date Jar | The Ultimate Ideas Generator",
     description: "Stop asking 'What do you want to do?'. Let the Date Jar decide.",
     siteName: "Date Jar",

@@ -2,10 +2,10 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.datejar.app',
-  appName: 'Decision Jar',
+  appName: 'Date Jar',
   webDir: 'public',
   server: {
-    url: 'https://date-jar.com', // Production domain
+    url: 'https://datejar.com', // Production domain
     cleartext: true
   }
 };
